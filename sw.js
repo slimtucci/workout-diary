@@ -1,5 +1,5 @@
 /* SlimTucci Workout Diary service worker: offline app shell. Bump VERSION on every deploy. */
-const VERSION = 'st-diary-v6';
+const VERSION = 'st-diary-v7';
 const SHELL = [
   './', './index.html', './styles.css', './app.js', './config.js', './exercises-library.js', './macros-calc.js', './manifest.webmanifest',
   './icons/icon-192.png', './icons/icon-512.png', './icons/icon-maskable-512.png',
