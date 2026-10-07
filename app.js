@@ -79,19 +79,27 @@
     const t = (name, items) => ({ id: uid(), name, items: items.map(([n, sets, reps]) => ({ exId: by(n), sets, reps: String(reps) })) });
     return {
       version: 1,
-      settings: { programStart: weekStart(todayStr()) },
+      settings: { programStart: weekStart(todayStr()), samplesCleared: true },
       exercises: ex,
-      templates: [
-        t('Monday Lower + Rotation', [['Barbell Back Squat', 4, 5], ['Barbell RDL', 3, 6], ['Bulgarian Split Squat', 3, 8], ['Lateral Lunge', 3, 8], ['Landmine Rotation', 3, 8], ['Cable Woodchop', 3, 10]]),
-        t('Wednesday Upper (Unilateral)', [['Single-Arm DB Bench', 4, 8], ['Single-Arm DB Row', 4, 10], ['Landmine Press', 3, 8], ['Single-Arm Pulldown', 3, 10]]),
-        t('Friday Upper + Rotational Core', [['Bench Press', 4, 5], ['Pull-Up', 4, 6], ['Med Ball Rotational Throw', 3, 5], ['Pallof Press', 3, 10]]),
-        t('Saturday Full Body (Unilateral)', [['Trap Bar Deadlift', 3, 5], ['Cossack Squat', 3, 6], ['Single-Leg RDL', 3, 8], ['Lateral Sled Drag', 4, 20], ['Suitcase Carry', 3, 40]])
-      ],
+      templates: [],
       sessions: []
     };
   }
   function load() {
-    try { const raw = localStorage.getItem(KEY); if (raw) return normalize(JSON.parse(raw)); } catch (e) { console.error(e); }
+    try {
+      const raw = localStorage.getItem(KEY);
+      if (raw) {
+        const d = normalize(JSON.parse(raw));
+        // one-time cleanup: drop the starter sample workouts shipped in the first release
+        if (!d.settings.samplesCleared) {
+          const SAMPLE = ['Monday Lower + Rotation', 'Wednesday Upper (Unilateral)', 'Friday Upper + Rotational Core', 'Saturday Full Body (Unilateral)'];
+          d.templates = d.templates.filter((t) => !SAMPLE.includes(t.name));
+          d.settings.samplesCleared = true;
+          localStorage.setItem(KEY, JSON.stringify(d));
+        }
+        return d;
+      }
+    } catch (e) { console.error(e); }
     const s = seed(); localStorage.setItem(KEY, JSON.stringify(s)); return s;
   }
   function normalize(d) {
