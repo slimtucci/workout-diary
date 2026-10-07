@@ -10,6 +10,7 @@
   const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const MON = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
   const DOW = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  const DOW_LONG = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
   const pad = (n) => String(n).padStart(2, '0');
   function todayStr() { const d = new Date(); return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()); }
   // Dates are plain 'YYYY-MM-DD' strings; math is done in UTC so DST never shifts a day.
@@ -39,10 +40,13 @@
     if (withYear || d.getUTCFullYear() !== new Date().getFullYear()) r += `, ${d.getUTCFullYear()}`;
     return r;
   }
+  function fmtLongDate(s) { const d = new Date(toMs(s)); return `${DOW_LONG[d.getUTCDay()]}, ${MON[d.getUTCMonth()]} ${d.getUTCDate()}`; }
+  function relDay(s) { const t = todayStr(); return s === t ? 'Today' : s === addDays(t, -1) ? 'Yesterday' : s === addDays(t, 1) ? 'Tomorrow' : ''; }
   const num = (v) => (v === '' || v == null || isNaN(Number(v)) ? null : Number(v));
   const fmtW = (w) => (w == null ? 'BW' : (Math.round(w * 100) / 100).toString());
   const fmtSet = (st) => `${fmtW(num(st.weight))} × ${num(st.reps) == null ? '–' : num(st.reps)}`;
   const isLogged = (st) => num(st.weight) != null || num(st.reps) != null;
+  const plural = (n, w) => `${n} ${w}${n === 1 ? '' : 's'}`;
   function topSet(sets) {
     let best = null;
     for (const st of sets || []) {
@@ -64,25 +68,89 @@
   }
   const fmtVol = (v) => (v >= 10000 ? (v / 1000).toFixed(1) + 'k' : v.toLocaleString());
 
+  // ---------- built-in exercise library (exercises-library.js) ----------
+  const LIB = window.SLIMTUCCI_LIBRARY || { categories: [], items: [] };
+  const CAT_LABEL = Object.fromEntries(LIB.categories.map((c) => [c.key, c.label]));
+  const CAT_KEY = Object.fromEntries(LIB.categories.map((c) => [c.label.toLowerCase(), c.key]));
+  const CHIP_SHORT = { push: 'Push', pull: 'Pull', legs: 'Legs', core: 'Core', power: 'Power & Plyo', carry: 'Carries', cardio: 'Cardio', agility: 'Agility', mobility: 'Mobility', stretch: 'Stretching' };
+  const norm = (s) => String(s || '').toLowerCase().replace(/[’']/g, '').replace(/[^a-z0-9]+/g, ' ').trim();
+  const LIB_ITEMS = LIB.items.map(([name, cat, sub, equip], i) => ({ i, name, cat, sub, equip, key: norm(name), hay: ' ' + norm([name, CAT_LABEL[cat], sub, equip].join(' ')) }));
+  const SYN = { db: 'dumbbell', dbs: 'dumbbell', bb: 'barbell', kb: 'kettlebell', kbs: 'kettlebell', rdl: 'romanian deadlift', sldl: 'stiff leg deadlift',
+    ohp: 'overhead press', mb: 'med ball', bss: 'bulgarian split squat', ghr: 'glute ham raise', sl: 'single leg', sa: 'single arm', bw: 'bodyweight',
+    lat: 'lat', pulldown: 'pulldown', pullup: 'pull up', pushup: 'push up', chinup: 'chin up', situp: 'sit up', stepup: 'step up', trx: 'suspension', ez: 'ez' };
+  function queryTokens(q) {
+    const out = [];
+    for (const t of norm(q).split(' ').filter(Boolean)) (SYN[t] ? SYN[t].split(' ') : [t]).forEach((x) => out.push(x));
+    return out;
+  }
+  function lev(a, b) {
+    if (Math.abs(a.length - b.length) > 1) return 2;
+    const dp = Array.from({ length: a.length + 1 }, (_, i) => [i]);
+    for (let j = 1; j <= b.length; j++) dp[0][j] = j;
+    for (let i = 1; i <= a.length; i++) for (let j = 1; j <= b.length; j++)
+      dp[i][j] = Math.min(dp[i - 1][j] + 1, dp[i][j - 1] + 1, dp[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+    return dp[a.length][b.length];
+  }
+  function fuzzyWord(t, words) {
+    if (t.length < 3) return false;
+    return words.some((w) => (t.length >= 4 && (lev(t, w) <= 1 || lev(t, w.slice(0, t.length)) <= 1)));
+  }
+  // "fuzzy-ish": every token must appear (substring) or be a 1-typo match for a word in the name.
+  function scoreItem(tokens, hay, key) {
+    if (!tokens.length) return 0;
+    let score = 0; let words = null;
+    for (const t of tokens) {
+      const i = hay.indexOf(t);
+      if (i >= 0) { score += hay[i - 1] === ' ' ? 3 : 1; if (key.startsWith(t)) score += 2; continue; }
+      words = words || key.split(' ');
+      if (fuzzyWord(t, words)) { score += 0.5; continue; }
+      return -1;
+    }
+    if (key.startsWith(tokens.join(' '))) score += 6;
+    return score - key.length / 200;
+  }
+  const mineHay = (e) => ' ' + norm([e.name, e.cat, e.sub, e.equip].join(' '));
+  function searchList(list, q, hayFn, keyFn) {
+    const tokens = queryTokens(q);
+    if (!tokens.length) return list.slice();
+    return list.map((x) => [x, scoreItem(tokens, hayFn(x), keyFn(x))]).filter((p) => p[1] >= 0).sort((a, b) => b[1] - a[1]).map((p) => p[0]);
+  }
+  function catKeyOf(ex) { return CAT_KEY[String(ex.cat || '').toLowerCase()] || null; }
+  function findMineByName(name) { const k = norm(name); return state.exercises.find((e) => norm(e.name) === k); }
+  // add a library movement to "My exercises" (or return the existing one)
+  function ensureMine(libItem) {
+    const have = findMineByName(libItem.name);
+    if (have) return { ex: have, created: false };
+    const ex = { id: uid(), name: libItem.name, cat: CAT_LABEL[libItem.cat], sub: libItem.sub, equip: libItem.equip, notes: '' };
+    state.exercises.push(ex); save();
+    return { ex, created: true };
+  }
+  function createCustom(name, catKey) {
+    const have = findMineByName(name);
+    if (have) return { ex: have, created: false };
+    const ex = { id: uid(), name: name.trim(), cat: catKey ? CAT_LABEL[catKey] : 'Custom', sub: '', equip: '', notes: '' };
+    state.exercises.push(ex); save();
+    return { ex, created: true };
+  }
+
   // ---------- state ----------
   let state;
   function seed() {
     const names = [
-      ['Barbell Back Squat', 'Legs'], ['Barbell RDL', 'Legs'], ['Bulgarian Split Squat', 'Legs'], ['Lateral Lunge', 'Legs'],
-      ['Cossack Squat', 'Legs'], ['Single-Leg RDL', 'Legs'], ['Landmine Rotation', 'Rotation'], ['Cable Woodchop', 'Rotation'],
-      ['Med Ball Rotational Throw', 'Rotation'], ['Pallof Press', 'Core'], ['Bench Press', 'Push'], ['Single-Arm DB Bench', 'Push'],
-      ['Landmine Press', 'Push'], ['Pull-Up', 'Pull'], ['Single-Arm DB Row', 'Pull'], ['Single-Arm Pulldown', 'Pull'],
-      ['Trap Bar Deadlift', 'Full body'], ['Suitcase Carry', 'Carry'], ['Farmer Carry', 'Carry'], ['Lateral Sled Drag', 'Conditioning']
+      ['Barbell Back Squat', 'Legs', 'Squat'], ['Romanian Deadlift', 'Legs', 'Hinge'], ['Bulgarian Split Squat', 'Legs', 'Lunge'], ['Lateral Lunge', 'Legs', 'Lunge'],
+      ['Cossack Squat', 'Legs', 'Squat'], ['Single-Leg Romanian Deadlift', 'Legs', 'Hinge'], ['Landmine Rotation', 'Core', 'Rotation'], ['Cable Woodchop', 'Core', 'Rotation'],
+      ['Med Ball Rotational Throw', 'Core', 'Rotation'], ['Pallof Press', 'Core', 'Anti-Rotation'], ['Barbell Bench Press', 'Push', 'Chest'], ['Single-Arm Dumbbell Bench Press', 'Push', 'Chest'],
+      ['Landmine Press', 'Push', 'Shoulders'], ['Pull-Up', 'Pull', 'Back'], ['Single-Arm Dumbbell Row', 'Pull', 'Back'], ['Single-Arm Lat Pulldown', 'Pull', 'Back'],
+      ['Trap Bar Deadlift', 'Legs', 'Hinge'], ['Suitcase Carry', 'Carries & Strongman', 'Carries'], ["Farmer's Carry", 'Carries & Strongman', 'Carries'], ['Lateral Sled Drag', 'Carries & Strongman', 'Strongman & Sled']
     ];
-    const ex = names.map(([name, cat]) => ({ id: uid(), name, cat, notes: '' }));
-    const by = (n) => ex.find((e) => e.name === n).id;
-    const t = (name, items) => ({ id: uid(), name, items: items.map(([n, sets, reps]) => ({ exId: by(n), sets, reps: String(reps) })) });
+    const ex = names.map(([name, cat, sub]) => { const li = LIB_ITEMS.find((x) => x.name === name); return { id: uid(), name, cat, sub, equip: li ? li.equip : '', notes: '' }; });
     return {
       version: 1,
       settings: { programStart: weekStart(todayStr()), samplesCleared: true },
       exercises: ex,
       templates: [],
-      sessions: []
+      sessions: [],
+      plans: []
     };
   }
   function load() {
@@ -107,6 +175,10 @@
     if (!d || !Array.isArray(d.exercises) || !Array.isArray(d.templates) || !Array.isArray(d.sessions)) throw new Error('Not a SlimTucci diary backup');
     d.settings = d.settings || {};
     if (!('programStart' in d.settings)) d.settings.programStart = null;
+    if (!Array.isArray(d.plans)) d.plans = [];
+    // map first-release category names onto the library categories
+    const LEGACY = { rotation: 'Core', carry: 'Carries & Strongman', conditioning: 'Cardio & Conditioning', 'full body': 'Legs' };
+    for (const e of d.exercises) { const k = String(e.cat || '').toLowerCase(); if (LEGACY[k]) e.cat = LEGACY[k]; }
     d.version = 1;
     return d;
   }
@@ -120,6 +192,7 @@
   const exById = (id) => state.exercises.find((e) => e.id === id);
   const exName = (entry) => (exById(entry.exId) || {}).name || entry.name || '(deleted exercise)';
   const sortedSessions = () => state.sessions.slice().sort((a, b) => (b.date + b.createdAt).localeCompare(a.date + a.createdAt));
+  const tplById = (id) => state.templates.find((t) => t.id === id);
 
   function lastPerformance(exId, cur) {
     let best = null;
@@ -137,7 +210,7 @@
   let toastT;
   function toast(msg) {
     const t = document.getElementById('toast'); t.textContent = msg; t.hidden = false;
-    clearTimeout(toastT); toastT = setTimeout(() => (t.hidden = true), 2200);
+    clearTimeout(toastT); toastT = setTimeout(() => (t.hidden = true), 2400);
   }
   function setChrome(title, back) {
     document.getElementById('title').textContent = title;
@@ -145,132 +218,254 @@
     document.getElementById('backBtn').hidden = !back;
     const tab = location.hash.split('/')[1] || 'home';
     const map = { '': 'home', log: 'home', history: 'history', exercises: 'exercises', exercise: 'exercises', templates: 'templates', template: 'templates', settings: 'settings' };
-    document.querySelectorAll('.tabbar a').forEach((a) => a.classList.toggle('active', a.dataset.tab === (map[tab] || tab)));
+    document.querySelectorAll('.tabbar a').forEach((a) => { const on = a.dataset.tab === (map[tab] || tab); a.classList.toggle('active', on); if (on) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); });
+    document.body.classList.toggle('has-actionbar', tab === 'log');
   }
   function go(h) { if (location.hash === h) render(); else location.hash = h; }
+  function emptyState(icon, title, sub, btnHtml) {
+    return `<div class="empty"><div class="empty-ico" aria-hidden="true">${icon}</div><div class="empty-title">${title}</div>${sub ? `<div class="empty-sub">${sub}</div>` : ''}${btnHtml || ''}</div>`;
+  }
 
-  // exercise picker bottom sheet
-  function pickExercise(title, onPick) {
+  // generic bottom sheet
+  function openSheet(title, bodyHtml, onClick, opts = {}) {
     const bg = document.createElement('div'); bg.className = 'sheet-bg';
-    bg.innerHTML = `<div class="sheet" role="dialog" aria-label="${esc(title)}"><h3>${esc(title)}</h3>
-      <input type="search" id="pickQ" placeholder="Search or type a new exercise" autocomplete="off">
-      <div id="pickList" style="margin-top:10px"></div>
-      <button class="btn ghost block" data-x="close" style="margin-top:6px">Cancel</button></div>`;
+    bg.innerHTML = `<div class="sheet${opts.tall ? ' tall' : ''}" role="dialog" aria-modal="true" aria-label="${esc(title)}">
+      <div class="sheet-grab" aria-hidden="true"></div>
+      <div class="sheet-head"><h3>${esc(title)}</h3><button class="btn ${opts.doneLabel ? 'primary' : 'ghost'} sm" data-x="close">${esc(opts.doneLabel || 'Close')}</button></div>
+      <div class="sheet-body">${bodyHtml}</div></div>`;
     document.body.appendChild(bg);
-    const q = bg.querySelector('#pickQ'), list = bg.querySelector('#pickList');
-    const close = () => bg.remove();
-    function draw() {
-      const v = q.value.trim().toLowerCase();
-      const hits = state.exercises.filter((e) => !v || e.name.toLowerCase().includes(v) || (e.cat || '').toLowerCase().includes(v));
-      const exact = state.exercises.some((e) => e.name.toLowerCase() === v);
-      list.innerHTML = (v && !exact ? `<button class="btn primary block" data-x="create" style="margin-bottom:8px">+ Create “${esc(q.value.trim())}”</button>` : '') +
-        hits.map((e) => `<div class="list-item" data-x="pick" data-id="${e.id}"><div class="grow"><div class="title">${esc(e.name)}</div>${e.cat ? `<div class="small muted">${esc(e.cat)}</div>` : ''}</div><span class="accent bold">+</span></div>`).join('') +
-        (!hits.length && !v ? '<div class="empty">No exercises yet. Type a name above.</div>' : '');
-    }
-    q.addEventListener('input', draw);
+    document.body.classList.add('sheet-open');
+    const close = () => { bg.remove(); document.body.classList.remove('sheet-open'); if (opts.onClose) opts.onClose(); };
     bg.addEventListener('click', (ev) => {
-      const el = ev.target.closest('[data-x]');
       if (ev.target === bg) return close();
-      if (!el) return;
-      if (el.dataset.x === 'close') close();
-      if (el.dataset.x === 'pick') { close(); onPick(el.dataset.id); }
-      if (el.dataset.x === 'create') { const e = { id: uid(), name: q.value.trim(), cat: '', notes: '' }; state.exercises.push(e); save(); close(); onPick(e.id); }
+      const el = ev.target.closest('[data-x]'); if (!el) return;
+      if (el.dataset.x === 'close') return close();
+      onClick && onClick(el, close, bg);
     });
-    draw(); setTimeout(() => q.focus(), 50);
+    return { bg, close };
+  }
+
+  // ---------- exercise browser (picker + Exercises tab share this) ----------
+  function chipsHTML(active, withMine) {
+    const chips = [['all', 'All']].concat(withMine ? [['mine', 'My exercises']] : []).concat(LIB.categories.map((c) => [c.key, CHIP_SHORT[c.key] || c.label]));
+    return `<div class="chips" role="tablist">${chips.map(([k, l]) => `<button class="chip${k === active ? ' on' : ''}" data-chip="${k}" role="tab" aria-selected="${k === active}">${esc(l)}</button>`).join('')}</div>`;
+  }
+  function metaLine(cat, sub, equip) { return [cat, sub, equip].filter(Boolean).map(esc).join(' · '); }
+  // returns HTML for result rows. mode: 'pick' (adds) or 'browse' (Exercises tab)
+  function resultsHTML(o) {
+    const { q, chip, limit, added, mode, seg } = o;
+    const showMine = mode === 'pick' ? chip !== 'lib' : seg === 'mine';
+    const showLib = mode === 'pick' ? chip !== 'mine' : seg === 'lib';
+    let mine = [], lib = [];
+    if (showMine) {
+      mine = state.exercises.filter((e) => chip === 'all' || chip === 'mine' || catKeyOf(e) === chip);
+      mine = searchList(mine, q, mineHay, (e) => norm(e.name));
+    }
+    if (showLib) {
+      const mineKeys = new Set(state.exercises.map((e) => norm(e.name)));
+      lib = LIB_ITEMS.filter((x) => (chip === 'all' || chip === 'mine' || x.cat === chip) && (mode === 'browse' || !mineKeys.has(x.key)));
+      lib = searchList(lib, q, (x) => x.hay, (x) => x.key);
+    }
+    const qt = q.trim();
+    const exact = qt && (state.exercises.some((e) => norm(e.name) === norm(qt)) || LIB_ITEMS.some((x) => x.key === norm(qt)));
+    const customRow = qt && !exact ? `<button class="pick-row custom" data-x="custom"><span class="pr-plus" aria-hidden="true">+</span><span class="grow"><span class="pr-name">Add custom “${esc(qt)}”</span><span class="pr-meta">Saved to My exercises${chip !== 'all' && chip !== 'mine' ? ' · ' + esc(CAT_LABEL[chip]) : ''}</span></span></button>` : '';
+    let h = '';
+    const nothing = !mine.length && !lib.length;
+    if (nothing && customRow) h += customRow;
+    if (showMine) {
+      if (mode === 'pick') h += `<div class="sec-title">My exercises <span class="count">${mine.length}</span></div>`;
+      if (mine.length) h += mine.map((e) => {
+        const isAdded = added && added.has(e.id);
+        if (mode === 'pick') return `<button class="pick-row${isAdded ? ' added' : ''}" data-x="pick-mine" data-id="${e.id}"><span class="grow"><span class="pr-name">${esc(e.name)}</span><span class="pr-meta">${metaLine(e.cat, e.sub, e.equip) || 'Custom'}</span></span><span class="pr-add" aria-hidden="true">${isAdded ? '✓ Added' : '+'}</span></button>`;
+        return `<div class="pick-row" data-exrow="${e.id}"><a class="grow rowlink" href="#/exercise/${e.id}"><span class="pr-name">${esc(e.name)}</span><span class="pr-meta">${metaLine(e.cat, e.sub, e.equip) || 'Custom'}${(() => { const lp = lastPerformance(e.id); const t = lp && topSet(lp.e.sets); return t ? ` · last ${fmtSet(t)}` : ''; })()}</span></a><span class="chev" aria-hidden="true">›</span></div>`;
+      }).join('');
+      else if (!qt && mode === 'pick') h += `<div class="sec-empty">Nothing here yet — pick from the library below.</div>`;
+      else if (!qt) h += emptyState('🏋️', 'No exercises yet', 'Browse the library and tap + to add movements you use.', `<button class="btn primary" data-x="seg-lib">Browse library</button>`);
+      else if (mode === 'browse' && !customRow) h += `<div class="sec-empty">No match in My exercises.</div>`;
+    }
+    if (showLib) {
+      const shown = lib.slice(0, limit);
+      if (mode === 'pick') h += `<div class="sec-title">Library <span class="count">${lib.length}</span></div>`;
+      if (!lib.length && qt && !(nothing && customRow)) h += `<div class="sec-empty">No library match for “${esc(qt)}”.</div>`;
+      h += shown.map((x) => {
+        const mineEx = mode === 'browse' ? findMineByName(x.name) : null;
+        const isAdded = added && added.has('lib:' + x.i);
+        const right = mode === 'browse' ? (mineEx ? '<span class="pr-have">✓ Mine</span>' : '<span class="pr-add" aria-hidden="true">+</span>') : `<span class="pr-add" aria-hidden="true">${isAdded ? '✓ Added' : '+'}</span>`;
+        return `<button class="pick-row${isAdded ? ' added' : ''}" data-x="pick-lib" data-li="${x.i}" aria-label="${esc((mineEx ? 'Open ' : 'Add ') + x.name)}"><span class="grow"><span class="pr-name">${esc(x.name)}</span><span class="pr-meta">${metaLine(x.sub === CAT_LABEL[x.cat] ? '' : x.sub, x.equip)}</span></span>${right}</button>`;
+      }).join('');
+      if (lib.length > shown.length) h += `<button class="btn ghost block" data-x="more">Show more (${lib.length - shown.length} more)</button>`;
+    }
+    if (!nothing && customRow) h += customRow;
+    return h;
+  }
+
+  // the "Add exercise" picker sheet. onPick(exerciseId) is called for every tap; sheet stays open for multi-add.
+  function pickExercise(title, onPick, onDone) {
+    const st = { q: '', chip: 'all', limit: 60, added: new Set(), mode: 'pick' };
+    const body = `<div class="picker-top"><input type="search" id="pickQ" placeholder="Search ${LIB_ITEMS.length}+ exercises" autocomplete="off" autocapitalize="off" enterkeyhint="search" aria-label="Search exercises">${chipsHTML('all', true)}</div><div id="pickList" class="pick-list"></div>`;
+    let count = 0;
+    const sh = openSheet(title, body, (el, close, bg) => {
+      const x = el.dataset.x;
+      if (x === 'pick-mine') { onPick(el.dataset.id); st.added.add(el.dataset.id); count++; toast(`Added ${exById(el.dataset.id).name}`); }
+      else if (x === 'pick-lib') {
+        const li = LIB_ITEMS[+el.dataset.li]; const r = ensureMine(li);
+        onPick(r.ex.id); st.added.add('lib:' + li.i); st.added.add(r.ex.id); count++;
+        toast(r.created ? `Added ${li.name} · saved to My exercises` : `Added ${li.name}`);
+      } else if (x === 'custom') {
+        const r = createCustom(st.q, st.chip !== 'all' && st.chip !== 'mine' ? st.chip : null);
+        onPick(r.ex.id); st.added.add(r.ex.id); count++; toast(`Added custom “${r.ex.name}”`);
+        st.q = ''; bg.querySelector('#pickQ').value = '';
+      } else if (x === 'more') st.limit += 100;
+      else return;
+      updDone(); draw();
+    }, { tall: true, doneLabel: 'Done', onClose: () => onDone && onDone(count) });
+    const bg = sh.bg, list = bg.querySelector('#pickList'), q = bg.querySelector('#pickQ');
+    const doneBtn = bg.querySelector('[data-x="close"]');
+    function updDone() { doneBtn.textContent = count ? `Done (${count})` : 'Done'; }
+    function draw() { list.innerHTML = resultsHTML(st); }
+    q.addEventListener('input', () => { st.q = q.value; st.limit = 60; draw(); list.scrollTop = 0; });
+    bg.querySelector('.chips').addEventListener('click', (ev) => {
+      const c = ev.target.closest('[data-chip]'); if (!c) return;
+      st.chip = c.dataset.chip; st.limit = 60;
+      bg.querySelectorAll('.chip').forEach((b) => { b.classList.toggle('on', b === c); b.setAttribute('aria-selected', b === c); });
+      draw(); list.scrollTop = 0;
+    });
+    draw();
+    setTimeout(() => q.focus({ preventScroll: true }), 60);
   }
 
   // ---------- views ----------
-  function weekCard(anchor, opts = {}) {
+  let selDay = todayStr();
+  function dayInfo(d) {
+    return { logged: state.sessions.filter((s) => s.date === d), planned: state.plans.filter((p) => p.date === d) };
+  }
+  function weekCard(anchor) {
     const ws = weekStart(anchor), today = todayStr();
     const inWeek = state.sessions.filter((s) => weekStart(s.date) === ws);
     const st = sessionStats(inWeek);
     const days = [0, 1, 2, 3, 4, 5, 6].map((i) => {
-      const d = addDays(ws, i), has = inWeek.some((s) => s.date === d);
-      return `<div class="day${has ? ' done' : ''}${d === today ? ' today' : ''}" data-date="${d}"><span>${DOW[i][0]}</span><span class="dn">${new Date(toMs(d)).getUTCDate()}</span><span class="dot"></span></div>`;
+      const d = addDays(ws, i), info = dayInfo(d);
+      const cls = ['day', d === selDay ? 'sel' : '', d === today ? 'today' : '', info.logged.length ? 'has-log' : '', info.planned.length ? 'has-plan' : ''].filter(Boolean).join(' ');
+      const lab = `${DOW_LONG[i]} ${MON[new Date(toMs(d)).getUTCMonth()]} ${new Date(toMs(d)).getUTCDate()}${info.logged.length ? `, ${plural(info.logged.length, 'workout')} logged` : ''}${info.planned.length ? `, ${info.planned.length} planned` : ''}`;
+      return `<button class="${cls}" data-action="sel-day" data-date="${d}" aria-pressed="${d === selDay}" aria-label="${esc(lab)}"><span class="dw">${DOW[i][0]}</span><span class="dn">${new Date(toMs(d)).getUTCDate()}</span><span class="dots"><i class="dot-log"></i><i class="dot-plan"></i></span></button>`;
     }).join('');
-    return `<div class="card" data-week="${ws}"><div class="week-head"><div class="week-title">${esc(weekLabel(ws))}</div>
-      ${opts.nav ? `<div class="row"><button class="icon-btn" data-action="week-prev" aria-label="Previous week">‹</button><button class="icon-btn" data-action="week-next" aria-label="Next week">›</button></div>` : ''}</div>
-      <div class="small muted">Sun–Sat</div>
+    const isThisWeek = ws === weekStart(today);
+    return `<section class="card week" data-week="${ws}">
+      <div class="week-head"><div aria-label="${esc(weekLabel(ws))}">${(() => { const n = weekNum(ws); return n != null && n >= 1 ? `<div class="week-title">Week ${n}</div><div class="week-sub">${esc(rangeLabel(ws))}${isThisWeek ? ' · This week' : ''}</div>` : `<div class="week-title">${esc(rangeLabel(ws))}</div><div class="week-sub">${isThisWeek ? 'This week' : 'Sun–Sat'}</div>`; })()}</div>
+        <div class="week-nav"><button class="icon-btn" data-action="week-prev" aria-label="Previous week">‹</button>${selDay !== today ? '<button class="btn sm soft" data-action="go-today">Today</button>' : ''}<button class="icon-btn" data-action="week-next" aria-label="Next week">›</button></div></div>
       <div class="days">${days}</div>
-      <div class="stats"><div class="stat"><b>${st.workouts}</b><span>Workouts</span></div><div class="stat"><b>${st.sets}</b><span>Sets</span></div><div class="stat"><b>${fmtVol(st.vol)}</b><span>Volume lb</span></div></div></div>`;
+      <div class="stats"><div class="stat"><b>${st.workouts}</b><span>Workouts</span></div><div class="stat"><b>${st.sets}</b><span>Sets</span></div><div class="stat"><b>${fmtVol(st.vol)}</b><span>Volume (lb)</span></div></div>
+    </section>`;
   }
-  function sessionItem(s) {
+  function sessionItem(s, showDate = true) {
     const names = s.exercises.map(exName);
-    return `<a class="list-item" href="#/log/${s.id}" data-session="${s.id}"><div class="grow"><div class="title">${esc(s.name || 'Workout')}</div>
-      <div class="small muted">${esc(fmtDate(s.date))} · ${s.exercises.length} exercise${s.exercises.length === 1 ? '' : 's'}</div>
-      ${names.length ? `<div class="hist-ex">${esc(names.slice(0, 4).join(', '))}${names.length > 4 ? ` +${names.length - 4}` : ''}</div>` : ''}</div><span class="chev">›</span></a>`;
+    const st = sessionStats([s]);
+    return `<a class="list-item" href="#/log/${s.id}" data-session="${s.id}"><span class="li-ico done" aria-hidden="true">✓</span><div class="grow"><div class="title">${esc(s.name || 'Workout')}</div>
+      <div class="sub">${showDate ? esc(fmtDate(s.date)) + ' · ' : ''}${plural(s.exercises.length, 'exercise')} · ${plural(st.sets, 'set')}</div>
+      ${names.length ? `<div class="hist-ex">${esc(names.slice(0, 4).join(', '))}${names.length > 4 ? ` +${names.length - 4}` : ''}</div>` : ''}</div><span class="chev" aria-hidden="true">›</span></a>`;
   }
 
-  let homeWeek = null;
   function viewHome() {
     setChrome('SlimTucci', false);
-    const anchor = homeWeek || todayStr();
-    const ws = weekStart(anchor);
-    const inWeek = sortedSessions().filter((s) => weekStart(s.date) === ws);
-    $app.innerHTML = `${weekCard(anchor, { nav: true })}
-      <h2>Start a workout</h2>
-      ${state.templates.map((t) => `<div class="list-item" data-action="start" data-tpl="${t.id}"><div class="grow"><div class="title">${esc(t.name)}</div><div class="small muted">${t.items.length} exercises</div></div><span class="pill accent">Start</span></div>`).join('')}
-      <button class="btn block" data-action="start" data-tpl="">+ Blank workout</button>
-      <h2>${homeWeek && ws !== weekStart(todayStr()) ? 'Workouts that week' : 'This week'}</h2>
-      ${inWeek.length ? inWeek.map(sessionItem).join('') : '<div class="empty">No workouts logged this week yet.</div>'}`;
+    const info = dayInfo(selDay);
+    const logged = info.logged.slice().sort((a, b) => a.createdAt.localeCompare(b.createdAt));
+    const rel = relDay(selDay);
+    const plannedHTML = info.planned.map((p) => {
+      const t = tplById(p.templateId);
+      return `<div class="list-item planned" data-plan="${p.id}"><span class="li-ico plan" aria-hidden="true">◷</span><div class="grow"><div class="title">${esc(t ? t.name : p.name)}</div><div class="sub">Planned${t ? ` · ${plural(t.items.length, 'exercise')}` : ' · template deleted'}</div></div>
+        ${t ? `<button class="btn primary sm" data-action="plan-start" data-plan="${p.id}">Start</button>` : ''}<button class="icon-btn" data-action="plan-remove" data-plan="${p.id}" aria-label="Remove planned workout">✕</button></div>`;
+    }).join('');
+    $app.innerHTML = `${weekCard(selDay)}
+      <section class="card day-panel" id="dayPanel" data-day="${selDay}">
+        <div class="day-panel-head"><div><div class="day-title">${esc(fmtLongDate(selDay))}</div>${rel ? `<div class="day-rel">${rel}</div>` : ''}</div>
+          <button class="fab" data-action="day-add" aria-label="Log a workout on ${esc(fmtLongDate(selDay))}">+</button></div>
+        ${logged.map((s) => sessionItem(s, false)).join('')}${plannedHTML}
+        ${!logged.length && !info.planned.length ? `<div class="day-empty">No workouts on ${DOW[dow(selDay)]} — tap <b>+</b> to log one${state.templates.length ? ' or plan a template' : ''}.</div>` : ''}
+        <div class="btn-row"><button class="btn primary" data-action="day-add">+ Log workout</button><button class="btn" data-action="day-plan">Plan template</button></div>
+      </section>
+      ${state.sessions.length ? '' : `<section class="card welcome"><div class="welcome-title">Welcome to your diary 👋</div><ol class="steps"><li>Tap a day, then <b>+ Log workout</b>.</li><li>Add exercises from ${LIB_ITEMS.length}+ movements.</li><li>Enter lb and reps for each set — it saves as you type.</li></ol><a class="btn block soft" href="#/templates">Build a template for the days you repeat</a></section>`}`;
   }
 
-  function startWorkout(tplId) {
-    const t = state.templates.find((x) => x.id === tplId);
+  function startSheet(date) {
+    const tpls = state.templates;
+    const body = `<button class="pick-row big" data-x="blank"><span class="pr-plus" aria-hidden="true">+</span><span class="grow"><span class="pr-name">Blank workout</span><span class="pr-meta">Add exercises as you go</span></span></button>
+      <div class="sec-title">From a template</div>
+      ${tpls.length ? tpls.map((t) => `<button class="pick-row" data-x="tpl" data-tpl="${t.id}"><span class="grow"><span class="pr-name">${esc(t.name)}</span><span class="pr-meta">${plural(t.items.length, 'exercise')}</span></span><span class="pr-add" aria-hidden="true">Start</span></button>`).join('')
+        : `<div class="sec-empty">No templates yet. <a href="#/templates" data-x="close">Create one</a> for workouts you repeat.</div>`}`;
+    openSheet(`Log workout · ${fmtDate(date)}`, body, (el, close) => {
+      if (el.dataset.x === 'blank') { close(); startWorkout(null, date); }
+      if (el.dataset.x === 'tpl') { close(); startWorkout(el.dataset.tpl, date); }
+    });
+  }
+  function planSheet(date) {
+    const tpls = state.templates;
+    const body = tpls.length ? `<div class="sheet-note">Pick a template to plan for ${esc(fmtLongDate(date))}. It shows on that day so you can start it with one tap.</div>` + tpls.map((t) => `<button class="pick-row" data-x="plan" data-tpl="${t.id}"><span class="grow"><span class="pr-name">${esc(t.name)}</span><span class="pr-meta">${plural(t.items.length, 'exercise')}</span></span><span class="pr-add" aria-hidden="true">Plan</span></button>`).join('')
+      : emptyState('🗂️', 'No templates yet', 'Templates are saved workouts (like “Monday Lower + Rotation”) you can plan and start in one tap.', '<a class="btn primary" href="#/templates" data-x="close">Create a template</a>');
+    openSheet(`Plan · ${fmtDate(date)}`, body, (el, close) => {
+      if (el.dataset.x === 'plan') {
+        const t = tplById(el.dataset.tpl);
+        state.plans.push({ id: uid(), date, templateId: t.id, name: t.name }); save(); close(); toast(`Planned ${t.name} for ${fmtDate(date)}`); render();
+      }
+    });
+  }
+
+  function startWorkout(tplId, date, planId) {
+    const t = tplId ? tplById(tplId) : null;
     const now = new Date().toISOString();
-    const s = { id: uid(), date: todayStr(), name: t ? t.name : 'Workout', templateId: t ? t.id : null, notes: '', createdAt: now, updatedAt: now, exercises: [] };
+    const s = { id: uid(), date: date || todayStr(), name: t ? t.name : 'Workout', templateId: t ? t.id : null, notes: '', createdAt: now, updatedAt: now, exercises: [] };
     if (t) s.exercises = t.items.filter((it) => exById(it.exId)).map((it) => ({ exId: it.exId, name: exName(it), target: it.reps, notes: '', sets: Array.from({ length: Math.max(1, Number(it.sets) || 1) }, () => ({ weight: '', reps: '', done: false })) }));
-    state.sessions.push(s); save();
+    state.sessions.push(s);
+    if (planId) state.plans = state.plans.filter((p) => p.id !== planId);
+    selDay = s.date; save();
     go('#/log/' + s.id);
   }
 
   function viewLog(id) {
     const s = state.sessions.find((x) => x.id === id);
-    if (!s) { $app.innerHTML = '<div class="empty">Workout not found.</div>'; return setChrome('Workout', true); }
+    if (!s) { setChrome('Workout', true); $app.innerHTML = emptyState('🤔', 'Workout not found', 'It may have been deleted.', '<a class="btn primary" href="#/">Back to Today</a>'); document.body.classList.remove('has-actionbar'); return; }
     setChrome(s.name || 'Workout', true);
-    const wl = weekLabel(s.date);
-    $app.innerHTML = `<div class="card stack">
+    $app.innerHTML = `<section class="card stack">
         <div><label class="f" for="sName">Workout name</label><input id="sName" data-bind="session" data-k="name" value="${esc(s.name)}"></div>
-        <div><label class="f" for="sDate">Date</label><input id="sDate" type="date" data-bind="session" data-k="date" value="${esc(s.date)}"><div class="small muted" style="margin-top:6px" id="sWeek">${esc(wl)}</div></div>
-        <details class="notes"${s.notes ? ' open' : ''}><summary>📝 Session notes${s.notes ? '' : ' (tap to add)'}</summary><textarea data-bind="session" data-k="notes" placeholder="How did it feel? Sleep, energy, niggles…">${esc(s.notes)}</textarea></details>
-      </div>
+        <div><label class="f" for="sDate">Date</label><input id="sDate" type="date" data-bind="session" data-k="date" value="${esc(s.date)}"><div class="hint" id="sWeek">${esc(weekLabel(s.date))}</div></div>
+        <details class="notes"${s.notes ? ' open' : ''}><summary>Session notes</summary><textarea data-bind="session" data-k="notes" placeholder="How did it feel? Sleep, energy, niggles…">${esc(s.notes)}</textarea></details>
+      </section>
       <div id="exList">${s.exercises.map((e, i) => exCard(s, e, i)).join('')}</div>
-      ${s.exercises.length ? '' : '<div class="empty">No exercises yet. Add one below.</div>'}
-      <div class="stack">
-        <button class="btn primary block" data-action="add-ex">+ Add exercise</button>
-        <div class="btn-row"><button class="btn" data-action="save-as-tpl">Save as template</button><button class="btn" data-action="finish">Done</button></div>
-        <button class="btn danger block" data-action="del-session">Delete workout</button>
-      </div>`;
+      ${s.exercises.length ? '' : emptyState('🏋️', 'No exercises yet', `Tap <b>+ Add exercise</b> to search ${LIB_ITEMS.length}+ movements or add your own.`, '<button class="btn primary" data-action="add-ex">+ Add exercise</button>')}
+      <section class="more-actions"><div class="sec-title">Workout options</div>
+        <div class="btn-row"><button class="btn" data-action="save-as-tpl">Save as template</button><button class="btn danger" data-action="del-session">Delete workout</button></div></section>
+      <div class="actionbar" role="toolbar" aria-label="Workout actions"><button class="btn" data-action="add-ex">+ Add exercise</button><button class="btn primary" data-action="finish">Finish ✓</button></div>`;
   }
   function exCard(s, e, i) {
     const lp = lastPerformance(e.exId, s);
-    const last = lp ? `Last time (${fmtDate(lp.s.date)}): ${lp.e.sets.filter(isLogged).map(fmtSet).join(' · ')}` : 'Last time: first time logging this';
+    const last = lp ? `Last time · ${fmtDate(lp.s.date)}: ${lp.e.sets.filter(isLogged).map(fmtSet).join(' · ')}` : 'First time logging this — set a baseline';
     const lastSets = lp ? lp.e.sets.filter(isLogged) : [];
-    return `<div class="ex-card" data-ei="${i}">
-      <div class="ex-head"><div class="ex-name">${esc(exName(e))}${e.target ? ` <span class="pill">target ${esc(e.target)}</span>` : ''}</div>
-        <button class="icon-btn" data-action="ex-up" data-ei="${i}" aria-label="Move up"${i === 0 ? ' disabled' : ''}>↑</button>
-        <button class="icon-btn" data-action="ex-down" data-ei="${i}" aria-label="Move down"${i === s.exercises.length - 1 ? ' disabled' : ''}>↓</button>
-        <button class="icon-btn danger" data-action="ex-remove" data-ei="${i}" aria-label="Remove exercise">✕</button></div>
-      <div class="last">${esc(last)}</div>
-      <table class="sets"><thead><tr><th>Set</th><th>lb</th><th>Reps</th><th></th><th></th></tr></thead><tbody>
+    const exObj = exById(e.exId);
+    return `<section class="ex-card" data-ei="${i}">
+      <div class="ex-head"><div class="grow"><div class="ex-name">${esc(exName(e))}</div>${exObj && exObj.cat ? `<div class="ex-meta">${esc(exObj.cat)}${e.target ? ' · target ' + esc(e.target) + ' reps' : ''}</div>` : e.target ? `<div class="ex-meta">target ${esc(e.target)} reps</div>` : ''}</div>
+        <button class="icon-btn sm" data-action="ex-up" data-ei="${i}" aria-label="Move up"${i === 0 ? ' disabled' : ''}>↑</button>
+        <button class="icon-btn sm" data-action="ex-down" data-ei="${i}" aria-label="Move down"${i === s.exercises.length - 1 ? ' disabled' : ''}>↓</button>
+        <button class="icon-btn sm danger" data-action="ex-remove" data-ei="${i}" aria-label="Remove exercise">✕</button></div>
+      <div class="last${lp ? '' : ' first'}">${esc(last)}</div>
+      <table class="sets"><thead><tr><th scope="col">Set</th><th scope="col">lb</th><th scope="col">Reps</th><th scope="col"><span class="sr">Done</span></th><th scope="col"><span class="sr">Remove</span></th></tr></thead><tbody>
       ${e.sets.map((st, j) => {
         const ph = lastSets[j] || lastSets[lastSets.length - 1];
-        return `<tr><td class="n">${j + 1}</td>
-          <td><input type="number" inputmode="decimal" step="any" min="0" data-bind="set" data-ei="${i}" data-si="${j}" data-k="weight" value="${esc(st.weight)}" placeholder="${ph && num(ph.weight) != null ? esc(num(ph.weight)) : 'lb'}" aria-label="Set ${j + 1} weight"></td>
+        return `<tr class="${st.done ? 'done' : ''}"><td class="n">${j + 1}</td>
+          <td><input type="number" inputmode="decimal" step="any" min="0" data-bind="set" data-ei="${i}" data-si="${j}" data-k="weight" value="${esc(st.weight)}" placeholder="${ph && num(ph.weight) != null ? esc(num(ph.weight)) : 'lb'}" aria-label="Set ${j + 1} weight in pounds"></td>
           <td><input type="number" inputmode="numeric" step="1" min="0" data-bind="set" data-ei="${i}" data-si="${j}" data-k="reps" value="${esc(st.reps)}" placeholder="${ph && num(ph.reps) != null ? esc(num(ph.reps)) : esc(e.target || 'reps')}" aria-label="Set ${j + 1} reps"></td>
-          <td class="ck"><button class="check${st.done ? ' on' : ''}" data-action="set-done" data-ei="${i}" data-si="${j}" aria-label="Mark set done">✓</button></td>
-          <td class="x"><button class="icon-btn danger" data-action="set-remove" data-ei="${i}" data-si="${j}" aria-label="Remove set">−</button></td></tr>`;
+          <td class="ck"><button class="check${st.done ? ' on' : ''}" data-action="set-done" data-ei="${i}" data-si="${j}" aria-pressed="${!!st.done}" aria-label="Mark set ${j + 1} done">✓</button></td>
+          <td class="x"><button class="icon-btn sm ghost danger" data-action="set-remove" data-ei="${i}" data-si="${j}" aria-label="Remove set ${j + 1}">−</button></td></tr>`;
       }).join('')}
       </tbody></table>
-      <div class="ex-tools"><button class="btn sm" data-action="set-add" data-ei="${i}">+ Add set</button></div>
-      <details class="notes"${e.notes ? ' open' : ''}><summary>📝 Exercise notes${e.notes ? '' : ' (tap to add)'}</summary><textarea data-bind="exnote" data-ei="${i}" placeholder="Cues, tempo, how it moved…">${esc(e.notes)}</textarea></details>
-    </div>`;
+      <button class="btn soft block" data-action="set-add" data-ei="${i}">+ Add set</button>
+      <details class="notes"${e.notes ? ' open' : ''}><summary>Exercise notes</summary><textarea data-bind="exnote" data-ei="${i}" placeholder="Cues, tempo, how it moved…">${esc(e.notes)}</textarea></details>
+    </section>`;
   }
 
   let histQ = '';
   function viewHistory() {
     setChrome('History', false);
-    $app.innerHTML = `<div class="search"><input type="search" id="histQ" placeholder="Search workout, exercise or notes" value="${esc(histQ)}" autocomplete="off"></div><div id="histList"></div>`;
+    if (!state.sessions.length) { $app.innerHTML = emptyState('📓', 'No workouts logged yet', 'Your past sessions will show here, grouped by week (Sun–Sat).', '<a class="btn primary" href="#/">Log your first workout</a>'); return; }
+    $app.innerHTML = `<div class="search"><input type="search" id="histQ" placeholder="Search workouts, exercises or notes" value="${esc(histQ)}" autocomplete="off" aria-label="Search history"></div><div id="histList"></div>`;
     const inp = document.getElementById('histQ');
     inp.addEventListener('input', () => { histQ = inp.value; drawHistory(); });
     drawHistory();
@@ -280,29 +475,39 @@
     const list = sortedSessions().filter((s) => !q || (s.name || '').toLowerCase().includes(q) || (s.notes || '').toLowerCase().includes(q) ||
       s.exercises.some((e) => exName(e).toLowerCase().includes(q) || (e.notes || '').toLowerCase().includes(q)));
     const el = document.getElementById('histList');
-    if (!list.length) { el.innerHTML = `<div class="empty">${q ? 'No workouts match “' + esc(histQ) + '”.' : 'No workouts logged yet. Start one from Today.'}</div>`; return; }
-    // group by Sun–Sat week
+    if (!list.length) { el.innerHTML = emptyState('🔍', `No workouts match “${esc(histQ)}”`, 'Try an exercise name like “squat” or a workout name.', '<button class="btn" data-action="hist-clear">Clear search</button>'); return; }
     const groups = new Map();
     for (const s of list) { const k = weekStart(s.date); if (!groups.has(k)) groups.set(k, []); groups.get(k).push(s); }
     el.innerHTML = [...groups.entries()].map(([ws, ss]) => {
       const st = sessionStats(ss);
-      return `<div class="week-group" data-week="${ws}"><div class="week-group-head"><span class="wt">${esc(weekLabel(ws))}</span><span class="wsum">${st.workouts} workout${st.workouts === 1 ? '' : 's'} · ${st.sets} set${st.sets === 1 ? '' : 's'} · ${fmtVol(st.vol)} lb</span></div>${ss.map(sessionItem).join('')}</div>`;
+      return `<div class="week-group" data-week="${ws}"><div class="week-group-head"><span class="wt">${esc(weekLabel(ws))}</span><span class="wsum">${plural(st.workouts, 'workout')} · ${plural(st.sets, 'set')} · ${fmtVol(st.vol)} lb</span></div>${ss.map((s) => sessionItem(s)).join('')}</div>`;
     }).join('');
   }
 
+  const exTab = { seg: 'mine', q: '', chip: 'all', limit: 80, mode: 'browse' };
   function viewExercises() {
     setChrome('Exercises', false);
-    $app.innerHTML = `<div class="card"><label class="f" for="newEx" style="margin-top:0">New exercise</label>
-      <div class="row"><input id="newEx" class="grow" placeholder="e.g. Hip Thrust" autocomplete="off"><button class="btn primary" data-action="ex-create">Add</button></div></div>
-      <h2>Your library (${state.exercises.length})</h2>
-      ${state.exercises.map((e, i) => `<div class="list-item" data-exrow="${e.id}"><a class="grow" href="#/exercise/${e.id}" style="color:inherit;text-decoration:none"><div class="title">${esc(e.name)}</div><div class="small muted">${esc(e.cat || '')}${(() => { const lp = lastPerformance(e.id); const t = lp && topSet(lp.e.sets); return t ? `${e.cat ? ' · ' : ''}last ${fmtSet(t)}` : ''; })()}</div></a>
-        <button class="icon-btn" data-action="lib-up" data-i="${i}" aria-label="Move up"${i === 0 ? ' disabled' : ''}>↑</button><button class="icon-btn" data-action="lib-down" data-i="${i}" aria-label="Move down"${i === state.exercises.length - 1 ? ' disabled' : ''}>↓</button></div>`).join('') || '<div class="empty">No exercises yet.</div>'}`;
-    document.getElementById('newEx').addEventListener('keydown', (ev) => { if (ev.key === 'Enter') doAction('ex-create'); });
+    $app.innerHTML = `<div class="seg" role="tablist"><button class="seg-btn${exTab.seg === 'mine' ? ' on' : ''}" data-action="seg" data-seg="mine" role="tab" aria-selected="${exTab.seg === 'mine'}">My exercises <span class="count">${state.exercises.length}</span></button><button class="seg-btn${exTab.seg === 'lib' ? ' on' : ''}" data-action="seg" data-seg="lib" role="tab" aria-selected="${exTab.seg === 'lib'}">Library <span class="count">${LIB_ITEMS.length}</span></button></div>
+      <div class="search"><input type="search" id="exQ" placeholder="${exTab.seg === 'mine' ? 'Search my exercises or add a new one' : `Search ${LIB_ITEMS.length} exercises`}" value="${esc(exTab.q)}" autocomplete="off" aria-label="Search exercises">${chipsHTML(exTab.chip, false)}</div>
+      <div id="exResults" class="pick-list"></div>
+      ${exTab.seg === 'mine' && state.exercises.length > 1 ? '<button class="btn ghost block" data-action="lib-reorder">Reorder my exercises</button>' : ''}`;
+    const inp = document.getElementById('exQ');
+    inp.addEventListener('input', () => { exTab.q = inp.value; exTab.limit = 80; drawExResults(); });
+    drawExResults();
+  }
+  function drawExResults() { const el = document.getElementById('exResults'); if (el) el.innerHTML = resultsHTML(exTab); }
+  function reorderSheet() {
+    const draw = () => state.exercises.map((e, i) => `<div class="pick-row"><span class="grow"><span class="pr-name">${esc(e.name)}</span></span><button class="icon-btn sm" data-x="up" data-i="${i}" aria-label="Move ${esc(e.name)} up"${i === 0 ? ' disabled' : ''}>↑</button><button class="icon-btn sm" data-x="down" data-i="${i}" aria-label="Move ${esc(e.name)} down"${i === state.exercises.length - 1 ? ' disabled' : ''}>↓</button></div>`).join('');
+    const sh = openSheet('Reorder my exercises', `<div id="ro">${draw()}</div>`, (el) => {
+      const i = +el.dataset.i; if (el.disabled) return;
+      if (el.dataset.x === 'up') swap(state.exercises, i, i - 1); else if (el.dataset.x === 'down') swap(state.exercises, i, i + 1); else return;
+      save(); sh.bg.querySelector('#ro').innerHTML = draw();
+    }, { tall: true, doneLabel: 'Done', onClose: () => render() });
   }
 
   function viewExercise(id) {
     const e = exById(id);
-    if (!e) { setChrome('Exercise', true); $app.innerHTML = '<div class="empty">Exercise not found.</div>'; return; }
+    if (!e) { setChrome('Exercise', true); $app.innerHTML = emptyState('🤔', 'Exercise not found', '', '<a class="btn primary" href="#/exercises">Back to exercises</a>'); return; }
     setChrome(e.name, true);
     const rows = [];
     for (const s of sortedSessions()) for (const x of s.exercises) if (x.exId === id && x.sets.some(isLogged)) rows.push({ s, x, top: topSet(x.sets) });
@@ -310,45 +515,48 @@
     for (const r of rows) { const w = num(r.top.weight) ?? -1, rp = num(r.top.reps) ?? 0; if (!best || w > best.w || (w === best.w && rp > best.r)) best = { w, r: rp, row: r }; }
     const groups = new Map();
     for (const r of rows) { const k = weekStart(r.s.date); if (!groups.has(k)) groups.set(k, []); groups.get(k).push(r); }
-    $app.innerHTML = `<div class="card stack">
-        <div><label class="f" for="exName" style="margin-top:0">Name</label><input id="exName" data-bind="exdef" data-k="name" value="${esc(e.name)}"></div>
-        <div><label class="f" for="exCat">Category</label><input id="exCat" data-bind="exdef" data-k="cat" value="${esc(e.cat || '')}" placeholder="Legs, Push, Pull, Rotation…"></div>
-        <div><label class="f" for="exNotes">Notes / cues</label><textarea id="exNotes" data-bind="exdef" data-k="notes" placeholder="Setup, cues, machine settings…">${esc(e.notes || '')}</textarea></div>
-      </div>
-      ${best ? `<div class="card"><div class="small muted">Best set</div><div class="week-title">${esc(fmtSet(best.row.top))} <span class="small muted">· ${esc(fmtDate(best.row.s.date))}</span></div></div>` : ''}
-      <h2>History by week (Sun–Sat)</h2>
+    const cats = LIB.categories.map((c) => `<option value="${esc(c.label)}"${c.label === e.cat ? ' selected' : ''}>${esc(c.label)}</option>`).join('') + `<option value="Custom"${!catKeyOf(e) ? ' selected' : ''}>Custom / other</option>`;
+    $app.innerHTML = `${best ? `<section class="card best"><div class="best-l">Best set</div><div class="best-v">${esc(fmtSet(best.row.top))}</div><div class="best-d">${esc(fmtDate(best.row.s.date))} · ${plural(rows.length, 'session')} logged</div></section>` : ''}
+      <div class="sec-title">History by week (Sun–Sat)</div>
       ${rows.length ? [...groups.entries()].map(([ws, rs]) => {
         const wkTop = topSet(rs.map((r) => r.top));
-        return `<div class="card tight" data-week="${ws}"><div class="week-group-head" style="margin:4px 0"><span class="wt">${esc(weekLabel(ws))}</span><span class="wsum">top ${esc(fmtSet(wkTop))}</span></div>
-          <table class="hist">${rs.map((r) => `<tr data-href="#/log/${r.s.id}"><td>${esc(fmtDate(r.s.date))}<div class="small muted">${esc(r.x.sets.filter(isLogged).map(fmtSet).join(' · '))}</div></td><td>${esc(fmtSet(r.top))}${best && r === best.row ? '<span class="badge-pr">BEST</span>' : ''}</td></tr>`).join('')}</table></div>`;
-      }).join('') : '<div class="empty">Not logged yet.</div>'}
-      <button class="btn danger block" data-action="ex-delete" data-id="${e.id}" style="margin-top:14px">Delete exercise</button>`;
+        return `<section class="card tight" data-week="${ws}"><div class="week-group-head inset"><span class="wt">${esc(weekLabel(ws))}</span><span class="wsum">top ${esc(fmtSet(wkTop))}</span></div>
+          <table class="hist">${rs.map((r) => `<tr data-href="#/log/${r.s.id}" tabindex="0"><td>${esc(fmtDate(r.s.date))}<div class="sub">${esc(r.x.sets.filter(isLogged).map(fmtSet).join(' · '))}</div></td><td>${esc(fmtSet(r.top))}${best && r === best.row ? '<span class="badge-pr">BEST</span>' : ''}</td></tr>`).join('')}</table></section>`;
+      }).join('') : `<div class="card">${emptyState('📈', 'Not logged yet', 'Add it to a workout and your sets will show here week by week.')}</div>`}
+      <div class="sec-title">Details</div>
+      <section class="card stack">
+        <div><label class="f" for="exName">Name</label><input id="exName" data-bind="exdef" data-k="name" value="${esc(e.name)}"></div>
+        <div><label class="f" for="exCat">Category</label><select id="exCat" data-bind="exdef" data-k="cat">${cats}</select></div>
+        <div><label class="f" for="exNotes">Notes / cues</label><textarea id="exNotes" data-bind="exdef" data-k="notes" placeholder="Setup, cues, machine settings…">${esc(e.notes || '')}</textarea></div>
+      </section>
+      <button class="btn danger block" data-action="ex-delete" data-id="${e.id}">Delete exercise</button>`;
   }
 
   function viewTemplates() {
     setChrome('Templates', false);
-    $app.innerHTML = `<div class="card"><label class="f" for="newTpl" style="margin-top:0">New template</label>
-      <div class="row"><input id="newTpl" class="grow" placeholder="e.g. Monday Lower + Rotation" autocomplete="off"><button class="btn primary" data-action="tpl-create">Add</button></div></div>
-      <h2>Your templates</h2>
-      ${state.templates.map((t, i) => `<div class="list-item"><a class="grow" href="#/template/${t.id}" style="color:inherit;text-decoration:none"><div class="title">${esc(t.name)}</div><div class="small muted">${t.items.length} exercises</div></a>
-        <button class="icon-btn" data-action="tpl-up" data-i="${i}" aria-label="Move up"${i === 0 ? ' disabled' : ''}>↑</button><button class="icon-btn" data-action="tpl-down" data-i="${i}" aria-label="Move down"${i === state.templates.length - 1 ? ' disabled' : ''}>↓</button></div>`).join('') || '<div class="empty">No templates yet.</div>'}`;
+    $app.innerHTML = `<section class="card"><label class="f" for="newTpl">New template</label>
+      <div class="row"><input id="newTpl" class="grow" placeholder="e.g. Monday Lower + Rotation" autocomplete="off"><button class="btn primary" data-action="tpl-create">Create</button></div></section>
+      ${state.templates.length ? `<div class="sec-title">Your templates</div>` + state.templates.map((t, i) => `<div class="list-item"><a class="grow rowlink" href="#/template/${t.id}"><div class="title">${esc(t.name)}</div><div class="sub">${plural(t.items.length, 'exercise')}</div></a>
+        <button class="icon-btn sm" data-action="tpl-up" data-i="${i}" aria-label="Move up"${i === 0 ? ' disabled' : ''}>↑</button><button class="icon-btn sm" data-action="tpl-down" data-i="${i}" aria-label="Move down"${i === state.templates.length - 1 ? ' disabled' : ''}>↓</button>
+        <button class="btn primary sm" data-action="start" data-tpl="${t.id}">Start</button></div>`).join('')
+        : emptyState('🗂️', 'No templates yet', 'Save the workouts you repeat (e.g. “Monday Lower + Rotation”) and start or plan them in one tap. Name one above to begin.')}`;
     document.getElementById('newTpl').addEventListener('keydown', (ev) => { if (ev.key === 'Enter') doAction('tpl-create'); });
   }
 
   function viewTemplate(id) {
-    const t = state.templates.find((x) => x.id === id);
-    if (!t) { setChrome('Template', true); $app.innerHTML = '<div class="empty">Template not found.</div>'; return; }
+    const t = tplById(id);
+    if (!t) { setChrome('Template', true); $app.innerHTML = emptyState('🤔', 'Template not found', '', '<a class="btn primary" href="#/templates">Back to templates</a>'); return; }
     setChrome(t.name, true);
-    $app.innerHTML = `<div class="card"><label class="f" for="tName" style="margin-top:0">Template name</label><input id="tName" data-bind="tpl" data-k="name" value="${esc(t.name)}"></div>
-      <h2>Exercises</h2>
-      ${t.items.map((it, i) => `<div class="ex-card"><div class="ex-head"><div class="ex-name">${esc(exName(it))}</div>
-          <button class="icon-btn" data-action="ti-up" data-i="${i}" aria-label="Move up"${i === 0 ? ' disabled' : ''}>↑</button>
-          <button class="icon-btn" data-action="ti-down" data-i="${i}" aria-label="Move down"${i === t.items.length - 1 ? ' disabled' : ''}>↓</button>
-          <button class="icon-btn danger" data-action="ti-remove" data-i="${i}" aria-label="Remove">✕</button></div>
-        <div class="row" style="margin-top:8px"><div class="grow"><label class="f">Sets</label><input type="number" inputmode="numeric" min="1" data-bind="ti" data-i="${i}" data-k="sets" value="${esc(it.sets)}"></div>
-        <div class="grow"><label class="f">Target reps</label><input data-bind="ti" data-i="${i}" data-k="reps" value="${esc(it.reps)}" placeholder="e.g. 5 or 8-10"></div></div></div>`).join('') || '<div class="empty">No exercises in this template yet.</div>'}
-      <div class="stack"><button class="btn block" data-action="ti-add">+ Add exercise</button>
-        <button class="btn primary block" data-action="start" data-tpl="${t.id}">Start this workout</button>
+    $app.innerHTML = `<section class="card"><label class="f" for="tName">Template name</label><input id="tName" data-bind="tpl" data-k="name" value="${esc(t.name)}"></section>
+      <div class="sec-title">Exercises</div>
+      ${t.items.map((it, i) => `<section class="ex-card"><div class="ex-head"><div class="grow"><div class="ex-name">${esc(exName(it))}</div></div>
+          <button class="icon-btn sm" data-action="ti-up" data-i="${i}" aria-label="Move up"${i === 0 ? ' disabled' : ''}>↑</button>
+          <button class="icon-btn sm" data-action="ti-down" data-i="${i}" aria-label="Move down"${i === t.items.length - 1 ? ' disabled' : ''}>↓</button>
+          <button class="icon-btn sm danger" data-action="ti-remove" data-i="${i}" aria-label="Remove">✕</button></div>
+        <div class="row"><div class="grow"><label class="f">Sets</label><input type="number" inputmode="numeric" min="1" data-bind="ti" data-i="${i}" data-k="sets" value="${esc(it.sets)}"></div>
+        <div class="grow"><label class="f">Target reps</label><input data-bind="ti" data-i="${i}" data-k="reps" value="${esc(it.reps)}" placeholder="e.g. 5 or 8-10"></div></div></section>`).join('') || emptyState('🏋️', 'No exercises yet', 'Add movements from the library or your own list.')}
+      <div class="stack"><button class="btn soft block" data-action="ti-add">+ Add exercise</button>
+        <button class="btn primary block" data-action="start" data-tpl="${t.id}">Start this workout today</button>
         <button class="btn danger block" data-action="tpl-delete">Delete template</button></div>`;
   }
 
@@ -356,17 +564,17 @@
     setChrome('More', false);
     const ps = state.settings.programStart;
     const st = sessionStats(state.sessions);
-    $app.innerHTML = `<h2>Program</h2><div class="card">
-        <label class="f" for="progStart" style="margin-top:0">Program start date</label>
+    $app.innerHTML = `<div class="sec-title">Program</div><section class="card">
+        <label class="f" for="progStart">Program start date</label>
         <input id="progStart" type="date" data-bind="setting" data-k="programStart" value="${esc(ps || '')}">
-        <div class="small muted" style="margin-top:8px">Weeks run Sunday → Saturday. Week 1 is the Sun–Sat week containing this date${ps ? ` (${esc(rangeLabel(ps))})` : ''}. This week: <b id="curWeek">${esc(weekLabel(todayStr()))}</b></div></div>
-      <h2>Backup</h2><div class="card stack">
-        <div class="small muted">Your diary lives only on this phone. Export a backup regularly (and before changing phones or clearing your browser), then Import it to restore.</div>
+        <div class="hint">Weeks run Sunday → Saturday. Week 1 is the Sun–Sat week containing this date${ps ? ` (${esc(rangeLabel(ps))})` : ''}. This week: <b id="curWeek">${esc(weekLabel(todayStr()))}</b></div></section>
+      <div class="sec-title">Backup</div><section class="card stack">
+        <div class="hint">Your diary lives only on this phone. Export a backup regularly (and before changing phones or clearing your browser), then Import it to restore.</div>
         <div class="btn-row"><button class="btn primary" data-action="export">Export JSON</button><button class="btn" data-action="import">Import JSON</button></div>
-        <div class="small muted">${st.workouts} workouts · ${state.exercises.length} exercises · ${state.templates.length} templates · <span id="persist">checking storage…</span></div></div>
-      <h2>Danger zone</h2><div class="card stack">
-        <button class="btn danger block" data-action="wipe">Erase all data</button></div>
-      <div class="empty small">SlimTucci Workout Diary · works offline · add to Home Screen from your browser's Share/menu</div>`;
+        <div class="hint">${plural(st.workouts, 'workout')} · ${plural(state.exercises.length, 'exercise')} · ${plural(state.templates.length, 'template')} · <span id="persist">checking storage…</span></div></section>
+      <div class="sec-title">Danger zone</div><section class="card">
+        <button class="btn danger block" data-action="wipe">Erase all data</button></section>
+      <div class="foot">SlimTucci Workout Diary · works offline<br>Add to Home Screen from your browser’s Share / ⋮ menu</div>`;
     if (navigator.storage && navigator.storage.persisted) navigator.storage.persisted().then((p) => { const el = document.getElementById('persist'); if (el) el.textContent = p ? 'storage: persistent' : 'storage: best-effort'; });
     else document.getElementById('persist').textContent = 'storage: local';
   }
@@ -375,8 +583,7 @@
   let renderedHash = null;
   function render() {
     renderedHash = null; // blur/change events fired while the old view is torn down are ignored
-    const parts = (location.hash.replace(/^#\/?/, '') || '').split('/');
-    const [r, id] = parts;
+    const [r, id] = (location.hash.replace(/^#\/?/, '') || '').split('/');
     window.scrollTo(0, 0);
     if (r === 'log') viewLog(id);
     else if (r === 'history') viewHistory();
@@ -391,7 +598,7 @@
   function rerenderKeepScroll() { const y = window.scrollY; render(); window.scrollTo(0, y); }
   const curId = () => location.hash.split('/')[2];
   const curSession = () => state.sessions.find((s) => s.id === curId());
-  const curTpl = () => state.templates.find((t) => t.id === curId());
+  const curTpl = () => tplById(curId());
   function swap(arr, i, j) { if (j < 0 || j >= arr.length) return; [arr[i], arr[j]] = [arr[j], arr[i]]; }
   const touch = (s) => { s.updatedAt = new Date().toISOString(); };
 
@@ -402,39 +609,42 @@
     const ei = Number(d.ei), si = Number(d.si), i = Number(d.i);
     switch (a) {
       case 'back': if (history.length > 1) history.back(); else go('#/'); break;
-      case 'week-prev': homeWeek = addDays(weekStart(homeWeek || todayStr()), -7); render(); break;
-      case 'week-next': homeWeek = addDays(weekStart(homeWeek || todayStr()), 7); render(); break;
-      case 'start': startWorkout(d.tpl); break;
-      case 'add-ex': pickExercise('Add exercise', (id) => { s.exercises.push({ exId: id, name: exById(id).name, target: '', notes: '', sets: [{ weight: '', reps: '', done: false }] }); touch(s); save(); rerenderKeepScroll(); }); break;
+      case 'sel-day': selDay = d.date; rerenderKeepScroll(); break;
+      case 'week-prev': selDay = addDays(selDay, -7); rerenderKeepScroll(); break;
+      case 'week-next': selDay = addDays(selDay, 7); rerenderKeepScroll(); break;
+      case 'go-today': selDay = todayStr(); rerenderKeepScroll(); break;
+      case 'day-add': startSheet(selDay); break;
+      case 'day-plan': planSheet(selDay); break;
+      case 'plan-start': { const p = state.plans.find((x) => x.id === d.plan); if (p) startWorkout(p.templateId, p.date, p.id); break; }
+      case 'plan-remove': state.plans = state.plans.filter((x) => x.id !== d.plan); save(); toast('Removed from plan'); rerenderKeepScroll(); break;
+      case 'start': startWorkout(d.tpl || null, todayStr()); break;
+      case 'add-ex': pickExercise('Add exercise', (id) => { s.exercises.push({ exId: id, name: exById(id).name, target: '', notes: '', sets: [{ weight: '', reps: '', done: false }] }); touch(s); save(); },
+        (n) => { if (n) { rerenderKeepScroll(); const cards = document.querySelectorAll('.ex-card'); if (cards.length) cards[cards.length - 1].scrollIntoView({ block: 'center' }); } }); break;
       case 'ex-up': swap(s.exercises, ei, ei - 1); touch(s); save(); rerenderKeepScroll(); break;
       case 'ex-down': swap(s.exercises, ei, ei + 1); touch(s); save(); rerenderKeepScroll(); break;
       case 'ex-remove': if (confirm(`Remove ${exName(s.exercises[ei])} from this workout?`)) { s.exercises.splice(ei, 1); touch(s); save(); rerenderKeepScroll(); } break;
       case 'set-add': { const sets = s.exercises[ei].sets, prev = sets[sets.length - 1]; sets.push({ weight: prev ? prev.weight : '', reps: prev ? prev.reps : '', done: false }); touch(s); save(); rerenderKeepScroll(); break; }
       case 'set-remove': s.exercises[ei].sets.splice(si, 1); touch(s); save(); rerenderKeepScroll(); break;
-      case 'set-done': { const st = s.exercises[ei].sets[si]; st.done = !st.done; el.classList.toggle('on', st.done); touch(s); save(); break; }
-      case 'finish': toast('Workout saved'); go('#/history'); break;
+      case 'set-done': { const st = s.exercises[ei].sets[si]; st.done = !st.done; el.classList.toggle('on', st.done); el.setAttribute('aria-pressed', st.done); el.closest('tr').classList.toggle('done', st.done); touch(s); save(); break; }
+      case 'finish': selDay = s.date; toast('Workout saved 💪'); go('#/'); break;
       case 'save-as-tpl': {
         const name = prompt('Template name', s.name || 'Workout'); if (!name) break;
         state.templates.push({ id: uid(), name: name.trim(), items: s.exercises.map((e) => ({ exId: e.exId, sets: e.sets.length || 1, reps: e.target || String(num((topSet(e.sets) || {}).reps) ?? '') })) });
         save(); toast('Template saved'); break;
       }
-      case 'del-session': if (confirm('Delete this workout? This cannot be undone.')) { state.sessions = state.sessions.filter((x) => x.id !== s.id); save(); toast('Workout deleted'); go('#/history'); } break;
-      case 'ex-create': {
-        const inp = document.getElementById('newEx'); const name = inp.value.trim(); if (!name) return inp.focus();
-        if (state.exercises.some((e) => e.name.toLowerCase() === name.toLowerCase())) { toast('That exercise already exists'); break; }
-        state.exercises.unshift({ id: uid(), name, cat: '', notes: '' }); save(); toast('Exercise added'); render(); break;
-      }
-      case 'lib-up': swap(state.exercises, i, i - 1); save(); rerenderKeepScroll(); break;
-      case 'lib-down': swap(state.exercises, i, i + 1); save(); rerenderKeepScroll(); break;
+      case 'del-session': if (confirm('Delete this workout? This cannot be undone.')) { state.sessions = state.sessions.filter((x) => x.id !== s.id); save(); toast('Workout deleted'); go('#/'); } break;
+      case 'hist-clear': histQ = ''; render(); break;
+      case 'seg': exTab.seg = d.seg; exTab.limit = 80; render(); break;
+      case 'lib-reorder': reorderSheet(); break;
       case 'ex-delete': {
         const e = exById(d.id);
-        if (!confirm(`Delete “${e.name}” from your library? Past workouts keep their logs; it is removed from templates.`)) break;
+        if (!confirm(`Delete “${e.name}” from My exercises? Past workouts keep their logs; it is removed from templates.`)) break;
         for (const ss of state.sessions) for (const x of ss.exercises) if (x.exId === e.id) x.name = e.name;
         for (const tt of state.templates) tt.items = tt.items.filter((it) => it.exId !== e.id);
         state.exercises = state.exercises.filter((x) => x.id !== e.id); save(); toast('Exercise deleted'); go('#/exercises'); break;
       }
       case 'tpl-create': {
-        const inp = document.getElementById('newTpl'); const name = inp.value.trim(); if (!name) return inp.focus();
+        const inp = document.getElementById('newTpl'); const name = inp.value.trim(); if (!name) { toast('Give the template a name first'); return inp.focus(); }
         const nt = { id: uid(), name, items: [] }; state.templates.push(nt); save(); go('#/template/' + nt.id); break;
       }
       case 'tpl-up': swap(state.templates, i, i - 1); save(); rerenderKeepScroll(); break;
@@ -442,17 +652,34 @@
       case 'ti-up': swap(t.items, i, i - 1); save(); rerenderKeepScroll(); break;
       case 'ti-down': swap(t.items, i, i + 1); save(); rerenderKeepScroll(); break;
       case 'ti-remove': t.items.splice(i, 1); save(); rerenderKeepScroll(); break;
-      case 'ti-add': pickExercise('Add to template', (id) => { t.items.push({ exId: id, sets: 3, reps: '8' }); save(); rerenderKeepScroll(); }); break;
-      case 'tpl-delete': if (confirm(`Delete template “${t.name}”? Logged workouts are kept.`)) { state.templates = state.templates.filter((x) => x.id !== t.id); save(); toast('Template deleted'); go('#/templates'); } break;
+      case 'ti-add': pickExercise('Add to template', (id) => { t.items.push({ exId: id, sets: 3, reps: '8' }); save(); }, (n) => { if (n) rerenderKeepScroll(); }); break;
+      case 'tpl-delete': if (confirm(`Delete template “${t.name}”? Logged workouts are kept.`)) { state.templates = state.templates.filter((x) => x.id !== t.id); state.plans = state.plans.filter((p) => p.templateId !== t.id); save(); toast('Template deleted'); go('#/templates'); } break;
       case 'export': exportJSON(); break;
       case 'import': document.getElementById('importFile').click(); break;
       case 'wipe':
         if (confirm('Erase ALL workouts, exercises and templates on this phone? Export a backup first!') && confirm('Really erase everything?')) {
-          state = { version: 1, settings: { programStart: weekStart(todayStr()) }, exercises: [], templates: [], sessions: [] }; save(); toast('All data erased'); go('#/');
+          state = { version: 1, settings: { programStart: weekStart(todayStr()), samplesCleared: true }, exercises: [], templates: [], sessions: [], plans: [] }; save(); toast('All data erased'); go('#/');
         }
         break;
     }
   }
+
+  // Exercises tab interactions (chips, library rows, custom add)
+  $app.addEventListener('click', (ev) => {
+    if (!location.hash.startsWith('#/exercises')) return;
+    const chip = ev.target.closest('[data-chip]');
+    if (chip) { exTab.chip = chip.dataset.chip; exTab.limit = 80; document.querySelectorAll('#app .chip').forEach((b) => { b.classList.toggle('on', b === chip); b.setAttribute('aria-selected', b === chip); }); drawExResults(); return; }
+    const x = ev.target.closest('[data-x]'); if (!x) return;
+    if (x.dataset.x === 'pick-lib') {
+      const li = LIB_ITEMS[+x.dataset.li]; const have = findMineByName(li.name);
+      if (have) { location.hash = '#/exercise/' + have.id; return; }
+      ensureMine(li); toast(`${li.name} added to My exercises`); drawExResults();
+      const c = document.querySelector('.seg-btn[data-seg="mine"] .count'); if (c) c.textContent = state.exercises.length;
+    } else if (x.dataset.x === 'custom') {
+      const r = createCustom(exTab.q, exTab.chip !== 'all' ? exTab.chip : null); exTab.q = ''; toast(`Added “${r.ex.name}” to My exercises`); exTab.seg = 'mine'; render();
+    } else if (x.dataset.x === 'more') { exTab.limit += 150; drawExResults(); }
+    else if (x.dataset.x === 'seg-lib') { exTab.seg = 'lib'; render(); }
+  });
 
   function exportJSON() {
     const payload = { app: 'slimtucci-diary', version: 1, exportedAt: new Date().toISOString(), data: state };
@@ -479,11 +706,14 @@
 
   // ---------- events ----------
   document.addEventListener('click', (ev) => {
+    if (ev.target.closest('.sheet-bg')) return;
     const tr = ev.target.closest('tr[data-href]'); if (tr) { location.hash = tr.dataset.href; return; }
-    const day = ev.target.closest('.day[data-date]');
-    if (day) { const ss = sortedSessions().filter((x) => x.date === day.dataset.date); if (ss.length) location.hash = '#/log/' + ss[ss.length - 1].id; return; }
     const el = ev.target.closest('[data-action]'); if (!el || el.disabled) return;
     ev.preventDefault(); doAction(el.dataset.action, el);
+  });
+  document.addEventListener('keydown', (ev) => {
+    if (ev.key === 'Escape') { const c = document.querySelector('.sheet-bg [data-x="close"]'); if (c) c.click(); }
+    if (ev.key === 'Enter' && ev.target.matches('tr[data-href]')) location.hash = ev.target.dataset.href;
   });
   function onField(ev) {
     const el = ev.target; const b = el.dataset && el.dataset.bind; if (!b) return;
@@ -494,11 +724,11 @@
       const s = curSession(); if (!s) return;
       if (k === 'date') { if (!v) return; s.date = v; touch(s); save(); if (ev.type === 'change') rerenderKeepScroll(); return; }
       s[k] = v; touch(s); if (k === 'name') document.getElementById('title').textContent = v || 'Workout';
-    } else if (b === 'set') { const s = curSession(); s.exercises[+el.dataset.ei].sets[+el.dataset.si][k] = v; touch(s); }
-    else if (b === 'exnote') { const s = curSession(); s.exercises[+el.dataset.ei].notes = v; touch(s); }
-    else if (b === 'exdef') { const e = exById(curId()); if (k === 'name' && !v.trim()) return; e[k] = k === 'name' ? v.trim() : v; if (k === 'name') document.getElementById('title').textContent = v; }
-    else if (b === 'tpl') { const t = curTpl(); if (!v.trim()) return; t.name = v.trim(); document.getElementById('title').textContent = v; }
-    else if (b === 'ti') { const t = curTpl(); t.items[+el.dataset.i][k] = k === 'sets' ? Math.max(1, parseInt(v, 10) || 1) : v; }
+    } else if (b === 'set') { const s = curSession(); if (!s) return; s.exercises[+el.dataset.ei].sets[+el.dataset.si][k] = v; touch(s); }
+    else if (b === 'exnote') { const s = curSession(); if (!s) return; s.exercises[+el.dataset.ei].notes = v; touch(s); }
+    else if (b === 'exdef') { const e = exById(curId()); if (!e) return; if (k === 'name' && !v.trim()) return; e[k] = k === 'name' ? v.trim() : v; if (k === 'name') document.getElementById('title').textContent = v; }
+    else if (b === 'tpl') { const t = curTpl(); if (!t || !v.trim()) return; t.name = v.trim(); document.getElementById('title').textContent = v; }
+    else if (b === 'ti') { const t = curTpl(); if (!t) return; t.items[+el.dataset.i][k] = k === 'sets' ? Math.max(1, parseInt(v, 10) || 1) : v; }
     else if (b === 'setting') { state.settings[k] = v || null; save(); if (ev.type === 'change') render(); return; }
     save();
   }
@@ -508,8 +738,8 @@
   window.addEventListener('pagehide', save);
   document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') save(); });
 
-  // expose week helpers for testing / debugging
-  window.SlimTucci = { weekStart, weekEnd, weekNum, weekLabel, get state() { return state; } };
+  // expose helpers for testing / debugging
+  window.SlimTucci = { weekStart, weekEnd, weekNum, weekLabel, search: (q) => searchList(LIB_ITEMS, q, (x) => x.hay, (x) => x.key).slice(0, 10).map((x) => x.name), libSize: LIB_ITEMS.length, get state() { return state; } };
 
   render();
   if (navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(() => {});

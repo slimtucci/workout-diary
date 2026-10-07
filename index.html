@@ -3,10 +3,12 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#0e0f12">
+  <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#121a1e" media="(prefers-color-scheme: dark)">
+  <meta name="color-scheme" content="light dark">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="SlimTucci">
   <title>SlimTucci Workout Diary</title>
   <link rel="manifest" href="manifest.webmanifest">
@@ -16,20 +18,23 @@
 </head>
 <body>
   <header class="topbar">
-    <button class="icon-btn" id="backBtn" data-action="back" aria-label="Back" hidden>&#8592;</button>
+    <button class="icon-btn back" id="backBtn" data-action="back" aria-label="Back" hidden>
+      <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
     <h1 id="title">SlimTucci</h1>
-    <span class="brand-dot" aria-hidden="true"></span>
+    <span class="brand" aria-hidden="true">ST</span>
   </header>
   <main id="app" aria-live="polite"></main>
-  <nav class="tabbar" id="tabbar">
-    <a href="#/" data-tab="home"><span class="ti">&#9679;</span>Today</a>
-    <a href="#/history" data-tab="history"><span class="ti">&#9776;</span>History</a>
-    <a href="#/exercises" data-tab="exercises"><span class="ti">&#9650;</span>Exercises</a>
-    <a href="#/templates" data-tab="templates"><span class="ti">&#9638;</span>Templates</a>
-    <a href="#/settings" data-tab="settings"><span class="ti">&#9881;</span>More</a>
+  <nav class="tabbar" id="tabbar" aria-label="Main">
+    <a href="#/" data-tab="home"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>Today</a>
+    <a href="#/history" data-tab="history"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>History</a>
+    <a href="#/exercises" data-tab="exercises"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 8v8M17.5 8v8M3.5 10v4M20.5 10v4M6.5 12h11"/></svg>Exercises</a>
+    <a href="#/templates" data-tab="templates"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="3.5" width="16" height="17" rx="3"/><path d="M8 8.5h8M8 12h8M8 15.5h5"/></svg>Templates</a>
+    <a href="#/settings" data-tab="settings"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="5.5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="18.5" cy="12" r="1.6"/></svg>More</a>
   </nav>
   <div id="toast" class="toast" role="status" hidden></div>
   <input type="file" id="importFile" accept="application/json,.json" hidden>
+  <script src="exercises-library.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
