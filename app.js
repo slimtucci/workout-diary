@@ -150,7 +150,8 @@
       exercises: ex,
       templates: [],
       sessions: [],
-      plans: []
+      plans: [],
+      macros: null
     };
   }
   function load() {
@@ -176,6 +177,7 @@
     d.settings = d.settings || {};
     if (!('programStart' in d.settings)) d.settings.programStart = null;
     if (!Array.isArray(d.plans)) d.plans = [];
+    if (d.macros === undefined) d.macros = null;
     // map first-release category names onto the library categories
     const LEGACY = { rotation: 'Core', carry: 'Carries & Strongman', conditioning: 'Cardio & Conditioning', 'full body': 'Legs' };
     for (const e of d.exercises) { const k = String(e.cat || '').toLowerCase(); if (LEGACY[k]) e.cat = LEGACY[k]; }
@@ -217,7 +219,7 @@
     document.title = title === 'SlimTucci' ? 'SlimTucci Workout Diary' : `${title} · SlimTucci`;
     document.getElementById('backBtn').hidden = !back;
     const tab = location.hash.split('/')[1] || 'home';
-    const map = { '': 'home', log: 'home', history: 'history', exercises: 'exercises', exercise: 'exercises', templates: 'templates', template: 'templates', settings: 'settings' };
+    const map = { '': 'home', log: 'home', history: 'history', exercises: 'exercises', exercise: 'exercises', templates: 'settings', template: 'settings', settings: 'settings', macros: 'macros' };
     document.querySelectorAll('.tabbar a').forEach((a) => { const on = a.dataset.tab === (map[tab] || tab); a.classList.toggle('active', on); if (on) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); });
     document.body.classList.toggle('has-actionbar', tab === 'log');
   }
@@ -383,6 +385,7 @@
         ${!logged.length && !info.planned.length ? `<div class="day-empty">No workouts on ${DOW[dow(selDay)]} — tap <b>+</b> to log one${state.templates.length ? ' or plan a template' : ''}.</div>` : ''}
         <div class="btn-row"><button class="btn primary" data-action="day-add">+ Log workout</button><button class="btn" data-action="day-plan">Plan template</button></div>
       </section>
+      ${macroMiniHTML()}
       ${state.sessions.length ? '' : `<section class="card welcome"><div class="welcome-title">Welcome to your diary 👋</div><ol class="steps"><li>Tap a day, then <b>+ Log workout</b>.</li><li>Add exercises from ${LIB_ITEMS.length}+ movements.</li><li>Enter lb and reps for each set — it saves as you type.</li></ol><a class="btn block soft" href="#/templates">Build a template for the days you repeat</a></section>`}`;
   }
 
@@ -533,7 +536,7 @@
   }
 
   function viewTemplates() {
-    setChrome('Templates', false);
+    setChrome('Templates', true);
     $app.innerHTML = `<section class="card"><label class="f" for="newTpl">New template</label>
       <div class="row"><input id="newTpl" class="grow" placeholder="e.g. Monday Lower + Rotation" autocomplete="off"><button class="btn primary" data-action="tpl-create">Create</button></div></section>
       ${state.templates.length ? `<div class="sec-title">Your templates</div>` + state.templates.map((t, i) => `<div class="list-item"><a class="grow rowlink" href="#/template/${t.id}"><div class="title">${esc(t.name)}</div><div class="sub">${plural(t.items.length, 'exercise')}</div></a>
@@ -564,7 +567,10 @@
     setChrome('More', false);
     const ps = state.settings.programStart;
     const st = sessionStats(state.sessions);
-    $app.innerHTML = `<div class="sec-title">Program</div><section class="card">
+    $app.innerHTML = `<div class="sec-title">Plan</div>
+      <a class="list-item" href="#/templates"><span class="li-ico tool" aria-hidden="true">▤</span><div class="grow"><div class="title">Templates</div><div class="sub">${plural(state.templates.length, 'saved workout')} · create, edit, start</div></div><span class="chev" aria-hidden="true">›</span></a>
+      <a class="list-item" href="#/macros"><span class="li-ico tool" aria-hidden="true">◔</span><div class="grow"><div class="title">Macro calculator</div><div class="sub">${state.macros && state.macros.result && state.macros.result.calories ? `${state.macros.result.calories.toLocaleString()} kcal · P ${state.macros.result.protein} · C ${state.macros.result.carbs} · F ${state.macros.result.fat}` : 'Set your daily calories and macros'}</div></div><span class="chev" aria-hidden="true">›</span></a>
+      <div class="sec-title">Program</div><section class="card">
         <label class="f" for="progStart">Program start date</label>
         <input id="progStart" type="date" data-bind="setting" data-k="programStart" value="${esc(ps || '')}">
         <div class="hint">Weeks run Sunday → Saturday. Week 1 is the Sun–Sat week containing this date${ps ? ` (${esc(rangeLabel(ps))})` : ''}. This week: <b id="curWeek">${esc(weekLabel(todayStr()))}</b></div></section>
@@ -577,6 +583,114 @@
       <div class="foot">SlimTucci Workout Diary · works offline<br>Add to Home Screen from your browser’s Share / ⋮ menu</div>`;
     if (navigator.storage && navigator.storage.persisted) navigator.storage.persisted().then((p) => { const el = document.getElementById('persist'); if (el) el.textContent = p ? 'storage: persistent' : 'storage: best-effort'; });
     else document.getElementById('persist').textContent = 'storage: local';
+  }
+
+
+  // ---------- macro calculator (math lives in macros-calc.js) ----------
+  const MAC = window.SlimTucciMacros;
+  const KG_LB = 2.20462;
+  const DEFAULT_PROFILE = { weightKg: null, heightCm: null, age: null, sex: 'male', activity: 'moderate', goal: 'maintain', intensity: 'standard', bodyFat: null, wUnit: 'lb', hUnit: 'ftin' };
+  function macroState() {
+    if (!state.macros || !state.macros.profile) state.macros = { profile: Object.assign({}, DEFAULT_PROFILE), result: null, updatedAt: null };
+    state.macros.profile = Object.assign({}, DEFAULT_PROFILE, state.macros.profile);
+    return state.macros;
+  }
+  const trim1 = (x) => (x == null || x === '' || isNaN(x) ? '' : String(Math.round(x * 10) / 10));
+  function heightParts(cm) { if (!(cm > 0)) return { ft: '', inch: '' }; let tin = Math.round(cm / 2.54); return { ft: Math.floor(tin / 12), inch: tin % 12 }; }
+  // FUTURE HOOK: pass "calories burned today" (e.g. from a logged session or a wearable) as the 2nd argument.
+  // Nothing feeds it yet; keep it 0 until that integration exists.
+  function caloriesBurnedToday() { return 0; }
+  function recomputeMacros() {
+    const m = macroState();
+    m.result = MAC.computeTargets(m.profile, caloriesBurnedToday());
+    m.updatedAt = new Date().toISOString();
+    save();
+    return m.result;
+  }
+  function macroMiniHTML() {
+    const r = state.macros && state.macros.result;
+    if (!r || !r.calories) return `<a class="card macro-mini empty-mini" href="#/macros"><span class="li-ico tool" aria-hidden="true">◔</span><span class="grow"><b>Set your daily macro targets</b><span class="sub">Calories, protein, carbs and fat in 30 seconds</span></span><span class="chev" aria-hidden="true">›</span></a>`;
+    return `<a class="card macro-mini" href="#/macros" aria-label="Today's targets: ${r.calories} calories, ${r.protein} grams protein, ${r.carbs} grams carbs, ${r.fat} grams fat">
+      <div class="mm-head"><span>Today’s targets</span><span class="chev" aria-hidden="true">›</span></div>
+      <div class="mm-row"><div class="mm-k"><b>${r.calories.toLocaleString()}</b><span>kcal</span></div><div class="mm-p"><b>${r.protein}g</b><span>Protein</span></div><div class="mm-c"><b>${r.carbs}g</b><span>Carbs</span></div><div class="mm-f"><b>${r.fat}g</b><span>Fat</span></div></div></a>`;
+  }
+  const DISCLAIMER = 'Estimates only. Adjust based on your weekly progress, and talk to your coach if you have any medical conditions.';
+  function macroResultsHTML() {
+    const m = macroState(), r = m.result, p = m.profile;
+    if (!r) return `<section class="card">${emptyState('◔', 'Your daily targets', 'Enter your weight, height and age below to see calories, protein, carbs and fat.')}</section>`;
+    if (r.blocked) return `<section class="card warn"><b>Under 18?</b> Calorie targets need a coach review first. Talk to your coach before using these numbers.</section>`;
+    const g = MAC.GOALS[r.goal], goalTxt = r.goal === 'maintain' ? 'Maintain' : `${g.label} · ${MAC.INTENSITY_LABEL[r.intensity]} (${r.adjPct > 0 ? '+' : ''}${r.adjPct}%)`;
+    const bmrLine = r.method === 'Katch-McArdle'
+      ? `Katch-McArdle BMR = 370 + 21.6 × lean mass (${r.lbmKg} kg at ${trim1(p.bodyFat)}% body fat) = <b>${r.bmr.toLocaleString()}</b> kcal`
+      : `Mifflin-St Jeor BMR = 10 × ${trim1(p.weightKg)} kg + 6.25 × ${trim1(p.heightCm)} cm − 5 × ${p.age} ${p.sex === 'female' ? '− 161' : '+ 5'} = <b>${r.bmr.toLocaleString()}</b> kcal`;
+    return `<section class="card macro-hero"><div class="mh-l">Daily calories</div><div class="mh-v" id="mCalories">${r.calories.toLocaleString()}<span> kcal</span></div><div class="mh-s">${esc(goalTxt)} · ${esc(r.activityLabel)}</div></section>
+      <div class="macro-grid">
+        <div class="macro-card p"><span class="mc-l">Protein</span><b id="mProtein">${r.protein}<small>g</small></b><span class="mc-pct">${r.pct.protein}%</span></div>
+        <div class="macro-card c"><span class="mc-l">Carbs</span><b id="mCarbs">${r.carbs}<small>g</small></b><span class="mc-pct">${r.pct.carbs}%</span></div>
+        <div class="macro-card f"><span class="mc-l">Fat</span><b id="mFat">${r.fat}<small>g</small></b><span class="mc-pct">${r.pct.fat}%</span></div>
+      </div>
+      <div class="split-bar" role="img" aria-label="Calorie split: protein ${r.pct.protein}%, carbs ${r.pct.carbs}%, fat ${r.pct.fat}%"><i class="p" style="width:${r.pct.protein}%"></i><i class="c" style="width:${r.pct.carbs}%"></i><i class="f" style="width:${r.pct.fat}%"></i></div>
+      <div class="macro-meta" id="mMeta">BMR ${r.bmr.toLocaleString()} · TDEE ${r.tdee.toLocaleString()} kcal · ${esc(r.method)}</div>
+      ${r.warnings.map((w) => `<div class="card warn">${esc(w)}</div>`).join('')}
+      <details class="how"><summary>How this was calculated</summary><ol>
+        <li>${bmrLine}</li>
+        <li>TDEE = BMR × ${r.activityMult} (${esc(r.activityLabel)}) = <b>${r.tdee.toLocaleString()}</b> kcal</li>
+        <li>Goal: ${esc(goalTxt)} → ${r.tdee.toLocaleString()} × ${(1 + r.adjPct / 100).toFixed(2)}${r.extraBurnKcal ? ` + ${r.extraBurnKcal} burned today` : ''}, rounded to the nearest 50 = <b>${r.calories.toLocaleString()}</b> kcal</li>
+        <li>Protein: ${r.proteinPerLb} g per lb × ${r.weightLb} lb = <b>${r.protein} g</b> (rounded to 5 g)</li>
+        <li>Fat: 0.35 g per lb (never below 0.3 g/lb, kept within 20–35% of calories) = <b>${r.fat} g</b></li>
+        <li>Carbs fill the rest: (${r.calories.toLocaleString()} − ${r.protein}×4 − ${r.fat}×9) ÷ 4 = <b>${r.carbs} g</b></li>
+      </ol><div class="hint">Based on the SlimTucci Nutrition Desk macro framework.</div></details>
+      <p class="disclaimer">${DISCLAIMER}</p>`;
+  }
+  function segHTML(k, cur, opts, label) {
+    return `<div class="seg mini" role="radiogroup" aria-label="${esc(label)}">${opts.map(([v, l]) => `<button class="seg-btn${v === cur ? ' on' : ''}" data-action="macro-set" data-k="${k}" data-v="${v}" role="radio" aria-checked="${v === cur}">${esc(l)}</button>`).join('')}</div>`;
+  }
+  function viewMacros() {
+    setChrome('Macros', false);
+    const m = macroState(), p = m.profile;
+    if (!m.result && p.weightKg) recomputeMacros();
+    const hp = heightParts(p.heightCm);
+    const wVal = p.weightKg ? (p.wUnit === 'kg' ? trim1(p.weightKg) : trim1(p.weightKg * KG_LB)) : '';
+    const goal = MAC.GOALS[p.goal] || MAC.GOALS.maintain;
+    const ints = Object.entries(goal.intensities);
+    $app.innerHTML = `<div id="macroResults">${macroResultsHTML()}</div>
+      <div class="sec-title">Your details</div>
+      <section class="card stack">
+        <div><div class="lab-row"><label class="f" for="mWeight">Weight</label>${segHTML('wUnit', p.wUnit, [['lb', 'lb'], ['kg', 'kg']], 'Weight unit')}</div>
+          <div class="unit-input"><input id="mWeight" type="number" inputmode="decimal" step="any" min="0" data-bind="macro" data-k="weight" value="${esc(wVal)}" placeholder="${p.wUnit === 'kg' ? 'e.g. 93' : 'e.g. 205'}"><span class="unit">${p.wUnit}</span></div></div>
+        <div><div class="lab-row"><label class="f" for="${p.hUnit === 'cm' ? 'mCm' : 'mFt'}">Height</label>${segHTML('hUnit', p.hUnit, [['ftin', 'ft / in'], ['cm', 'cm']], 'Height unit')}</div>
+          ${p.hUnit === 'cm' ? `<div class="unit-input"><input id="mCm" type="number" inputmode="decimal" step="any" min="0" data-bind="macro" data-k="cm" value="${esc(trim1(p.heightCm))}" placeholder="e.g. 193"><span class="unit">cm</span></div>`
+            : `<div class="row"><div class="unit-input grow"><input id="mFt" type="number" inputmode="numeric" min="0" max="8" data-bind="macro" data-k="ft" value="${esc(hp.ft)}" placeholder="6" aria-label="Height feet"><span class="unit">ft</span></div><div class="unit-input grow"><input id="mIn" type="number" inputmode="numeric" min="0" max="11" data-bind="macro" data-k="in" value="${esc(hp.inch)}" placeholder="4" aria-label="Height inches"><span class="unit">in</span></div></div>`}</div>
+        <div class="row top"><div class="grow"><label class="f" for="mAge">Age</label><div class="unit-input"><input id="mAge" type="number" inputmode="numeric" min="1" max="100" data-bind="macro" data-k="age" value="${esc(p.age || '')}" placeholder="e.g. 30"><span class="unit">yrs</span></div></div>
+          <div class="grow"><span class="f">Sex</span>${segHTML('sex', p.sex, [['male', 'Male'], ['female', 'Female']], 'Sex')}</div></div>
+        <div><label class="f" for="mBf">Body fat % <span class="opt">optional</span></label><div class="unit-input"><input id="mBf" type="number" inputmode="decimal" step="any" min="3" max="60" data-bind="macro" data-k="bodyFat" value="${esc(p.bodyFat || '')}" placeholder="Leave blank if unsure"><span class="unit">%</span></div>
+          <div class="hint">If you know it, BMR switches to Katch-McArdle (based on lean mass).</div></div>
+      </section>
+      <div class="sec-title">Activity level</div>
+      <div class="choice-list" role="radiogroup" aria-label="Activity level">${Object.entries(MAC.ACTIVITY).map(([k, a]) => `<button class="choice${k === p.activity ? ' on' : ''}" data-action="macro-set" data-k="activity" data-v="${k}" role="radio" aria-checked="${k === p.activity}"><span class="radio" aria-hidden="true"></span><span class="grow"><span class="ch-t">${esc(a.label)}</span><span class="ch-d">${esc(a.desc)}</span></span><span class="ch-m">×${a.mult}</span></button>`).join('')}</div>
+      <div class="sec-title">Goal</div>
+      <section class="card stack">
+        ${segHTML('goal', p.goal, [['cut', 'Cut'], ['maintain', 'Maintain'], ['bulk', 'Bulk']], 'Goal')}
+        ${ints.length > 1 ? `<div><span class="f">How hard?</span>${segHTML('intensity', p.intensity in goal.intensities ? p.intensity : 'standard', ints.map(([k, v]) => [k, `${MAC.INTENSITY_LABEL[k]} ${v > 0 ? '+' : ''}${Math.round(v * 100)}%`]), 'Goal intensity')}
+          <div class="hint">${p.goal === 'cut' ? 'Start mild or standard. Use a hard cut only with your coach’s OK.' : 'Lean bulk keeps fat gain low. Standard suits most phases.'}</div></div>` : '<div class="hint">Calories match your estimated daily burn (TDEE).</div>'}
+      </section>
+      <p class="disclaimer">${DISCLAIMER}</p>`;
+  }
+  function macroSet(k, v) {
+    const m = macroState(), p = m.profile;
+    p[k] = v;
+    if (k === 'goal') p.intensity = 'standard';
+    recomputeMacros(); rerenderKeepScroll();
+  }
+  function macroInput() {
+    const p = macroState().profile;
+    const val = (id) => { const el = document.getElementById(id); return el && el.value !== '' && !isNaN(Number(el.value)) ? Number(el.value) : null; };
+    const w = val('mWeight'); p.weightKg = w == null ? null : (p.wUnit === 'kg' ? w : w / KG_LB);
+    if (p.hUnit === 'cm') p.heightCm = val('mCm');
+    else { const ft = val('mFt'), inch = val('mIn'); p.heightCm = ft == null && inch == null ? null : ((ft || 0) * 12 + (inch || 0)) * 2.54; }
+    p.age = val('mAge'); p.bodyFat = val('mBf');
+    recomputeMacros();
+    document.getElementById('macroResults').innerHTML = macroResultsHTML();
   }
 
   // ---------- router ----------
@@ -592,6 +706,7 @@
     else if (r === 'templates') viewTemplates();
     else if (r === 'template') viewTemplate(id);
     else if (r === 'settings') viewSettings();
+    else if (r === 'macros') viewMacros();
     else viewHome();
     renderedHash = location.hash;
   }
@@ -655,10 +770,11 @@
       case 'ti-add': pickExercise('Add to template', (id) => { t.items.push({ exId: id, sets: 3, reps: '8' }); save(); }, (n) => { if (n) rerenderKeepScroll(); }); break;
       case 'tpl-delete': if (confirm(`Delete template “${t.name}”? Logged workouts are kept.`)) { state.templates = state.templates.filter((x) => x.id !== t.id); state.plans = state.plans.filter((p) => p.templateId !== t.id); save(); toast('Template deleted'); go('#/templates'); } break;
       case 'export': exportJSON(); break;
+      case 'macro-set': macroSet(d.k, d.v); break;
       case 'import': document.getElementById('importFile').click(); break;
       case 'wipe':
         if (confirm('Erase ALL workouts, exercises and templates on this phone? Export a backup first!') && confirm('Really erase everything?')) {
-          state = { version: 1, settings: { programStart: weekStart(todayStr()), samplesCleared: true }, exercises: [], templates: [], sessions: [], plans: [] }; save(); toast('All data erased'); go('#/');
+          state = { version: 1, settings: { programStart: weekStart(todayStr()), samplesCleared: true }, exercises: [], templates: [], sessions: [], plans: [], macros: null }; save(); toast('All data erased'); go('#/');
         }
         break;
     }
@@ -729,6 +845,7 @@
     else if (b === 'exdef') { const e = exById(curId()); if (!e) return; if (k === 'name' && !v.trim()) return; e[k] = k === 'name' ? v.trim() : v; if (k === 'name') document.getElementById('title').textContent = v; }
     else if (b === 'tpl') { const t = curTpl(); if (!t || !v.trim()) return; t.name = v.trim(); document.getElementById('title').textContent = v; }
     else if (b === 'ti') { const t = curTpl(); if (!t) return; t.items[+el.dataset.i][k] = k === 'sets' ? Math.max(1, parseInt(v, 10) || 1) : v; }
+    else if (b === 'macro') { macroInput(); return; }
     else if (b === 'setting') { state.settings[k] = v || null; save(); if (ev.type === 'change') render(); return; }
     save();
   }
@@ -739,7 +856,7 @@
   document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') save(); });
 
   // expose helpers for testing / debugging
-  window.SlimTucci = { weekStart, weekEnd, weekNum, weekLabel, search: (q) => searchList(LIB_ITEMS, q, (x) => x.hay, (x) => x.key).slice(0, 10).map((x) => x.name), libSize: LIB_ITEMS.length, get state() { return state; } };
+  window.SlimTucci = { computeTargets: (p, x) => MAC.computeTargets(p, x), weekStart, weekEnd, weekNum, weekLabel, search: (q) => searchList(LIB_ITEMS, q, (x) => x.hay, (x) => x.key).slice(0, 10).map((x) => x.name), libSize: LIB_ITEMS.length, get state() { return state; } };
 
   render();
   if (navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(() => {});
