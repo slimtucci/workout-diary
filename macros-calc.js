@@ -7,6 +7,9 @@
  *   5. Fat: 0.35 g/lb, never below the 0.3 g/lb floor, and held within 20–35 % of calories.
  *   6. Carbs fill the remaining calories.
  *   7. Round: calories to nearest 50 kcal, macros to nearest 5 g.
+ * Burn adjustment (computeBurnExtra): base = TDEE (the activity multiplier already covers normal training).
+ *   extra = (burn today − TDEE) × 50 % on a cut / 75 % on maintain or bulk, rounded to 5 kcal, clamped 0…+800.
+ *   computeTargets(profile, extra) adds it all to carbs; protein and fat stay at the base targets.
  */
 (function () {
   'use strict';
@@ -37,12 +40,23 @@
     return errs;
   }
 
+  const BURN_FACTOR = { cut: 0.5, maintain: 0.75, bulk: 0.75 };
+  const BURN_MAX_EXTRA = 800;
+  /** Extra kcal to eat today, from total calories burned today (e.g. WHOOP cycle kcal or a manual number). */
+  function computeBurnExtra(burnKcal, tdee, goal) {
+    const burn = Number(burnKcal), base = Number(tdee);
+    if (!(burn > 0) || !(base > 0)) return 0;
+    const factor = BURN_FACTOR[goal] != null ? BURN_FACTOR[goal] : 0.75;
+    const extra = Math.round(((burn - base) * factor) / 5) * 5;
+    return Math.max(0, Math.min(BURN_MAX_EXTRA, extra));
+  }
+
   /**
    * computeTargets(profile, extraBurnKcal = 0)
    * profile: { weightKg, heightCm, age, sex: 'male'|'female', activity, goal, intensity, bodyFat (optional %) }
    * extraBurnKcal: HOOK for a future "calories burned today" adjustment (e.g. a logged session or wearable).
-   *   It's added to the day's calorie target before the macro split; protein and the fat floor stay put and the
-   *   extra energy lands in carbs (and fat, if the 20 % floor needs it). Default 0, and nothing feeds it yet.
+   *   Base targets are computed first; the extra is then added on top, all of it as carbs (protein and fat unchanged).
+   *   Use computeBurnExtra() to turn a raw burn number into this extra. Default 0.
    * Returns null when required inputs are missing; { blocked: 'under18' } for under-18s (framework: coach review first).
    */
   function computeTargets(profile, extraBurnKcal = 0) {
@@ -61,20 +75,23 @@
     const intensity = goal.intensities[p.intensity] !== undefined ? p.intensity : 'standard';
     const adj = goal.intensities[intensity];
     const extra = Math.max(0, Number(extraBurnKcal) || 0);
-    const calories = round(tdee * (1 + adj) + extra, 50);
+    const baseCalories = round(tdee * (1 + adj), 50);
+    const calories = baseCalories;
 
     const protein = round(lb * goal.proteinPerLb, 5);
     let fat = Math.max(lb * FAT_PER_LB, lb * FAT_FLOOR_PER_LB, (calories * FAT_MIN_PCT) / 9);
     fat = Math.min(fat, Math.max((calories * FAT_MAX_PCT) / 9, lb * FAT_FLOOR_PER_LB));
     fat = round(fat, 5);
     if (fat * 9 < calories * FAT_MIN_PCT - 1 || fat < lb * FAT_FLOOR_PER_LB) fat = ceilTo(Math.max((calories * FAT_MIN_PCT) / 9, lb * FAT_FLOOR_PER_LB), 5);
-    let carbs = round((calories - protein * 4 - fat * 9) / 4, 5);
+    let baseCarbs = round((calories - protein * 4 - fat * 9) / 4, 5);
     const warnings = [];
-    if (carbs < 0) { carbs = 0; warnings.push('Protein and fat already exceed this calorie target. Talk to your coach.'); }
+    if (baseCarbs < 0) { baseCarbs = 0; warnings.push('Protein and fat already exceed this calorie target. Talk to your coach.'); }
+    const extraCarbs = round(extra / 4, 5);
+    const carbs = baseCarbs + extraCarbs;
     const macroKcal = protein * 4 + carbs * 4 + fat * 9;
     const pct = (k) => Math.round((k / macroKcal) * 100);
     return {
-      calories, protein, carbs, fat, macroKcal,
+      calories: baseCalories + extra, baseCalories, baseCarbs, extraCarbs, protein, carbs, fat, macroKcal,
       pct: { protein: pct(protein * 4), carbs: pct(carbs * 4), fat: pct(fat * 9) },
       bmr: Math.round(bmr), tdee: Math.round(tdee), method: useKatch ? 'Katch-McArdle' : 'Mifflin-St Jeor',
       activityMult: act.mult, activityLabel: act.label, goal: p.goal in GOALS ? p.goal : 'maintain', intensity, adjPct: Math.round(adj * 100),
@@ -82,5 +99,5 @@
     };
   }
 
-  window.SlimTucciMacros = { computeTargets, ACTIVITY, GOALS, INTENSITY_LABEL, LB_PER_KG };
+  window.SlimTucciMacros = { computeTargets, computeBurnExtra, BURN_FACTOR, BURN_MAX_EXTRA, ACTIVITY, GOALS, INTENSITY_LABEL, LB_PER_KG };
 })();

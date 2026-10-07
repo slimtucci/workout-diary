@@ -151,7 +151,8 @@
       templates: [],
       sessions: [],
       plans: [],
-      macros: null
+      macros: null,
+      burn: null
     };
   }
   function load() {
@@ -178,6 +179,7 @@
     if (!('programStart' in d.settings)) d.settings.programStart = null;
     if (!Array.isArray(d.plans)) d.plans = [];
     if (d.macros === undefined) d.macros = null;
+    if (d.burn === undefined) d.burn = null;
     // map first-release category names onto the library categories
     const LEGACY = { rotation: 'Core', carry: 'Carries & Strongman', conditioning: 'Cardio & Conditioning', 'full body': 'Legs' };
     for (const e of d.exercises) { const k = String(e.cat || '').toLowerCase(); if (LEGACY[k]) e.cat = LEGACY[k]; }
@@ -218,8 +220,8 @@
     document.getElementById('title').textContent = title;
     document.title = title === 'SlimTucci' ? 'SlimTucci Workout Diary' : `${title} · SlimTucci`;
     document.getElementById('backBtn').hidden = !back;
-    const tab = location.hash.split('/')[1] || 'home';
-    const map = { '': 'home', log: 'home', history: 'history', exercises: 'exercises', exercise: 'exercises', templates: 'settings', template: 'settings', settings: 'settings', macros: 'macros' };
+    const tab = location.hash.split('?')[0].split('/')[1] || 'home';
+    const map = { whoop: 'settings', '': 'home', log: 'home', history: 'history', exercises: 'exercises', exercise: 'exercises', templates: 'settings', template: 'settings', settings: 'settings', macros: 'macros' };
     document.querySelectorAll('.tabbar a').forEach((a) => { const on = a.dataset.tab === (map[tab] || tab); a.classList.toggle('active', on); if (on) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); });
     document.body.classList.toggle('has-actionbar', tab === 'log');
   }
@@ -386,6 +388,7 @@
         <div class="btn-row"><button class="btn primary" data-action="day-add">+ Log workout</button><button class="btn" data-action="day-plan">Plan template</button></div>
       </section>
       ${macroMiniHTML()}
+      ${burnCardHTML()}
       ${state.sessions.length ? '' : `<section class="card welcome"><div class="welcome-title">Welcome to your diary 👋</div><ol class="steps"><li>Tap a day, then <b>+ Log workout</b>.</li><li>Add exercises from ${LIB_ITEMS.length}+ movements.</li><li>Enter lb and reps for each set — it saves as you type.</li></ol><a class="btn block soft" href="#/templates">Build a template for the days you repeat</a></section>`}`;
   }
 
@@ -567,7 +570,9 @@
     setChrome('More', false);
     const ps = state.settings.programStart;
     const st = sessionStats(state.sessions);
-    $app.innerHTML = `<div class="sec-title">Plan</div>
+    $app.innerHTML = `<div class="sec-title">Connections</div>
+      <a class="list-item" href="#/whoop"><span class="li-ico tool" aria-hidden="true">⌁</span><div class="grow"><div class="title">Connections</div><div class="sub">WHOOP · ${whoopStatusText()}</div></div><span class="chev" aria-hidden="true">›</span></a>
+      <div class="sec-title">Plan</div>
       <a class="list-item" href="#/templates"><span class="li-ico tool" aria-hidden="true">▤</span><div class="grow"><div class="title">Templates</div><div class="sub">${plural(state.templates.length, 'saved workout')} · create, edit, start</div></div><span class="chev" aria-hidden="true">›</span></a>
       <a class="list-item" href="#/macros"><span class="li-ico tool" aria-hidden="true">◔</span><div class="grow"><div class="title">Macro calculator</div><div class="sub">${state.macros && state.macros.result && state.macros.result.calories ? `${state.macros.result.calories.toLocaleString()} kcal · P ${state.macros.result.protein} · C ${state.macros.result.carbs} · F ${state.macros.result.fat}` : 'Set your daily calories and macros'}</div></div><span class="chev" aria-hidden="true">›</span></a>
       <div class="sec-title">Program</div><section class="card">
@@ -597,12 +602,22 @@
   }
   const trim1 = (x) => (x == null || x === '' || isNaN(x) ? '' : String(Math.round(x * 10) / 10));
   function heightParts(cm) { if (!(cm > 0)) return { ft: '', inch: '' }; let tin = Math.round(cm / 2.54); return { ft: Math.floor(tin / 12), inch: tin % 12 }; }
-  // FUTURE HOOK: pass "calories burned today" (e.g. from a logged session or a wearable) as the 2nd argument.
-  // Nothing feeds it yet; keep it 0 until that integration exists.
-  function caloriesBurnedToday() { return 0; }
+  // HOOK: total calories burned today (WHOOP cycle kcal when connected, else a manual number). 0 = none.
+  // The base targets ignore it; adjustedToday() turns it into extra carbs via computeBurnExtra + computeTargets.
+  function caloriesBurnedToday() { const b = todayBurn(); return b ? b.kcal : 0; }
+  function todayBurn() { const b = state.burn; return b && b.date === todayStr() && b.kcal > 0 ? b : null; }
+  function adjustedToday() {
+    const m = state.macros, base = m && m.result;
+    if (!base || !base.calories || !m.profile) return null;
+    const burn = caloriesBurnedToday();
+    if (!burn) return null;
+    const extra = MAC.computeBurnExtra(burn, base.tdee, m.profile.goal);
+    const adj = MAC.computeTargets(m.profile, extra);
+    return { burn, extra, factor: MAC.BURN_FACTOR[m.profile.goal] ?? 0.75, tdee: base.tdee, base, adj };
+  }
   function recomputeMacros() {
     const m = macroState();
-    m.result = MAC.computeTargets(m.profile, caloriesBurnedToday());
+    m.result = MAC.computeTargets(m.profile, 0); // base targets; today's burn is applied separately (adjustedToday)
     m.updatedAt = new Date().toISOString();
     save();
     return m.result;
@@ -631,6 +646,7 @@
       </div>
       <div class="split-bar" role="img" aria-label="Calorie split: protein ${r.pct.protein}%, carbs ${r.pct.carbs}%, fat ${r.pct.fat}%"><i class="p" style="width:${r.pct.protein}%"></i><i class="c" style="width:${r.pct.carbs}%"></i><i class="f" style="width:${r.pct.fat}%"></i></div>
       <div class="macro-meta" id="mMeta">BMR ${r.bmr.toLocaleString()} · TDEE ${r.tdee.toLocaleString()} kcal · ${esc(r.method)}</div>
+      ${adjustedLineHTML()}
       ${r.warnings.map((w) => `<div class="card warn">${esc(w)}</div>`).join('')}
       <details class="how"><summary>How this was calculated</summary><ol>
         <li>${bmrLine}</li>
@@ -654,6 +670,8 @@
     const goal = MAC.GOALS[p.goal] || MAC.GOALS.maintain;
     const ints = Object.entries(goal.intensities);
     $app.innerHTML = `<div id="macroResults">${macroResultsHTML()}</div>
+      <div class="sec-title">WHOOP</div>
+      <div id="whoopCard">${whoopCardHTML()}</div>
       <div class="sec-title">Your details</div>
       <section class="card stack">
         <div><div class="lab-row"><label class="f" for="mWeight">Weight</label>${segHTML('wUnit', p.wUnit, [['lb', 'lb'], ['kg', 'kg']], 'Weight unit')}</div>
@@ -693,11 +711,151 @@
     document.getElementById('macroResults').innerHTML = macroResultsHTML();
   }
 
+  // ---------- burn today + WHOOP ----------
+  const CONFIG = window.SLIMTUCCI_CONFIG || {};
+  const WHOOP_URL = String(CONFIG.WHOOP_WORKER_URL || '').trim().replace(/\/+$/, '');
+  const WKEY = 'slimtucci-whoop-v1'; // per-device only: { session, connectedAt, lastSync, today, error }. Never WHOOP tokens.
+  function wload() { try { return JSON.parse(localStorage.getItem(WKEY)) || {}; } catch (e) { return {}; } }
+  let whoop = wload();
+  function wsave() { try { localStorage.setItem(WKEY, JSON.stringify(whoop)); } catch (e) {} }
+  const whoopConnected = () => !!(WHOOP_URL && whoop.session);
+  const fmtTime = (iso) => new Date(iso).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+  function whoopStatusText() { return !WHOOP_URL ? 'setup needed' : whoopConnected() ? 'connected' : 'not connected'; }
+  const SRC = (src) => `<span class="src-pill ${src === 'whoop' ? 'whoop' : 'manual'}">${src === 'whoop' ? 'WHOOP' : 'Manual'}</span>`;
+  function burnCardHTML() {
+    const b = todayBurn(), a = adjustedToday(), hasTargets = !!(state.macros && state.macros.result && state.macros.result.calories);
+    if (!b) return `<section class="card burn" id="burnCard"><div class="burn-head"><span class="bh-t">Burn today</span>${whoopConnected() ? SRC('whoop') : ''}</div>
+      <button class="burn-empty" data-action="burn-edit"><span class="pr-plus" aria-hidden="true">+</span><span class="grow"><b>Tap to enter calories burned</b><span class="sub">${whoopConnected() ? 'Waiting for WHOOP, or type a number' : 'Your total for today, from WHOOP or your watch'}</span></span></button></section>`;
+    let adjHTML;
+    if (!hasTargets) adjHTML = `<a class="adj-cta" href="#/macros">Set your macro targets to turn this into a carb adjustment ›</a>`;
+    else if (a.extra > 0) adjHTML = `<div class="adj" id="burnAdj">Adjusted for today: <b>+${a.extra.toLocaleString()} kcal</b> (+${a.adj.extraCarbs} g carbs)</div>
+      <div class="adj-sub">${Math.round(a.factor * 100)}% of your burn above your ${a.tdee.toLocaleString()} kcal TDEE, added as carbs → <b>${a.adj.calories.toLocaleString()} kcal · C ${a.adj.carbs} g</b> today</div>`;
+    else adjHTML = `<div class="adj none" id="burnAdj">Adjusted for today: <b>+0 kcal</b></div><div class="adj-sub">Burn is at or below your ${a.tdee.toLocaleString()} kcal TDEE, so today’s targets stay the same.</div>`;
+    return `<section class="card burn" id="burnCard"><div class="burn-head"><span class="bh-t">Burn today</span>${SRC(b.source)}</div>
+      <div class="burn-row"><div class="burn-v"><b id="burnKcal">${b.kcal.toLocaleString()}</b> kcal${b.source === 'whoop' && whoop.today && whoop.today.in_progress ? ' <span class="sub">so far</span>' : ''}</div><button class="btn sm" data-action="burn-edit">Edit</button></div>
+      ${adjHTML}</section>`;
+  }
+  function adjustedLineHTML() {
+    const b = todayBurn(), a = adjustedToday();
+    if (!b || !a) return `<button class="adj-line empty" data-action="burn-edit">Adjusted today: no burn entered · <u>add today’s burn</u></button>`;
+    return `<button class="adj-line" data-action="burn-edit" id="adjLine">Adjusted today: <b>+${a.extra.toLocaleString()} kcal (+${a.adj.extraCarbs} g carbs)</b>${a.extra ? ` <span class="nw">→ ${a.adj.calories.toLocaleString()} kcal · C ${a.adj.carbs} g</span>` : ''}<span class="al-src">from ${b.kcal.toLocaleString()} kcal burned (${b.source === 'whoop' ? 'WHOOP' : 'manual'})</span></button>`;
+  }
+  function burnSheet() {
+    const b = todayBurn();
+    const body = `<div class="sheet-note">Enter your <b>total</b> calories burned today (active + resting), e.g. from WHOOP or your watch. Your base targets already cover a normal day (your TDEE). Only the burn above that is added back: ${Math.round(MAC.BURN_FACTOR.cut * 100)}% on a cut, ${Math.round(MAC.BURN_FACTOR.maintain * 100)}% on maintain or bulk, up to +${MAC.BURN_MAX_EXTRA} kcal, all as carbs.</div>
+      <label class="f" for="burnInput">Calories burned today</label>
+      <div class="unit-input"><input id="burnInput" type="number" inputmode="numeric" min="0" max="15000" value="${b ? b.kcal : ''}" placeholder="e.g. 3600"><span class="unit">kcal</span></div>
+      <div class="btn-row"><button class="btn primary" data-x="burn-save">Save</button>${b ? '<button class="btn danger" data-x="burn-clear">Clear</button>' : ''}</div>
+      ${whoopConnected() ? `<button class="btn ghost block" data-x="burn-whoop">Use WHOOP instead</button>` : `<a class="btn ghost block" href="#/whoop" data-x="close">Connect WHOOP to fill this automatically</a>`}`;
+    const sh = openSheet('Burn today', body, (el, close) => {
+      const x = el.dataset.x;
+      if (x === 'burn-save') {
+        const v = Math.round(Number(sh.bg.querySelector('#burnInput').value));
+        if (!(v > 0) || v > 15000) { toast('Enter a number between 1 and 15,000'); return; }
+        state.burn = { date: todayStr(), kcal: v, source: 'manual', updatedAt: new Date().toISOString() }; save(); close(); toast('Burn saved'); refreshBurnViews();
+      } else if (x === 'burn-clear') { state.burn = null; save(); close(); refreshBurnViews(); }
+      else if (x === 'burn-whoop') { state.burn = null; save(); close(); refreshBurnViews(); whoopSync(true); }
+    });
+    sh.bg.querySelector('#burnInput').addEventListener('keydown', (e) => { if (e.key === 'Enter') sh.bg.querySelector('[data-x="burn-save"]').click(); });
+  }
+  // Update burn/WHOOP bits in place (no full re-render, so focus in Macros inputs is never lost).
+  function refreshBurnViews() {
+    const set = (id, html) => { const el = document.getElementById(id); if (el) el.outerHTML = html; };
+    const r = location.hash.split('?')[0];
+    if (r === '' || r === '#' || r === '#/') set('burnCard', burnCardHTML());
+    const mr = document.getElementById('macroResults'); if (mr) mr.innerHTML = macroResultsHTML();
+    const wc = document.getElementById('whoopCard'); if (wc) wc.innerHTML = whoopCardHTML();
+  }
+  function whoopCardHTML() {
+    const head = (pill) => `<div class="wc-head"><span class="wc-logo" aria-hidden="true">W</span><span class="grow"><b>WHOOP</b><span class="sub" id="whoopSub">${pill[2]}</span></span><span class="status-pill ${pill[0]}">${pill[1]}</span></div>`;
+    if (!WHOOP_URL) return `<section class="card whoop-card" data-state="setup">${head(['pending', 'Setup needed', 'Pull today’s calories burned automatically'])}
+      <p class="wc-note">Connecting WHOOP needs a one-time setup that’s still pending. Until then, enter <b>Burn today</b> by hand on the Today screen.</p>
+      <button class="btn primary block" data-action="whoop-connect">Connect WHOOP</button></section>`;
+    if (!whoop.session) return `<section class="card whoop-card" data-state="ready">${head(['off', 'Not connected', 'Pull today’s calories burned automatically'])}
+      ${whoop.error ? `<p class="wc-err">${esc(whoop.error)}</p>` : ''}<p class="wc-note">You’ll sign in at WHOOP and approve read access to your daily cycles. Your WHOOP password and tokens never touch this app.</p>
+      <button class="btn primary block" data-action="whoop-connect">Connect WHOOP</button></section>`;
+    const t = whoop.today && whoop.today.date === todayStr() ? whoop.today : null;
+    const tb = todayBurn();
+    return `<section class="card whoop-card on" data-state="connected">${head(['ok', 'Connected', `Connected · ${whoop.lastSync ? 'last synced ' + esc(fmtTime(whoop.lastSync)) : 'not synced yet'}`])}
+      <div class="wc-today"><span class="wc-l">Today${t && t.in_progress ? ' so far' : ''}</span><b id="whoopKcal">${t && t.kcal != null ? t.kcal.toLocaleString() : '—'}</b><span class="wc-u">kcal burned</span></div>
+      ${t && t.kcal == null ? '<p class="wc-note">WHOOP is still scoring today’s cycle. Check back soon.</p>' : ''}${whoop.error ? `<p class="wc-err">${esc(whoop.error)}</p>` : ''}
+      ${tb && tb.source === 'manual' ? '<p class="wc-note">Today is using your <b>manual</b> number. Open Burn today and tap “Use WHOOP instead” to switch.</p>' : ''}
+      <div class="btn-row"><button class="btn primary" data-action="whoop-refresh">↻ Refresh</button><button class="btn danger" data-action="whoop-disconnect">Disconnect</button></div></section>`;
+  }
+  function whoopSetupSheet() {
+    openSheet('Setup needed', `<div class="sheet-note">WHOOP only shares data through a small secure bridge that keeps its secret key off your phone. It’s a one-time setup:</div>
+      <ol class="setup-steps"><li><b>Create a WHOOP developer app</b> at developer.whoop.com (free, same WHOOP login). You paste in the redirect URL we give you.</li>
+      <li><b>Create a free Cloudflare account</b> at dash.cloudflare.com. The bridge runs there for $0.</li>
+      <li><b>We deploy the bridge and switch it on in the app.</b> Then you tap Connect WHOOP once and approve.</li></ol>
+      <div class="sheet-note">Until then, type today’s burn by hand. The same adjustment applies.</div>
+      <button class="btn primary block" data-x="manual">Enter today’s burn by hand</button>`, (el, close) => {
+      if (el.dataset.x === 'manual') { close(); burnSheet(); }
+    });
+  }
+  let whoopInflight = null;
+  function whoopSync(force) {
+    if (!whoopConnected()) return Promise.resolve();
+    if (whoopInflight) return whoopInflight;
+    const fresh = whoop.lastSync && Date.now() - new Date(whoop.lastSync).getTime() < 10 * 60 * 1000 && whoop.today && whoop.today.date === todayStr();
+    if (!force && fresh) return Promise.resolve();
+    whoopInflight = (async () => {
+      try {
+        const res = await fetch(`${WHOOP_URL}/today`, { headers: { Authorization: `Bearer ${whoop.session}` }, cache: 'no-store' });
+        const data = await res.json().catch(() => ({}));
+        if (res.status === 401) {
+          whoop = { error: 'WHOOP access ended. Tap Connect WHOOP to reconnect.' }; wsave();
+          if (state.burn && state.burn.source === 'whoop') { state.burn = null; save(); }
+        } else if (!res.ok) {
+          whoop.error = res.status === 429 ? 'WHOOP is busy. Try again in a minute.' : res.status === 503 ? 'Refreshing WHOOP access. Try again in a few seconds.' : 'Couldn’t reach WHOOP just now. Try Refresh later.'; wsave();
+        } else {
+          whoop.lastSync = new Date().toISOString(); whoop.error = null; whoop.today = Object.assign({}, data, { date: todayStr() }); wsave();
+          const manualToday = state.burn && state.burn.date === todayStr() && state.burn.source === 'manual';
+          if (data.kcal > 0 && !manualToday) { state.burn = { date: todayStr(), kcal: Math.round(data.kcal), source: 'whoop', updatedAt: whoop.lastSync }; save(); }
+          if (force) toast('WHOOP synced');
+        }
+      } catch (e) { whoop.error = 'You’re offline or the WHOOP bridge is unreachable.'; wsave(); }
+      finally { whoopInflight = null; refreshBurnViews(); }
+    })();
+    return whoopInflight;
+  }
+  const SESSION_RE = /^[A-Za-z0-9_-]{20,200}$/;
+  function handleWhoopReturn(query) {
+    const q = new URLSearchParams(query);
+    const sid = q.get('session'), err = q.get('error');
+    history.replaceState(null, '', location.pathname + location.search + '#/whoop'); // drop the session id from the URL
+    if (sid && SESSION_RE.test(sid)) {
+      whoop = { session: sid, connectedAt: new Date().toISOString() }; wsave();
+      setTimeout(() => { whoopSync(true); connectedSheet(sid); }, 0);
+    } else if (err || sid) {
+      const msg = { denied: 'WHOOP access wasn’t approved.', not_allowed: 'That WHOOP account isn’t allowed on this bridge.', bad_state: 'The sign-in link expired. Please try again.', token_exchange: 'WHOOP sign-in failed. Please try again.' }[err] || 'WHOOP connection failed. Please try again.';
+      whoop.error = msg; wsave(); setTimeout(() => toast(msg), 0);
+    }
+  }
+  function connectedSheet(sid) {
+    openSheet('WHOOP connected', `<div class="sheet-note">Today’s calories burned now fill in automatically.</div>
+      <div class="sheet-note small">Using the Home Screen app? If it still shows “Not connected” there, copy this connection code and paste it under More → Connections in that app.</div>
+      <div class="code-box"><code id="sessCode">${esc(sid)}</code></div><div class="btn-row"><button class="btn" data-x="copy">Copy code</button><button class="btn primary" data-x="close">Done</button></div>`, (el) => {
+      if (el.dataset.x === 'copy') (navigator.clipboard ? navigator.clipboard.writeText(sid) : Promise.reject()).then(() => toast('Code copied'), () => toast('Long-press the code to copy it'));
+    });
+  }
+  function viewWhoop() {
+    setChrome('Connections', true);
+    $app.innerHTML = `<div class="sec-title">WHOOP</div><div id="whoopCard">${whoopCardHTML()}</div>
+      <section class="card stack"><div class="bold">How it works</div>
+        <div class="hint">When connected, the app reads today’s total calories burned from your WHOOP cycle (kilojoules ÷ 4.184) and uses it as <b>Burn today</b>. It refreshes when you open Today or Macros, or tap Refresh.</div>
+        <div class="hint">Only a random per-device session code is stored on this phone. Your WHOOP password and tokens are never stored here. Disconnect revokes access at WHOOP.</div></section>
+      ${WHOOP_URL && !whoop.session ? `<details class="how"><summary>Have a connection code?</summary><div class="stack" style="padding:0 0 12px"><input id="pasteCode" placeholder="Paste connection code" autocomplete="off" autocapitalize="off" spellcheck="false"><button class="btn block" data-action="whoop-paste">Use code</button></div></details>` : ''}
+      <div class="foot">Apple Health can’t be read by a web app. Enter that burn by hand on Today.</div>`;
+    whoopSync(false);
+  }
+
   // ---------- router ----------
   let renderedHash = null;
   function render() {
     renderedHash = null; // blur/change events fired while the old view is torn down are ignored
-    const [r, id] = (location.hash.replace(/^#\/?/, '') || '').split('/');
+    const [hpath, hquery] = location.hash.split('?');
+    if (hpath === '#/whoop' && hquery) handleWhoopReturn(hquery);
+    const [r, id] = (location.hash.split('?')[0].replace(/^#\/?/, '') || '').split('/');
     window.scrollTo(0, 0);
     if (r === 'log') viewLog(id);
     else if (r === 'history') viewHistory();
@@ -706,8 +864,9 @@
     else if (r === 'templates') viewTemplates();
     else if (r === 'template') viewTemplate(id);
     else if (r === 'settings') viewSettings();
-    else if (r === 'macros') viewMacros();
-    else viewHome();
+    else if (r === 'macros') { viewMacros(); whoopSync(false); }
+    else if (r === 'whoop') viewWhoop();
+    else { viewHome(); whoopSync(false); }
     renderedHash = location.hash;
   }
   function rerenderKeepScroll() { const y = window.scrollY; render(); window.scrollTo(0, y); }
@@ -771,10 +930,18 @@
       case 'tpl-delete': if (confirm(`Delete template “${t.name}”? Logged workouts are kept.`)) { state.templates = state.templates.filter((x) => x.id !== t.id); state.plans = state.plans.filter((p) => p.templateId !== t.id); save(); toast('Template deleted'); go('#/templates'); } break;
       case 'export': exportJSON(); break;
       case 'macro-set': macroSet(d.k, d.v); break;
+      case 'burn-edit': burnSheet(); break;
+      case 'whoop-connect': if (!WHOOP_URL) whoopSetupSheet(); else location.href = `${WHOOP_URL}/auth/start`; break;
+      case 'whoop-refresh': whoopSync(true); break;
+      case 'whoop-paste': { const v = (document.getElementById('pasteCode').value || '').trim(); if (/^[A-Za-z0-9_-]{20,200}$/.test(v)) { whoop = { session: v, connectedAt: new Date().toISOString() }; wsave(); whoopSync(true); render(); } else toast('That code doesn’t look right'); break; }
+      case 'whoop-disconnect':
+        if (!confirm('Disconnect WHOOP? This revokes the app’s access at WHOOP.')) break;
+        { const sid = whoop.session; fetch(`${WHOOP_URL}/disconnect`, { method: 'POST', headers: { Authorization: `Bearer ${sid}` } }).catch(() => {}); }
+        whoop = {}; wsave(); if (state.burn && state.burn.source === 'whoop') { state.burn = null; save(); } toast('WHOOP disconnected'); refreshBurnViews(); break;
       case 'import': document.getElementById('importFile').click(); break;
       case 'wipe':
         if (confirm('Erase ALL workouts, exercises and templates on this phone? Export a backup first!') && confirm('Really erase everything?')) {
-          state = { version: 1, settings: { programStart: weekStart(todayStr()), samplesCleared: true }, exercises: [], templates: [], sessions: [], plans: [], macros: null }; save(); toast('All data erased'); go('#/');
+          state = { version: 1, settings: { programStart: weekStart(todayStr()), samplesCleared: true }, exercises: [], templates: [], sessions: [], plans: [], macros: null, burn: null }; save(); toast('All data erased'); go('#/');
         }
         break;
     }
@@ -856,7 +1023,7 @@
   document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') save(); });
 
   // expose helpers for testing / debugging
-  window.SlimTucci = { computeTargets: (p, x) => MAC.computeTargets(p, x), weekStart, weekEnd, weekNum, weekLabel, search: (q) => searchList(LIB_ITEMS, q, (x) => x.hay, (x) => x.key).slice(0, 10).map((x) => x.name), libSize: LIB_ITEMS.length, get state() { return state; } };
+  window.SlimTucci = { computeTargets: (p, x) => MAC.computeTargets(p, x), computeBurnExtra: MAC.computeBurnExtra, caloriesBurnedToday, adjustedToday, whoopConfigured: () => !!WHOOP_URL, weekStart, weekEnd, weekNum, weekLabel, search: (q) => searchList(LIB_ITEMS, q, (x) => x.hay, (x) => x.key).slice(0, 10).map((x) => x.name), libSize: LIB_ITEMS.length, get state() { return state; } };
 
   render();
   if (navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(() => {});
