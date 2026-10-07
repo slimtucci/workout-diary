@@ -1,7 +1,7 @@
 """End-to-end phone test (390x844) for the SlimTucci Workout Diary.
 Local: python3 -m http.server 8765  then  python3 tests/e2e_test.py
 Live:  BASE=https://slimtucci.github.io/workout-diary/ SHOTS=/path python3 tests/e2e_test.py"""
-import json, sys, os, datetime
+import json, sys, os, datetime, re
 from playwright.sync_api import sync_playwright
 
 BASE = os.environ.get("BASE", "http://localhost:8765/")
@@ -33,6 +33,9 @@ def tap_day(page, d):
 with sync_playwright() as p:
     b = p.chromium.launch()
     ctx = b.new_context(viewport={"width": 390, "height": 844}, device_scale_factor=3, is_mobile=True, has_touch=True, accept_downloads=True, color_scheme="light")
+    # This run simulates a fresh install with nothing configured (no WHOOP Worker, no dashboard).
+    # The configured states are tested further down against mocked Workers.
+    ctx.route("**/config.js", lambda route: route.fulfill(status=200, content_type="application/javascript", body="window.SLIMTUCCI_CONFIG = { WHOOP_WORKER_URL: '', DASHBOARD_URL: '' };"))
     page = ctx.new_page()
     page.on("dialog", lambda d: d.accept())
     errors = []; page.on("pageerror", lambda e: (errors.append(str(e)), print("PAGEERROR", e.stack)))
@@ -308,13 +311,15 @@ with sync_playwright() as p:
     page.goto(BASE); page.evaluate("async () => { await navigator.serviceWorker.ready; }")
     page.reload(); page.wait_for_function("navigator.serviceWorker.controller !== null", timeout=15000)
     cache = page.evaluate("async () => { const ks = await caches.keys(); const c = await caches.open(ks[0]); return [ks, (await c.keys()).map(r => r.url.split('/').pop())]; }")
-    check("SW cache st-diary-v6 holds library + macro + config files", "st-diary-v6" in cache[0] and "exercises-library.js" in cache[1] and "macros-calc.js" in cache[1] and "config.js" in cache[1], str(cache[0]))
+    SWV = re.search(r"VERSION = '([^']+)'", open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "sw.js")).read()).group(1)
+    check(f"SW cache {SWV} holds library + macro + config files", SWV in cache[0] and "exercises-library.js" in cache[1] and "macros-calc.js" in cache[1] and "config.js" in cache[1], str(cache[0]))
     ctx.set_offline(True); page.reload(); page.wait_for_selector("#dayPanel")
     check("offline: app + library load", page.evaluate("() => window.SlimTucci.libSize") >= 300)
     ctx.set_offline(False)
 
     # ---- dark mode render ----
     dctx = b.new_context(viewport={"width": 390, "height": 844}, device_scale_factor=3, is_mobile=True, has_touch=True, color_scheme="dark")
+    dctx.route("**/config.js", lambda route: route.fulfill(status=200, content_type="application/javascript", body="window.SLIMTUCCI_CONFIG = { WHOOP_WORKER_URL: '', DASHBOARD_URL: '' };"))
     dp = dctx.new_page(); dp.on("pageerror", lambda e: errors.append(str(e)))
     dp.goto(BASE); dp.wait_for_selector("#dayPanel")
     bg = dp.evaluate("() => getComputedStyle(document.body).backgroundColor")
@@ -395,6 +400,71 @@ with sync_playwright() as p:
     wp.goto(BASE + "#/whoop?session=bad"); wp.wait_for_selector('#whoopCard [data-state="ready"]')
     check("bad session in return URL is rejected safely", wp.evaluate("location.hash") == "#/whoop" and "connection failed" in wp.locator("#whoopCard").inner_text().lower())
     wctx.close()
+
+    # ---- v8: Dashboard sync with a mocked admin Worker (the real endpoint is tested in the Worker repo) ----
+    DMOCK = "https://slimtucci-admin.mock-worker.test"
+    TOK = "stds_Zq3vN8xR1kLm5TbW7pYc2HdF9gJs4aEu0oQiXy6Vn1M"
+    BADTOK = "stds_" + "B" * 43
+    posts = []; mode = {"status": 200}
+    DCORS = {"Access-Control-Allow-Origin": "*", "Access-Control-Allow-Headers": "Authorization, Content-Type", "Access-Control-Allow-Methods": "POST, OPTIONS"}
+    def dworker(route):
+        req = route.request; path = req.url.replace(DMOCK, "").split("?")[0]
+        if req.method == "OPTIONS": return route.fulfill(status=204, headers=DCORS)
+        if path == "/admin/api/diary-sync" and req.method == "POST":
+            auth = req.headers.get("authorization"); posts.append({"auth": auth, "body": json.loads(req.post_data)})
+            if auth != f"Bearer {TOK}" or mode["status"] == 401: return route.fulfill(status=401, headers=DCORS, content_type="application/json", body='{"error":"unauthorized"}')
+            return route.fulfill(status=mode["status"], headers=DCORS, content_type="application/json", body='{"ok":true}')
+        return route.fulfill(status=404, headers=DCORS, body="")
+    sctx = b.new_context(viewport={"width": 390, "height": 844}, device_scale_factor=3, is_mobile=True, has_touch=True, color_scheme="light", service_workers="block", accept_downloads=True)
+    sctx.route("**/config.js", lambda route: route.fulfill(status=200, content_type="application/javascript", body=f"window.SLIMTUCCI_CONFIG = {{ WHOOP_WORKER_URL: '', DASHBOARD_URL: '{DMOCK}' }};"))
+    sctx.route(DMOCK + "/**", dworker)
+    sp = sctx.new_page(); sp.on("pageerror", lambda e: errors.append("dash: " + str(e))); sp.on("dialog", lambda d: d.accept())
+    sp.clock.install()
+    sp.goto(BASE + "#/settings"); sp.wait_for_selector('a.list-item[href="#/dashsync"]')
+    check("More → Connections has 'Dashboard sync · Not connected'", "Dashboard sync" in sp.locator('a.list-item[href="#/dashsync"]').inner_text() and sp.locator("#dashSyncSub").inner_text() == "Not connected")
+    sp.clock.run_for(3000)
+    check("not connected → nothing is sent on open", posts == [], str(len(posts)))
+    sp.click('a.list-item[href="#/dashsync"]'); sp.wait_for_selector("#dashToken")
+    check("Dashboard sync page: title + paste field + Connect", sp.locator("#title").inner_text() == "Dashboard sync" and sp.locator('[data-action="dash-connect"]').is_visible())
+    shot(sp, "17-dashboard-sync-connect.png")
+    sp.fill("#dashToken", "hello"); sp.click('[data-action="dash-connect"]'); sp.wait_for_timeout(100)
+    check("malformed code rejected locally (nothing sent, nothing stored)", posts == [] and sp.evaluate("() => localStorage.getItem('slimtucci-dashsync-v1')") in (None, "{}") and "doesn’t look right" in sp.locator("#toast").inner_text())
+    sp.fill("#dashToken", BADTOK); sp.click('[data-action="dash-connect"]'); sp.wait_for_selector(".wc-err")
+    check("code refused by the dashboard → error shown, code not kept", len(posts) == 1 and "didn’t work" in sp.locator(".wc-err").inner_text() and "token" not in json.loads(sp.evaluate("() => localStorage.getItem('slimtucci-dashsync-v1')")))
+    posts.clear()
+    sp.fill("#dashToken", "  " + TOK + " "); sp.click('[data-action="dash-connect"]'); sp.wait_for_selector("#dashSyncStatus")
+    body = posts[0]["body"] if posts else {}
+    check("Connect sends one POST with Bearer code", len(posts) == 1 and posts[0]["auth"] == f"Bearer {TOK}", str(len(posts)))
+    check("payload = Export shape, workout data only (no macros, burn or WHOOP)", body.get("app") == "slimtucci-diary" and body.get("version") == 1 and "exportedAt" in body and sorted(body["data"].keys()) == ["exercises", "plans", "sessions", "settings", "templates", "version"], str(sorted(body.get("data", {}).keys())))
+    check("status line 'Synced just now'", sp.locator("#dashSyncStatus").inner_text() == "Synced just now", sp.locator("#dashSyncStatus").inner_text())
+    ls = sp.evaluate("() => [localStorage.getItem('slimtucci-dashsync-v1'), localStorage.getItem('slimtucci-diary-v1')]")
+    check("code stored only in its own key (slimtucci-dashsync-v1), not in diary data", TOK in ls[0] and TOK not in (ls[1] or ""))
+    sp.clock.run_for(2 * 60 * 1000 + 5000); sp.goto(BASE + "#/settings"); sp.wait_for_selector("#dashSyncSub")
+    check("quiet status in More: 'Synced 2 min ago'", sp.locator("#dashSyncSub").inner_text() == "Synced 2 min ago", sp.locator("#dashSyncSub").inner_text())
+    shot(sp, "18-more-dashboard-synced.png")
+    n0 = len(posts)
+    with sp.expect_download() as dl: sp.click('[data-action="export"]')
+    exp_txt = open(dl.value.path()).read()
+    check("Export JSON never contains the sync code", TOK not in exp_txt and "dashsync" not in exp_txt and json.loads(exp_txt)["app"] == "slimtucci-diary")
+    sp.goto(BASE + "#/"); sp.wait_for_selector("#dayPanel")
+    sp.locator('#dayPanel [data-action="day-add"]').last.click(); sp.click('.sheet [data-x="blank"]'); sp.wait_for_selector("#sDate")
+    sp.fill("#sName", "Sync Check Session"); sp.evaluate("document.activeElement.blur()")
+    n1 = len(posts)
+    sp.clock.run_for(20000)
+    check("change → no POST before the 30 s debounce", len(posts) == n1, f"{n0}->{len(posts)}")
+    sp.clock.run_for(15000); sp.wait_for_timeout(200)
+    check("change → one POST ~30 s later with the new workout", len(posts) == n1 + 1 and any(x.get("name") == "Sync Check Session" for x in posts[-1]["body"]["data"]["sessions"]), str(len(posts) - n1))
+    sp.clock.run_for(60000); sp.wait_for_timeout(100)
+    check("no repeat POST when nothing changed", len(posts) == n1 + 1)
+    sp.reload(); sp.wait_for_selector("#app"); sp.clock.run_for(3000); sp.wait_for_timeout(200)
+    check("app open → syncs", len(posts) == n1 + 2, str(len(posts) - n1))
+    mode["status"] = 401
+    sp.goto(BASE + "#/dashsync"); sp.wait_for_selector("#dashSyncStatus"); sp.click('[data-action="dash-sync-now"]'); sp.wait_for_timeout(300)
+    check("revoked code → 'Sync code no longer works' status", "no longer works" in sp.locator("#dashSyncStatus").inner_text(), sp.locator("#dashSyncStatus").inner_text())
+    mode["status"] = 200
+    sp.click('[data-action="dash-disconnect"]'); sp.wait_for_selector("#dashToken")
+    check("Disconnect removes the code from this phone", "token" not in json.loads(sp.evaluate("() => localStorage.getItem('slimtucci-dashsync-v1')") or "{}"))
+    sctx.close()
     check("no JS errors", not errors, "; ".join(errors))
     b.close()
 

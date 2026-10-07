@@ -200,7 +200,7 @@
   }
   let saveErr = false;
   function save() {
-    try { localStorage.setItem(KEY, JSON.stringify(state)); saveErr = false; }
+    try { localStorage.setItem(KEY, JSON.stringify(state)); saveErr = false; try { scheduleDashSync(); } catch (e) { /* dashboard sync not initialised yet */ } }
     catch (e) { if (!saveErr) toast('Could not save — storage full or blocked'); saveErr = true; }
   }
   state = load();
@@ -593,6 +593,7 @@
     const st = sessionStats(state.sessions);
     $app.innerHTML = `<div class="sec-title">Connections</div>
       <a class="list-item" href="#/whoop"><span class="li-ico tool" aria-hidden="true">⌁</span><div class="grow"><div class="title">Connections</div><div class="sub">WHOOP · ${whoopStatusText()}</div></div><span class="chev" aria-hidden="true">›</span></a>
+      <a class="list-item" href="#/dashsync"><span class="li-ico tool" aria-hidden="true">⇅</span><div class="grow"><div class="title">Dashboard sync</div><div class="sub" id="dashSyncSub">${esc(dashStatusText())}</div></div><span class="chev" aria-hidden="true">›</span></a>
       <div class="sec-title">Plan</div>
       <a class="list-item" href="#/templates"><span class="li-ico tool" aria-hidden="true">▤</span><div class="grow"><div class="title">Templates</div><div class="sub">${plural(state.templates.length, 'saved workout')} · create, edit, start</div></div><span class="chev" aria-hidden="true">›</span></a>
       <a class="list-item" href="#/macros"><span class="li-ico tool" aria-hidden="true">◔</span><div class="grow"><div class="title">Macro calculator</div><div class="sub">${state.macros && state.macros.result && state.macros.result.calories ? `${state.macros.result.calories.toLocaleString()} kcal · P ${state.macros.result.protein} · C ${state.macros.result.carbs} · F ${state.macros.result.fat}` : 'Set your daily calories and macros'}</div></div><span class="chev" aria-hidden="true">›</span></a>
@@ -870,6 +871,82 @@
     whoopSync(false);
   }
 
+  // ---------- dashboard sync (diary → SlimTucci admin) ----------
+  // The sync code can ONLY send this diary's workouts to the admin dashboard (write-only; it can't read anything).
+  // It lives in its own localStorage key, so it's never part of Export JSON. No WHOOP data is sent.
+  const DASH_URL = String(CONFIG.DASHBOARD_URL || '').trim().replace(/\/+$/, '');
+  const DKEY = 'slimtucci-dashsync-v1'; // per-device only: { token, connectedAt, lastSync, lastFp, error }
+  const DASH_DEBOUNCE_MS = 30 * 1000;
+  const DASH_TOKEN_RE = /^stds_[A-Za-z0-9_-]{43}$/;
+  function dload() { try { return JSON.parse(localStorage.getItem(DKEY)) || {}; } catch (e) { return {}; } }
+  let dash = dload();
+  function dsave() { try { localStorage.setItem(DKEY, JSON.stringify(dash)); } catch (e) {} }
+  const dashOn = () => !!(DASH_URL && dash.token);
+  function ago(iso) {
+    const s = Math.max(0, Math.round((Date.now() - new Date(iso).getTime()) / 1000));
+    if (s < 45) return 'just now';
+    if (s < 3600) return `${Math.max(1, Math.round(s / 60))} min ago`;
+    if (s < 86400) return `${Math.round(s / 3600)} h ago`;
+    return fmtDate(new Date(iso).toISOString().slice(0, 10));
+  }
+  function dashStatusText() {
+    if (!DASH_URL) return 'not available';
+    if (!dash.token) return 'Not connected';
+    if (dash.error) return dash.error;
+    return dash.lastSync ? `Synced ${ago(dash.lastSync)}` : 'Connected · waiting to sync';
+  }
+  function dashPayload() { // same shape as Export JSON, workout data only (no macros, burn or WHOOP session)
+    const d = { version: state.version, settings: state.settings, exercises: state.exercises, templates: state.templates, sessions: state.sessions, plans: state.plans };
+    const dataStr = JSON.stringify(d);
+    let h = 2166136261; for (let i = 0; i < dataStr.length; i++) { h ^= dataStr.charCodeAt(i); h = Math.imul(h, 16777619); }
+    return { fp: (h >>> 0).toString(36) + ':' + dataStr.length, body: `{"app":"slimtucci-diary","version":1,"exportedAt":${JSON.stringify(new Date().toISOString())},"data":${dataStr}}` };
+  }
+  function refreshDashViews() {
+    const sub = document.getElementById('dashSyncSub'); if (sub) sub.textContent = dashStatusText();
+    const st = document.getElementById('dashSyncStatus'); if (st) st.textContent = dashStatusText();
+  }
+  let dashTimer = null, dashInflight = null;
+  function scheduleDashSync() {
+    if (!dashOn()) return;
+    clearTimeout(dashTimer); dashTimer = setTimeout(() => dashSync('change'), DASH_DEBOUNCE_MS);
+  }
+  function dashSync(reason) {
+    if (!dashOn()) return Promise.resolve(false);
+    if (dashInflight) return dashInflight;
+    clearTimeout(dashTimer);
+    const p = dashPayload();
+    if (reason === 'change' && p.fp === dash.lastFp && !dash.error) return Promise.resolve(true); // nothing new since the last sync
+    dashInflight = (async () => {
+      try {
+        const res = await fetch(`${DASH_URL}/admin/api/diary-sync`, { method: 'POST', headers: { Authorization: `Bearer ${dash.token}`, 'Content-Type': 'application/json' }, body: p.body, cache: 'no-store' });
+        if (res.ok) { dash.lastSync = new Date().toISOString(); dash.lastFp = p.fp; dash.error = null; dsave(); return true; }
+        dash.error = res.status === 401 ? 'Sync code no longer works. Paste a new one.' : res.status === 413 ? 'Diary too big to sync (over 1 MB).' : 'Couldn’t sync. Will retry.';
+        dsave(); return false;
+      } catch (e) { dash.error = 'Offline. Will sync later.'; dsave(); return false; }
+      finally { dashInflight = null; refreshDashViews(); }
+    })();
+    return dashInflight;
+  }
+  function viewDashSync() {
+    setChrome('Dashboard sync', true);
+    if (!DASH_URL) { $app.innerHTML = emptyState('⇅', 'Not available', 'Dashboard sync isn’t configured in this version.', ''); return; }
+    const how = `<section class="card stack"><div class="bold">How it works</div>
+      <div class="hint">Your workouts, templates and plans are sent to your SlimTucci admin dashboard about 30 seconds after you make changes, and when you open the app. Macros, burn and WHOOP data are not sent.</div>
+      <div class="hint">The sync code can only send workouts. It can’t read anything back. It stays on this phone and is never part of Export JSON.</div></section>`;
+    if (!dash.token) {
+      $app.innerHTML = `<section class="card stack"><div class="bold">Connect to your dashboard</div>
+        <div class="hint">On your admin dashboard, open <b>My Training → Connect diary</b> and copy the sync code. Paste it here once.</div>
+        <label class="f" for="dashToken">Sync code</label>
+        <input id="dashToken" placeholder="stds_…" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
+        ${dash.error ? `<p class="wc-err">${esc(dash.error)}</p>` : ''}
+        <button class="btn primary block" data-action="dash-connect">Connect</button></section>${how}`;
+      return;
+    }
+    $app.innerHTML = `<section class="card stack"><div class="bold">Connected</div>
+      <div class="sub" id="dashSyncStatus">${esc(dashStatusText())}</div>
+      <div class="btn-row"><button class="btn primary" data-action="dash-sync-now">↻ Sync now</button><button class="btn danger" data-action="dash-disconnect">Disconnect</button></div></section>${how}`;
+  }
+
   // ---------- router ----------
   let renderedHash = null;
   function render() {
@@ -887,6 +964,7 @@
     else if (r === 'settings') viewSettings();
     else if (r === 'macros') { viewMacros(); whoopSync(false); }
     else if (r === 'whoop') viewWhoop();
+    else if (r === 'dashsync') viewDashSync();
     else { viewHome(); whoopSync(false); }
     renderedHash = location.hash;
   }
@@ -959,6 +1037,19 @@
         if (!confirm('Disconnect WHOOP? This revokes the app’s access at WHOOP.')) break;
         { const sid = whoop.session; fetch(`${WHOOP_URL}/disconnect`, { method: 'POST', headers: { Authorization: `Bearer ${sid}` } }).catch(() => {}); }
         whoop = {}; wsave(); if (state.burn && state.burn.source === 'whoop') { state.burn = null; save(); } toast('WHOOP disconnected'); refreshBurnViews(); break;
+      case 'dash-connect': {
+        const v = (document.getElementById('dashToken').value || '').trim();
+        if (!DASH_TOKEN_RE.test(v)) { toast('That sync code doesn’t look right'); break; }
+        dash = { token: v, connectedAt: new Date().toISOString() }; dsave(); el.disabled = true;
+        dashSync('connect').then((ok) => {
+          if (ok) { toast('Dashboard connected'); render(); }
+          else if (/no longer works/.test(dash.error || '')) { dash = { error: 'That sync code didn’t work. Copy a new one from the dashboard.' }; dsave(); render(); }
+          else { toast(dash.error || 'Saved. Will sync when online.'); render(); }
+        });
+        break;
+      }
+      case 'dash-sync-now': dashSync('manual').then((ok) => toast(ok ? 'Synced' : (dash.error || 'Couldn’t sync'))); break;
+      case 'dash-disconnect': if (confirm('Disconnect dashboard sync on this phone? Your diary stays here; it just stops sending updates.')) { dash = {}; dsave(); toast('Dashboard sync disconnected'); render(); } break;
       case 'import': document.getElementById('importFile').click(); break;
       case 'wipe':
         if (confirm('Erase ALL workouts, exercises and templates on this phone? Export a backup first!') && confirm('Really erase everything?')) {
@@ -1049,9 +1140,10 @@
   document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') save(); });
 
   // expose helpers for testing / debugging
-  window.SlimTucci = { computeTargets: (p, x) => MAC.computeTargets(p, x), computeBurnExtra: MAC.computeBurnExtra, caloriesBurnedToday, adjustedToday, whoopConfigured: () => !!WHOOP_URL, demoUrl, libCues: (name) => { const li = LIB_BY_KEY.get(norm(name)); return li ? li.cues.slice() : null; }, cuesFor: (name) => { const e = findMineByName(name); return e ? cuesText(e) : null; }, weekStart, weekEnd, weekNum, weekLabel, search: (q) => searchList(LIB_ITEMS, q, (x) => x.hay, (x) => x.key).slice(0, 10).map((x) => x.name), libSize: LIB_ITEMS.length, get state() { return state; } };
+  window.SlimTucci = { computeTargets: (p, x) => MAC.computeTargets(p, x), computeBurnExtra: MAC.computeBurnExtra, caloriesBurnedToday, adjustedToday, whoopConfigured: () => !!WHOOP_URL, dashSync: () => dashSync('manual'), dashStatusText: () => dashStatusText(), demoUrl, libCues: (name) => { const li = LIB_BY_KEY.get(norm(name)); return li ? li.cues.slice() : null; }, cuesFor: (name) => { const e = findMineByName(name); return e ? cuesText(e) : null; }, weekStart, weekEnd, weekNum, weekLabel, search: (q) => searchList(LIB_ITEMS, q, (x) => x.hay, (x) => x.key).slice(0, 10).map((x) => x.name), libSize: LIB_ITEMS.length, get state() { return state; } };
 
   render();
+  setTimeout(() => dashSync('open'), 1500); // on app open
   if (navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(() => {});
   if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1')) {
     window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch((e) => console.warn('SW failed', e)));
