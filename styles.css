@@ -325,3 +325,24 @@ a.macro-mini.empty-mini b{display:block}
 .sheet-note.small{font-size:13.5px}
 .code-box{background:var(--surface2);border:1px solid var(--line);border-radius:12px;padding:10px 12px;word-break:break-all;font-size:14px;user-select:all;-webkit-user-select:all}
 .nw{white-space:nowrap}
+
+/* ---------- v6: single exercise list, demo links, cues ---------- */
+.list-count{font-size:12.5px;font-weight:700;color:var(--muted);letter-spacing:.02em;margin:2px 4px 8px}
+.pick-row.ex-row{padding:6px 6px 6px 14px;gap:6px;cursor:default}
+.pick-row.ex-row .rowlink,.pick-row.ex-row .pr-main{min-width:0;padding:6px 0;align-self:stretch;display:flex;flex-direction:column;justify-content:center}
+.pr-main{background:none;border:none;color:inherit;font:inherit;text-align:left;cursor:pointer;padding:0}
+.pick-row.ex-row .pr-add{cursor:pointer;border:none;font-family:inherit}
+.pick-row .chev{flex:none;color:var(--faint);font-size:22px;padding:0 6px 0 2px}
+.demo-ico{flex:none;width:40px;height:40px;border-radius:12px;display:inline-flex;align-items:center;justify-content:center;color:var(--danger);background:color-mix(in srgb,var(--danger) 9%,transparent);text-decoration:none}
+.demo-ico:active{transform:scale(.95)}
+.tag-custom{display:inline-block;vertical-align:2px;margin-left:8px;font-size:11px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;padding:2px 7px;border-radius:999px;background:var(--accent-soft);color:var(--accent-text)}
+.exd-head .exh-meta{font-size:14px;color:var(--muted);font-weight:600;margin-bottom:12px}
+.btn.demo{background:#c4302b;border-color:#c4302b;color:#fff;gap:8px}
+.btn.demo svg{width:20px;height:20px}
+@media (prefers-color-scheme:dark){.btn.demo{background:#dc2626;border-color:#dc2626;color:#fff}}
+.exd-head .hint{text-align:center}
+textarea.cues{min-height:120px;line-height:1.5;font-size:15.5px}
+.cue-foot{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.cue-foot .hint{margin:0}
+.pick-row.ex-row .pr-add{font-size:22px}
+.pick-row.ex-row.added .pr-add{font-size:14px}

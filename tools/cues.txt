@@ -1,0 +1,651 @@
+# Coaching cues for the built-in library. One exercise per line: Name|cue|cue[|cue[|cue]]  (2–4 cues: setup, execution, common fault)
+# push / Chest
+Barbell Bench Press|Eyes under the bar, shoulder blades pinched down and back, feet planted|Lower to the lower chest with elbows ~45–70° from the torso, then press up and slightly back over the shoulders|Don't let the butt lift or the bar bounce off the chest
+Close-Grip Barbell Bench Press|Grip about shoulder width, shoulder blades set|Keep elbows tucked close to the ribs and touch lower on the chest than a normal bench|Don't go so narrow that the wrists bend back. Stack wrist over elbow
+Paused Barbell Bench Press|Same setup as the bench: tight upper back, feet driving into the floor|Lower under control and hold a dead-still 1–2 s pause on the chest before pressing|Don't sink or relax during the pause. Stay tight so the bar doesn't settle into the ribs
+Incline Barbell Bench Press|Bench at 30–45°, shoulder blades retracted, bar unracked over the upper chest|Lower to just below the collarbones, then press straight up over the shoulders|Don't flare elbows straight out to the sides or arch so hard it turns into a flat bench
+Decline Barbell Bench Press|Hook the legs securely and set the shoulder blades before the unrack|Lower to the lower chest/sternum line and press back up over the shoulders|Use a spotter. Don't let the bar drift toward the face on the way up
+Floor Press|Lie on the floor with knees bent or legs straight, bar over the chest, shoulders pinned|Lower until the upper arms touch the floor, pause briefly, then press|Don't bounce the elbows off the floor. Set them down softly
+Spoto Press|Normal bench setup and grip|Stop the bar 1–2 inches above the chest and hold for a beat without touching, then press|Don't let it drift or touch. Stay tight through the pause
+Pin Press|Set the safety pins at the sticking point and start each rep from a dead stop on the pins|Get tight under the bar, then drive it up explosively off the pins|Don't bounce off the pins or lose the upper-back arch between reps
+Board Press|Partner holds or straps a 1–3 board stack on the chest|Lower until the bar touches the boards, pause lightly, press|Don't relax onto the boards. Keep the same tight bench setup
+Smith Machine Bench Press|Line the bar up with the lower chest before unracking, shoulder blades back|Lower to the chest and press along the fixed path with elbows ~45–70°|Don't set up too far toward the head. The bar should touch mid-to-lower chest
+Smith Machine Incline Press|Incline bench at 30–45°, positioned so the bar meets the upper chest|Lower under control to just below the collarbones and press up|Don't let the shoulders roll forward at the top. Keep the blades back
+Dumbbell Bench Press|Kick the dumbbells up off the knees, shoulder blades back, feet planted|Lower until the dumbbells are beside the chest with forearms vertical, then press up and slightly in|Don't let the elbows drop far below the bench or the dumbbells drift apart
+Incline Dumbbell Bench Press|Bench at 30–45°, dumbbells over the upper chest|Lower to the sides of the upper chest, then press up until they nearly touch|Don't arch excessively. Keep the ribs down and the shoulders back
+Decline Dumbbell Bench Press|Lock the legs in on a slight decline, dumbbells over the lower chest|Lower with control to the sides of the lower chest and press up|Have a plan to get the dumbbells down safely at the end of the set
+Single-Arm Dumbbell Bench Press|One dumbbell, free hand on the bench or chest, feet wide for balance|Press without letting the torso twist or roll toward the weight|Don't let the hips lift on the working side. Brace the core to stay square
+Alternating Dumbbell Bench Press|Both dumbbells pressed up to lockout to start|Lower one dumbbell while the other stays locked out overhead, then switch|Don't let the locked-out arm drift or bend while the other side works
+Neutral-Grip Dumbbell Bench Press|Palms facing each other, dumbbells parallel|Lower with elbows close to the sides and press straight up|Don't flare the elbows. This grip is meant to keep them tucked and shoulder-friendly
+Dumbbell Floor Press|Lie on the floor, knees bent, dumbbells over the chest|Lower until the triceps touch the floor, pause, press|Don't slam the elbows into the floor
+Single-Arm Dumbbell Floor Press|Lie on the floor with one dumbbell, other arm out for balance|Lower until the elbow touches the floor, then press without rolling the hips|Don't let the shoulder shrug up toward the ear
+Dumbbell Squeeze Press|Press the dumbbells together hard over the chest, palms facing|Keep squeezing them together the whole time while lowering to the chest and pressing|Don't let them separate. Go lighter than a normal dumbbell press
+Dumbbell Fly|Slight bend in the elbows, dumbbells over the chest, palms facing|Open the arms in a wide arc until you feel a chest stretch, then hug back up|Don't bend and straighten the elbows. That turns it into a press
+Incline Dumbbell Fly|Bench at 30–45°, slight elbow bend locked in|Arc the dumbbells out and down to a stretch, then squeeze back over the upper chest|Don't go deeper than the shoulders tolerate. Stop at a strong stretch
+Kettlebell Floor Press|Lie on the floor, bell resting on the back of the forearm|Press straight up and keep the wrist straight with the bell stacked over the elbow|Don't let the wrist bend back under the bell
+Single-Arm Kettlebell Floor Press|Roll onto the side to get the bell into position, then lie flat|Press up, keeping the shoulder packed and the wrist neutral|Don't let the torso rotate toward the bell
+Cable Fly|Pulleys at about chest height, one step forward, slight elbow bend|Bring the handles together in a hugging arc in front of the chest|Don't let the arms straighten and bend. Keep the elbow angle fixed
+High-to-Low Cable Fly|Pulleys set high, staggered stance, slight forward lean|Sweep the handles down and in toward the hips|Don't shrug. Keep the shoulders down
+Low-to-High Cable Fly|Pulleys set low, palms up or forward|Sweep the handles up and in to shoulder height to hit the upper chest|Don't lift with the front delts and arms. Think chest pulling the arms together
+Single-Arm Cable Fly|Stand side-on to the cable, free hand on the hip|Bring one handle across in front of the chest in an arc|Don't rotate the torso to finish the rep
+Standing Cable Chest Press|Split stance, handles at chest height, core braced|Press forward and slightly together, then return under control|Don't lean forward and drop into the movement. Stay upright
+Single-Arm Cable Chest Press|Split stance with the opposite leg forward, brace|Press one handle forward without letting the torso twist|Don't let the cable pull the shoulder forward at the start
+Machine Chest Press|Seat height so the handles line up with the mid-chest|Press out smoothly, then return slowly until you feel a chest stretch|Don't let the shoulders roll forward off the pad
+Incline Machine Chest Press|Set the seat so the handles line up with the upper chest|Press up and out, controlling the return|Don't lift the hips off the seat to push heavier
+Pec Deck Fly|Seat height so the arms are about shoulder level, slight elbow bend|Bring the pads or handles together and squeeze for a beat|Don't let the weight yank the arms back past a comfortable stretch
+Hammer Strength Chest Press|Seat set so the handles line up with the mid-chest, back flat on the pad|Press each side evenly and control the stretch on the way back|Don't shrug or let the shoulders round forward at lockout
+Push-Up|Hands just outside shoulder width, body in a straight line from head to heels|Lower the chest to the floor with elbows ~45°, then push the floor away|Don't let the hips sag or pike up
+Wide Push-Up|Hands wider than shoulder width, rigid plank|Lower the chest between the hands under control|Don't go so wide that the elbows flare straight out to the sides
+Diamond Push-Up|Thumbs and index fingers touching under the chest|Lower with elbows tucked back along the ribs|Don't let the hips sag. Elevate the hands if you can't keep the body straight
+Incline Push-Up|Hands on a bench or box, body straight|Lower the chest to the edge, then press back|Don't drop the head or let the lower back sag
+Decline Push-Up|Feet on a bench, hands on the floor under the shoulders|Lower with control and keep the hips in line|Don't pike the hips up to make it easier
+Deficit Push-Up|Hands on plates or handles so the chest can go below hand level|Lower past hand height into a deep stretch, then press|Don't go deeper than the shoulders tolerate
+Archer Push-Up|Hands very wide, fingers turned slightly out, body rigid|Shift down toward one hand while the other arm straightens out to the side as a helper|Don't let the hips twist or sag as you shift. Keep the body square to the floor
+Weighted Push-Up|Plate on the upper back (between the shoulder blades) or a weight vest|Normal push-up: full range, rigid body|Don't let the weight shift onto the lower back. Keep it high
+Band-Resisted Push-Up|Band across the upper back with ends pinned under the hands|Push explosively through the band to lockout|Don't let the band pull the hips down. Brace hard
+Single-Arm Push-Up|Feet wide, working hand under the chest, free hand behind the back|Lower with the body slightly angled and press back up|Don't rotate wildly. Elevate the hands to build up to it
+Ring Push-Up|Rings a few inches off the floor, body straight|Lower while keeping the rings stable, then press and turn the hands out at the top|Don't let the rings drift wide
+Chest Dip|Grip the bars, lean the torso forward, knees bent behind|Lower until the upper arms are about parallel, then press up|Don't drop too deep or let the shoulders roll forward
+Weighted Dip|Dip belt with the weight hanging between the legs, start locked out|Lower until the upper arms are parallel and press up under control|Don't kip or swing. Add weight only once bodyweight reps are clean
+Ring Dip|Start in a support hold with the rings turned out and close to the body|Lower with the rings tight to the sides until the shoulders are just below the elbows, then press|Don't let the rings drift away from the body. Build up with support holds
+Landmine Chest Press|Kneel or stand facing the landmine, bar end at chest height in both hands|Press up and forward along the bar's arc|Don't lean back to finish the press
+Svend Press|Squeeze two light plates together between flat palms at the chest|Press straight out while squeezing the plates hard, then bring them back|Don't let the plates slip. The squeeze is the point, not the weight
+# push / Shoulders
+Barbell Overhead Press|Bar on the front delts, grip just outside the shoulders, glutes and abs braced|Press straight up, moving the head back then through so the bar finishes over mid-foot|Don't lean back and turn it into a standing incline press
+Push Press|Bar in the front rack, feet hip-width|Dip straight down a few inches, then drive up hard through the legs and press to lockout|Don't let the knees travel forward or the chest drop in the dip
+Behind-the-Neck Press|Only if you have the shoulder mobility. Bar on the traps, wide grip|Press straight up from behind the head and lower under control to ear level|Don't force depth or crank the neck forward
+Z Press|Sit on the floor with legs straight out, no back support|Press overhead while keeping the torso tall and the ribs down|Don't lean back or round the lower back. Lighten the load if you do
+Seated Barbell Shoulder Press|Bench upright, bar unracked at chin level|Press straight up, moving the head back slightly so the bar clears it|Don't arch off the backrest to finish reps
+Dumbbell Shoulder Press|Dumbbells at shoulder height, palms forward or slightly turned in|Press up and slightly in until the arms are locked overhead|Don't arch the lower back. Squeeze the glutes and keep the ribs down
+Seated Dumbbell Shoulder Press|Back on an upright bench, dumbbells at shoulder height|Press up to lockout, lower to about ear level|Don't let the elbows drift behind the body
+Single-Arm Dumbbell Shoulder Press|Stand tall with one dumbbell at the shoulder, free hand on the hip|Press up without leaning away from the weight|Don't side-bend. The core should stop it
+Arnold Press|Start with dumbbells in front of the shoulders, palms facing you|Rotate the palms forward as you press up, then reverse on the way down|Don't rush the rotation. Keep it smooth and controlled
+Kettlebell Overhead Press|Bell in the rack position, wrist straight, forearm vertical|Press up, letting the bell rotate slightly so the palm faces forward at lockout|Don't let the bell flop and bend the wrist back
+Single-Arm Kettlebell Press|Clean the bell to the rack and brace|Press to lockout with the biceps by the ear|Don't lean away from the bell to finish
+Bottoms-Up Kettlebell Press|Hold the bell upside down by the handle, squeeze the grip hard|Press slowly while keeping the bell balanced vertically|Don't rush it. If the bell tips, reset rather than chase it
+Half-Kneeling Single-Arm Press|Half-kneel with the down knee on the same side as the dumbbell, glute squeezed|Press up and slightly forward to lockout|Don't arch the lower back or rotate toward the weight
+Landmine Press|Stand staggered, bar end at the shoulder|Press up and forward along the bar's arc, reaching through at the top|Don't lean back. Let the shoulder blade move around the ribs
+Single-Arm Landmine Press|Split stance with the opposite leg forward, bar end at the shoulder|Press up and out, finishing with a reach|Don't twist the torso to move the bar
+Half-Kneeling Landmine Press|Half-kneel with the working-side knee down and glute squeezed|Press the bar up and forward without arching|Don't let the hips shift. Stay stacked
+Landmine Push Press|Bar end at the shoulder, feet hip-width|Quick dip and drive with the legs to launch the bar, then finish with the arm|Don't press first. The legs start it
+Machine Shoulder Press|Seat so the handles start at about shoulder height|Press up without locking out hard, then lower under control|Don't let the lower back peel off the pad
+Smith Machine Shoulder Press|Bench under the bar so it travels just in front of the face|Press to near lockout and lower to chin level|Don't set the bench so the bar hits the nose. Check the line first
+Pike Push-Up|Hips high in an inverted V, hands shoulder-width|Lower the top of the head toward the floor in front of the hands, then press|Don't let it turn into a regular push-up. Keep the hips high
+Handstand Push-Up|Kick up to a wall, hands slightly wider than the shoulders|Lower the head to the floor (or a pad) under control, then press back to lockout|Don't flare the elbows or crash the head down
+Wall Walk|Start in a push-up position with the feet against the wall|Walk the feet up the wall and the hands back toward it until the chest is near the wall, then reverse|Don't let the lower back sag. Keep the core tight
+Dumbbell Lateral Raise|Slight elbow bend, dumbbells at the sides, slight forward lean|Raise out to the sides to shoulder height, leading with the elbows|Don't shrug or swing the weight up with momentum
+Cable Lateral Raise|Cable low and on the opposite side, handle crossing in front of the body|Raise out to shoulder height with a slight elbow bend|Don't lean and yank. Keep the torso still
+Machine Lateral Raise|Pads on the outside of the arms, seat so the shoulders line up with the pivot|Raise to shoulder height and lower slowly|Don't shrug the traps up to move the pads
+Lean-Away Lateral Raise|Hold a post with the free hand and lean away|Raise the dumbbell out to the side for a longer range at the bottom|Don't swing. The lean adds range, not momentum
+Dumbbell Front Raise|Dumbbells in front of the thighs|Raise to shoulder height with straight arms, then lower slowly|Don't lean back to swing the weight up
+Plate Front Raise|Hold a plate at 3 and 9 o'clock|Raise to eye level with arms nearly straight|Don't arch the back to get it up
+Cable Front Raise|Face away from a low pulley, handle between the legs|Raise forward to shoulder height|Don't let the cable pull the shoulders forward at the bottom
+Rear Delt Fly|Hinge forward with a flat back, dumbbells hanging, slight elbow bend|Raise the arms out to the sides, leading with the elbows|Don't bend the elbows more as you lift. That turns it into a row
+Reverse Pec Deck|Face the pad, handles at shoulder height|Sweep the arms back in an arc to about in line with the body|Don't shrug or overextend behind the body
+Cable Rear Delt Fly|Cross the cables at shoulder height and grab the opposite handles|Pull the arms out and back in a wide arc|Don't turn it into a row. Arms stay nearly straight
+Band Pull-Apart|Hold the band at shoulder height with straight arms|Pull the band apart until it touches the chest, then control it back|Don't shrug or arch the lower back
+Face Pull|Rope at upper-chest to face height, overhand grip|Pull toward the face, separating the hands and finishing with the hands beside the ears|Don't let it become a heavy row. Light and controlled
+Band Face Pull|Band anchored at face height|Pull toward the forehead with the elbows high and the hands finishing beside the ears|Don't let the elbows drop below the shoulders
+Y-T-W Raise|Lie face-down on an incline bench with light dumbbells|Raise the arms into a Y, then a T, then a W, each with a short hold|Don't use momentum. The weight should be very light
+Barbell Upright Row|Grip about shoulder width or wider|Pull the bar up close to the body, elbows leading, to about lower-chest height|Don't pull higher than the shoulders comfortably allow
+Cable Upright Row|Straight bar on a low pulley, grip shoulder width or wider|Pull up along the body leading with the elbows|Don't go too narrow or too high if the shoulders pinch
+Dumbbell External Rotation|Lie on the side, elbow pinned to the side at 90°|Rotate the forearm up, keeping the elbow in place|Don't let the elbow lift off the side
+Cable External Rotation|Cable at elbow height, towel between the elbow and ribs|Rotate the hand away from the body and return slowly|Don't rotate the trunk to cheat the range
+Band External Rotation|Band at elbow height, elbow tucked at 90°|Rotate out against the band, then return slowly|Don't let the elbow drift away from the body
+Cable Internal Rotation|Cable at elbow height on the working side|Rotate the hand across the body with the elbow pinned|Don't use the torso to rotate
+Cuban Press|Light dumbbells, upright row to elbows at shoulder height|Rotate the forearms up to vertical, then press overhead, and reverse|Very light weights only. Don't rush the rotation
+Overhead Plate Raise|Hold a plate at the hips with arms straight|Raise it in front all the way overhead and lower slowly|Don't arch the lower back at the top
+# push / Triceps
+Close-Grip Push-Up|Hands under the shoulders or slightly narrower|Lower with the elbows tucked tight to the ribs|Don't let the elbows flare or the hips sag
+Bench Dip|Hands on the edge of a bench behind you, legs out|Lower until the upper arms are about parallel, then press up|Don't drop too low or let the shoulders roll forward
+Triceps Pushdown|Straight bar at a high pulley, elbows at the sides|Push down to full elbow extension and squeeze|Don't let the elbows drift forward or lean over the bar
+Rope Triceps Pushdown|Rope on a high pulley, elbows pinned|Push down and spread the rope ends apart at the bottom|Don't let the shoulders roll forward to finish
+Single-Arm Cable Pushdown|One handle, elbow pinned to the side|Extend fully and control the return|Don't let the elbow lift as you come up
+Overhead Cable Triceps Extension|Face away from the cable, rope behind the head|Extend the arms forward and up to lockout|Don't let the elbows flare wide. Keep them in
+Skull Crusher|Lie on a bench, EZ bar over the shoulders|Bend only at the elbows to lower the bar toward the forehead or just behind the head, then extend|Don't let the elbows flare out or the upper arms swing
+Dumbbell Skull Crusher|Dumbbells over the shoulders, palms facing|Lower to beside the head by bending only the elbows|Don't flare the elbows. Keep the upper arms still
+Overhead Dumbbell Triceps Extension|Hold one dumbbell overhead with both hands, ribs down|Lower behind the head and extend back up|Don't let the lower back arch. Brace the core
+Single-Arm Overhead Dumbbell Extension|Dumbbell overhead, elbow pointing up|Lower behind the head and extend|Don't let the elbow flare out to the side
+Dumbbell Triceps Kickback|Hinge forward, upper arm parallel to the floor|Extend the elbow fully and squeeze|Don't swing the weight. Keep the upper arm fixed
+Cable Triceps Kickback|Hinge forward, cable from a low pulley|Extend back until the arm is straight|Don't let the shoulder drop or swing
+JM Press|Close grip, bar over the shoulders|Lower toward the upper chest/chin by bending the elbows, then press|Start light. It loads the elbows hard
+Tate Press|Dumbbells over the chest, elbows flared out|Lower the dumbbells to touch the chest by bending the elbows, then extend|Don't move the shoulders. It's an elbow movement
+Band Triceps Pushdown|Band anchored overhead, elbows pinned at the sides|Push down to full lockout and hold a beat at the bottom|Don't let the band snap the hands back up. Control the return to about 90°
+Machine Triceps Extension|Elbows aligned with the machine pivot|Extend fully and return slowly|Don't lift the elbows off the pad
+Machine Dip|Sit tall with the handles beside the hips, shoulders pulled down|Press the handles down to straight arms, then return until the elbows are about 90°|Don't shrug or roll the shoulders forward at the top of the rep
+# pull / Back
+Pull-Up|Overhand grip just outside the shoulders, start from a dead hang|Pull the elbows down toward the ribs until the chin clears the bar|Don't kip or cut the range short at the bottom
+Chin-Up|Underhand grip about shoulder width|Pull the chest toward the bar, elbows driving down|Don't flail the legs. Keep the body still
+Neutral-Grip Pull-Up|Palms facing each other on parallel handles|Pull until the chin clears the handles, elbows driving down|Don't shrug at the top. Keep the shoulders down
+Wide-Grip Pull-Up|Grip well outside the shoulders|Pull the chest toward the bar, thinking elbows down and out|Don't shorten the range. Go to a full hang each rep
+Weighted Pull-Up|Dip belt or vest, start from a dead hang|Same strict pull-up: chin over the bar, controlled descent|Don't add weight until bodyweight reps are strict
+Weighted Chin-Up|Underhand grip, weight on a dip belt|Pull to the chin over the bar with a slow lowering|Don't swing the weight to get it moving
+Band-Assisted Pull-Up|Loop the band over the bar and put a foot or knee in it|Pull strictly and lower slowly, using the band only for help|Don't let the band slingshot you out of the bottom
+Assisted Pull-Up Machine|Set the assistance so the last reps are hard|Pull the chin over the bar, lower under control|Don't use so much assistance that it feels easy
+Negative Pull-Up|Jump or step to the top position with the chin over the bar|Lower as slowly as possible (3–5 s) to a full hang|Don't drop the last third. Control it all the way
+Scapular Pull-Up|Hang from the bar with straight arms|Pull the shoulder blades down and back without bending the elbows, then relax|Don't bend the arms. It's a small shoulder-blade movement
+Commando Pull-Up|Stand under the bar side-on and grip with the hands close, one in front of the other|Pull so the head goes to one side of the bar, alternating sides each rep|Don't twist the hips. Keep the body straight
+Lat Pulldown|Thighs locked under the pad, grip just outside the shoulders|Pull the bar to the upper chest, driving the elbows down|Don't lean way back or pull behind the neck
+Close-Grip Lat Pulldown|Close or V-handle, slight lean back|Pull to the upper chest with the elbows tight to the sides|Don't rock the torso to move the weight
+Neutral-Grip Lat Pulldown|Parallel-grip handle, chest up|Pull down to the upper chest and squeeze the lats|Don't let the shoulders roll forward at the bottom
+Single-Arm Lat Pulldown|One handle, sit slightly side-on|Pull the elbow down to the hip|Don't rotate the torso to cheat the pull
+Straight-Arm Pulldown|Bar or rope on a high pulley, slight hip hinge|Sweep the bar down to the thighs with the arms nearly straight|Don't bend the elbows. It's a lat movement, not a pushdown
+Kneeling Single-Arm Pulldown|Half-kneel or tall-kneel beside the cable|Pull the elbow down to the side|Don't side-bend toward the pull
+Band Lat Pulldown|Band anchored high, kneel facing it|Pull the band down to the chest, elbows to the sides|Don't arch the lower back to finish
+Barbell Bent-Over Row|Hinge to about 45° with a flat back, bar hanging at the knees|Row the bar to the lower ribs, pulling the elbows back|Don't stand up with each rep or jerk the weight
+Pendlay Row|Torso near parallel to the floor, bar starts on the floor each rep|Explosively row to the lower chest, then return to the floor|Don't lift the torso to help the bar up
+Yates Row|Underhand grip, torso more upright (~30°)|Row the bar to the lower belly, elbows close|Don't turn it into a shrug or a hip thrust
+Seal Row|Lie face-down on a high bench, bar hanging|Row to the bench while keeping the chest on the pad|Don't lift the chest off the bench to cheat
+T-Bar Row|Straddle the bar, hinge with a flat back|Row the handle to the chest, squeeze the shoulder blades|Don't round the lower back or stand up into it
+Meadows Row|Stand side-on to the landmine end, staggered stance, overhand grip on the bar end|Row the elbow high and back past the torso|Don't twist the torso open. The shoulder blade does the work
+Landmine Row|Straddle or stand beside the bar, flat back|Row the bar to the chest/hip|Don't shrug the weight. Pull with the back
+Dumbbell Row|Hinge with a flat back, dumbbells hanging|Row both dumbbells to the hips, elbows back|Don't let the lower back round
+Single-Arm Dumbbell Row|Hand and knee on a bench, flat back|Row the dumbbell to the hip, elbow close to the body|Don't rotate the torso open to lift it
+Chest-Supported Dumbbell Row|Chest on a 30–45° incline bench, dumbbells hanging straight down|Row the elbows back past the torso and squeeze the shoulder blades for a beat|Don't lift the chest off the pad or jerk the head up
+Incline Dumbbell Row|Lie face-down on an incline bench, arms hanging, palms in|Pull the dumbbells toward the hips, keeping the elbows close|Don't shrug the weight up toward the ears. Drive the elbows back
+Kroc Row|Heavy dumbbell, one hand braced, slight body English allowed|Explosive row for high reps, full stretch at the bottom|Don't let the form fall apart into a twisting yank
+Renegade Row|Push-up position on dumbbells, feet wide|Row one dumbbell while keeping the hips square|Don't let the hips twist toward the rowing side
+Kettlebell Row|Hinge and hold the bell, flat back|Row to the hip, elbow back|Don't let the shoulder roll forward at the bottom
+Single-Arm Kettlebell Row|Staggered stance with the free hand on a bench or knee, flat back|Row the bell to the hip pocket, finishing with the elbow past the torso|Don't open the chest to the side to get the bell higher
+Gorilla Row|Two kettlebells on the floor between the feet, deep hinge|Alternate rowing one bell while pushing the other into the floor|Don't rise up between reps. Stay in the hinge
+Seated Cable Row|Sit tall, slight knee bend, close-grip handle|Row to the belly, squeezing the shoulder blades|Don't rock back and forth to move the weight
+Single-Arm Seated Cable Row|Sit tall with one handle, the other hand on the thigh|Let the shoulder reach forward at the stretch, then row to the ribs|Don't lean the whole torso back to finish the rep
+Wide-Grip Seated Cable Row|Wide bar, sit tall with a slight knee bend|Row to the lower chest with the elbows flared about 45–60° to work the upper back and rear delts|Don't rock back and forth. Keep the torso still
+Half-Kneeling Single-Arm Cable Row|Half-kneel facing the cable with the working-side knee down|Row the handle to the ribs while the hips and shoulders stay square|Don't let the cable rotate the torso at the stretch
+Standing Cable Row|Athletic stance facing the cable|Row the handle to the ribs while bracing to stay still|Don't lean back to counter the weight
+Machine Row|Chest against the pad, seat set so the handles are at mid-chest height|Row the handles back and pause with the shoulder blades squeezed|Don't push the chest off the pad to move more weight
+Chest-Supported Machine Row|Chest on the pad, seat set so the handles are at mid-chest|Row back, pause, and lower slowly|Don't lift off the pad or let the shoulders roll forward
+Hammer Strength High Row|Thighs under the pad, handles overhead and in front|Pull down and back toward the chest|Don't lean back excessively
+Inverted Row|Bar at about waist height, heels on the floor, body straight like a plank|Pull the lower chest to the bar and squeeze|Don't let the hips sag or lead with the chin
+Ring Row|Hang under the rings with a straight body|Pull the chest to the rings and turn the palms in|Don't let the hips drop or shrug
+TRX Row|Lean back holding the handles, body straight|Pull the chest up to the hands, elbows back|Don't let the hips sag or flare the elbows high
+Band Row|Band anchored at chest height|Row back to the ribs and squeeze|Don't let the band snap you forward
+Barbell Shrug|Bar in the hands, arms straight|Shrug the shoulders straight up toward the ears and pause|Don't roll the shoulders or bend the elbows
+Dumbbell Shrug|Dumbbells at the sides, arms straight|Shrug straight up toward the ears and hold 1–2 s at the top|Don't roll the shoulders or bend the elbows to help
+Trap Bar Shrug|Stand inside the trap bar, arms straight|Shrug straight up, squeeze, lower slowly|Don't bend the elbows to help
+Cable Shrug|Straight bar on a low pulley, stand close, arms straight|Shrug straight up and pause at the top|Don't lean back or bounce the reps
+Rack Pull|Bar on the pins or blocks at about knee height, same setup as the deadlift|Drive the hips forward to lockout, keeping the bar close|Don't lean back at the top or hitch the bar up the thighs
+Back Extension|Hips on the pad, ankles locked in|Lower with a flat back and raise to a straight line|Don't hyperextend at the top
+45-Degree Back Extension|Pad just below the hip crease, ankles locked in|Hinge down with a flat back, then rise to a straight line from head to heels|Don't hyperextend past straight at the top
+Reverse Hyperextension|Lie face-down with the hips at the edge of the pad|Swing the legs up to about parallel using the glutes|Don't let the lower back crank into hyperextension
+Superman Hold|Lie face-down with the arms extended overhead|Lift the arms, chest and legs a few inches and hold, squeezing the glutes|Don't crank the neck up. Keep the gaze on the floor
+Prone Y Raise|Lie face-down, arms overhead in a Y|Lift the arms off the floor, thumbs up|Don't shrug toward the ears
+Dumbbell Pullover|Lie across or along a bench, dumbbell over the chest|Lower behind the head with slightly bent arms, then pull back over|Don't bend the elbows more as you lower
+Cable Pullover|Face a high pulley with a rope or bar|Sweep down in an arc to the thighs|Don't let the arms bend. Keep it lats
+# pull / Biceps & Grip
+Barbell Curl|Shoulder-width underhand grip, elbows at the sides|Curl up without moving the elbows forward, lower slowly|Don't swing the hips or lean back
+EZ-Bar Curl|Hands on the angled part of the EZ bar|Curl to the shoulders with the elbows pinned|Don't let the elbows drift forward at the top
+Dumbbell Curl|Dumbbells at the sides, palms forward|Curl both up, turning the pinky slightly up at the top|Don't swing. Control the lowering
+Alternating Dumbbell Curl|Dumbbells at the sides, elbows pinned|Curl one arm at a time, rotating the palm up, and lower fully before switching|Don't twist the torso or swing the hips to help
+Hammer Curl|Neutral grip, palms facing in|Curl up keeping the palms facing in|Don't let the elbows travel forward
+Cross-Body Hammer Curl|Neutral grip, elbows at the sides|Curl the dumbbell up and across toward the opposite chest|Don't let the elbow drift forward or swing the torso
+Incline Dumbbell Curl|Lie back on an incline bench with the arms hanging straight down|Curl without letting the elbows move forward|Don't lift the shoulders off the bench
+Preacher Curl|Armpits snug on the pad, EZ bar|Curl up and lower to nearly straight arms|Don't drop the weight fast at the bottom. It strains the elbow
+Dumbbell Preacher Curl|Back of the upper arm flat on the pad, armpit snug at the top|Curl up, then lower slowly to nearly straight|Don't lift the elbow off the pad or drop the weight at the bottom
+Machine Preacher Curl|Elbows lined up with the machine pivot, arms flat on the pad|Curl up and lower slowly through the full range|Don't lift the elbows or shoulders off the pad to finish reps
+Concentration Curl|Sit with the elbow braced against the inner thigh|Curl to the shoulder and squeeze|Don't use the thigh to push the arm
+Spider Curl|Chest on an incline bench, arms hanging straight down|Curl up without moving the upper arm|Don't swing from the shoulders
+Zottman Curl|Curl the dumbbells up with the palms facing up|At the top, rotate to palms-down and lower slowly for 3 s|Don't rush the lowering. That's where the forearms work
+Cable Curl|Straight bar on a low pulley|Curl up with the elbows at the sides|Don't lean back to move the weight
+Single-Arm Cable Curl|One handle from a low pulley, step back slightly|Curl through a full range, squeezing at the top|Don't let the shoulder roll forward as you curl
+Bayesian Cable Curl|Face away from a low pulley, arm stretched behind the body|Curl forward while keeping the elbow behind the torso|Don't let the elbow swing forward
+Rope Hammer Curl|Rope on a low pulley, neutral grip|Curl the rope up with the elbows pinned, spreading the ends slightly at the top|Don't let the elbows flare or drift forward
+Reverse Barbell Curl|Overhand grip about shoulder width|Curl up with the wrists straight and the elbows pinned|Don't let the wrists bend back. Go lighter than regular curls
+Drag Curl|Underhand grip, bar touching the thighs|Curl by dragging the bar up the torso as the elbows travel back|Don't let the bar drift away from the body
+Band Curl|Stand on the band, handles or band ends in hand|Curl up against the band and lower slowly|Don't let the band snap the hands down
+Kettlebell Curl|Hold the bell by the handle (or the horns for two hands)|Curl up with the elbows pinned and lower under control|Don't swing the bell up with the hips
+Wrist Curl|Forearms on the thighs or a bench, palms up, wrists over the edge|Lower the weight toward the fingertips, then curl the wrists up|Don't lift the forearms off the support
+Reverse Wrist Curl|Forearms supported, palms down, wrists over the edge|Raise the back of the hand up as high as possible|Go much lighter than wrist curls. Don't swing the weight up
+Wrist Roller|Hold the roller at shoulder height with the arms straight|Roll the weight up by turning the wrists, then roll it down slowly|Don't let the arms drop below shoulder height
+Plate Pinch|Pinch two smooth plates together with the fingers and thumb|Hold for time with the arm straight|Don't let the plates slide. Stop before they drop
+Dead Hang|Grip the bar shoulder width|Hang with the shoulders engaged and the body still|Don't kip. Let go before the grip fails completely
+Towel Pull-Up|Drape towels over the bar and grip them|Pull up while squeezing the towels|Don't let the towels slide. Use thick towels
+Fat Grip Hold|Fat grips on dumbbells or a bar, deadlift it up|Hold for time with straight arms and shoulders pulled down|Don't let the wrists bend. Set the weights down before the grip fails
+# legs / Squat
+Barbell Back Squat|Bar on the upper back, feet about shoulder width, toes slightly out, big breath and brace|Sit down between the hips with the knees tracking over the toes to at least parallel, then drive up|Don't let the knees cave in or the heels lift
+High-Bar Back Squat|Bar on top of the traps, upright torso|Sit straight down, knees forward over the toes, to full depth|Don't let the chest fall forward out of the hole
+Low-Bar Back Squat|Bar on the rear delts below the spine of the shoulder blade, more hip hinge|Sit back and down, chest angled forward, drive the hips up|Don't let the hips shoot up faster than the chest
+Paused Back Squat|Same setup as the back squat|Hold a 2–3 s pause at the bottom while staying tight, then drive up|Don't relax or bounce out of the pause
+Box Squat|Box set to about parallel, wider stance|Sit back onto the box, pause without relaxing, drive up|Don't plop down. Control the descent
+Pin Squat|Pins set at the target depth|Squat down to the pins, pause briefly, drive up from a dead stop|Don't crash the bar into the pins
+Front Squat|Bar in the front rack on the shoulders, elbows high|Squat straight down with an upright torso and drive up|Don't let the elbows drop or the upper back round
+Zercher Squat|Bar in the crooks of the elbows, hands clasped|Squat down with an upright torso, elbows inside the knees|Don't round the upper back. Pad the bar if needed
+Safety Bar Squat|Safety squat bar on the back, handles in front|Squat with the chest tall, resisting the bar pushing you forward|Don't let the bar tip you onto the toes
+Overhead Squat|Bar locked overhead with a wide (snatch) grip|Squat down keeping the bar over the mid-foot|Don't let the bar drift forward. Light weight first
+Anderson Squat|Bar set on pins at the bottom position|Get tight under the bar and drive up from a dead stop|Don't jerk the bar off the pins
+Goblet Squat|Hold a dumbbell vertically at the chest|Squat down with the elbows inside the knees and the torso upright|Don't let the heels lift or the weight pull you forward
+Kettlebell Goblet Squat|Hold the bell by the horns at the chest|Squat deep with an upright torso|Don't round the back at the bottom
+Double Kettlebell Front Squat|Two bells in the front rack|Squat down keeping the elbows tight|Don't let the bells pull you forward
+Dumbbell Squat|Dumbbells at the sides, feet shoulder width|Squat to depth with the dumbbells hanging straight down, then drive up|Don't let the chest drop or the dumbbells swing forward
+Landmine Squat|Hold the end of the bar at the chest|Squat down and up following the bar's arc|Don't let the knees cave in
+Heels-Elevated Goblet Squat|Heels on a wedge or plates|Squat deep with the knees traveling forward|Don't rush. Control the bottom
+Smith Machine Squat|Feet slightly in front of the bar|Squat down and drive up along the fixed path|Don't let the knees cave in
+Hack Squat|Back on the pad, feet mid-platform|Lower to depth and drive up through the full foot|Don't lock the knees hard at the top
+Pendulum Squat|Shoulders under the pads, feet mid-platform|Lower to a deep squat and drive back up|Don't let the heels lift or the knees cave
+Belt Squat|Belt around the hips, feet on the platform|Squat down and up with an upright torso|Don't let the weight swing
+Leg Press|Feet hip-width in the middle of the platform|Lower until the knees are near the chest, then press|Don't let the lower back round off the pad or lock the knees hard
+Single-Leg Leg Press|One foot centered on the platform|Lower under control and press up|Don't let the knee cave in or the hips twist
+Sissy Squat|Hold support, rise onto the toes|Lean back and let the knees travel forward and down|Don't go deeper than the knees tolerate
+Bodyweight Squat|Feet shoulder width, arms forward|Squat to depth and stand up|Don't let the heels lift or the knees cave
+Jump Squat|Feet shoulder width, arms ready to swing|Dip to a quarter or half squat and jump as high as possible|Don't land stiff-legged. Absorb through the hips and knees
+Wall Sit|Back against the wall, thighs parallel to the floor|Hold the position with the knees over the ankles|Don't let the knees drift past the toes or rest the hands on the thighs
+Pistol Squat|Stand on one leg with the other leg and arms forward|Squat down on one leg to full depth and stand up|Don't let the heel lift or the knee cave
+Box Pistol Squat|Stand on one leg in front of a box, the other leg out front|Sit back to the box on one leg, touch, and stand without rocking|Don't plop onto the box or let the knee cave in
+Skater Squat|Stand on one leg, the other leg bent behind|Lower the back knee toward the floor and drive up|Don't let the front knee cave in
+Shrimp Squat|Hold the back foot behind you|Lower the back knee to the floor and stand up|Don't fall forward. Use a support if needed
+Cossack Squat|Very wide stance, toes slightly out|Shift into one leg, sitting deep while the other leg stays straight with the toes up|Don't let the heel of the squatting leg lift
+Goblet Cossack Squat|Wide stance, dumbbell or kettlebell at the chest|Sit into one hip while the other leg stays straight, then shift across|Don't round the back or let the bent-leg heel lift
+Lateral Squat|Wide stance, toes forward|Sit into one hip, keeping the other leg straight, and push back to the middle|Don't let the bent knee cave in past the toes
+Sumo Squat|Wide stance, toes out, dumbbell hanging between the legs|Squat down with the knees pushed out over the toes|Don't let the knees collapse inward
+Leg Extension|Knees lined up with the machine pivot, pad on the lower shins|Extend the knees fully and squeeze the quads for a beat|Don't swing the weight up or lift the hips off the seat
+Single-Leg Leg Extension|One leg working, knee lined up with the pivot|Extend fully and lower slowly over 2–3 s|Don't twist the hips to help lift
+Spanish Squat|Heavy band looped behind both knees and anchored to a post in front|Sit back into the band and squat down with the shins staying vertical|Don't lose band tension. Lean back into it the whole set
+# legs / Hinge
+Conventional Deadlift|Mid-foot under the bar, shins close, hands just outside the legs, flat back|Push the floor away and drag the bar up the legs to lockout|Don't let the hips shoot up first or the back round
+Sumo Deadlift|Wide stance, toes out, hands inside the knees|Push the knees out and drive the hips through to stand|Don't let the knees cave in or the hips rise early
+Trap Bar Deadlift|Stand centered in the trap bar, grip the handles|Push the floor away, standing tall to lockout|Don't round the back or squat it too much. Find a hinge
+High-Handle Trap Bar Deadlift|Stand centered in the bar and grip the raised handles|Take the slack out, then push the floor away to stand tall|Don't jerk the bar or round the back
+Deficit Deadlift|Stand on a 1–3 inch platform|Pull from the lower start keeping the back flat|Don't round the back to reach the bar
+Paused Deadlift|Normal deadlift setup: bar over mid-foot, lats tight, flat back|Pause 1–2 s just below the knees with the shoulders over the bar, then finish the pull|Don't let the bar drift forward or the hips rise during the pause
+Snatch-Grip Deadlift|Very wide grip, hips lower than a normal deadlift|Pull with the chest up and the bar dragging up the legs|Don't let the upper back round under the wide grip
+Romanian Deadlift|Stand tall with the bar, soft knees|Push the hips back, sliding the bar down the thighs until you feel a hamstring stretch, then drive the hips forward|Don't round the back or turn it into a squat
+Dumbbell Romanian Deadlift|Dumbbells in front of the thighs|Hinge back keeping the dumbbells close to the legs|Don't let the dumbbells drift forward
+Kettlebell Romanian Deadlift|Hold the bell with both hands in front of the hips|Push the hips back until you feel the hamstrings stretch, then drive the hips forward|Don't squat it down or round the back
+Single-Leg Romanian Deadlift|Stand on one leg, weight in the opposite hand|Hinge forward as the back leg lifts, keeping the hips square|Don't let the hips open up toward the ceiling
+Kickstand Romanian Deadlift|Back foot's toes lightly on the floor for balance, front leg does the work|Hinge back on the front leg|Don't push through the back foot. It's only for balance
+Landmine Romanian Deadlift|Hold the bar end with both hands in front of the hips|Hinge back with the bar close|Don't let the bar drift away from the legs
+Landmine Single-Leg Romanian Deadlift|Bar end in the hand opposite the standing leg|Hinge on one leg as the back leg lifts|Don't let the hips rotate open toward the bar
+Cable Romanian Deadlift|Face a low cable, rope between the legs|Hinge back and drive the hips forward|Don't lean back at the top
+Stiff-Leg Deadlift|Legs nearly straight, bar in front of the thighs|Hinge down to a deep hamstring stretch with a flat back|Don't round the back to reach lower
+Good Morning|Bar on the upper back, soft knees|Push the hips back and hinge until the torso is near parallel|Don't round the back. Go light
+Seated Good Morning|Sit on a bench with the bar on the upper back|Hinge forward from the hips with a flat back|Don't round the lower back. Go light
+Kettlebell Swing|Hinge with the bell hiked between the legs|Snap the hips forward to float the bell to chest height|Don't squat it or lift with the arms
+Single-Arm Kettlebell Swing|One hand on the bell, free arm out to the side|Hike and snap the hips, letting the bell float to chest height|Don't let the shoulder get yanked forward or the torso rotate
+American Kettlebell Swing|Same hip hinge as a normal swing|Swing the bell all the way overhead|Don't arch the lower back at the top. Only if the shoulders allow full overhead
+Kettlebell Deadlift|Bell between the mid-feet, feet hip-width|Hinge down with a flat back, grab the handle, and push the floor away to stand tall|Don't squat it up or round the back
+Suitcase Deadlift|Dumbbell or kettlebell at one side|Deadlift the weight up without leaning toward it|Don't side-bend. Keep the shoulders level
+Cable Pull-Through|Face away from a low cable, rope between the legs|Hinge back until the hamstrings stretch, then drive the hips forward and squeeze|Don't pull with the arms or lean back at the top
+Band Pull-Through|Band anchored low behind you|Hinge back and squeeze the glutes to stand|Don't let the band yank you backward
+Lying Leg Curl|Lie face-down, pad above the heels|Curl the heels toward the glutes|Don't lift the hips off the pad
+Seated Leg Curl|Knees lined up with the pivot, thigh pad snug|Curl the legs down and back|Don't let the hips slide forward
+Single-Leg Lying Leg Curl|One leg working, hips flat on the pad|Curl the heel toward the glute and lower slowly|Don't twist the hips to help the rep
+Nordic Hamstring Curl|Kneel with the ankles anchored|Lower the body forward as slowly as possible, catch with the hands, push back|Don't bend at the hips. Keep a straight line from knees to head
+Glute-Ham Raise|Feet in the plates, knees just behind the pad|Lower forward under control and curl back up with the hamstrings|Don't pike at the hips. Keep the knees-to-shoulders line straight
+Swiss Ball Hamstring Curl|Lie on the back with the heels on the ball|Lift the hips, then curl the ball toward you|Don't let the hips drop as you curl
+Slider Hamstring Curl|Heels on sliders, hips lifted into a bridge|Slide the heels out slowly and curl them back in|Don't let the hips sag as the legs straighten
+Single-Leg Swiss Ball Hamstring Curl|One heel on the ball, the other leg up|Lift the hips and curl with one leg|Don't let the hips rotate or drop
+# legs / Lunge
+Forward Lunge|Stand tall, feet hip-width|Step forward and lower until both knees are about 90°, then push back|Don't let the front knee cave in
+Reverse Lunge|Stand tall, feet hip-width|Step back and lower the back knee toward the floor, then drive up through the front foot|Don't let the torso fold forward or the front knee cave in
+Dumbbell Reverse Lunge|Dumbbells at the sides, stand tall|Step back and lower until the back knee nearly touches, then drive up through the front heel|Don't let the front knee drift inward
+Barbell Reverse Lunge|Bar on the upper back, brace|Step back with control and lower straight down|Don't let the hips rotate or the bar tilt
+Deficit Reverse Lunge|Front foot on a 2–4 inch plate or step|Step back into a deeper lunge than normal and drive up through the front foot|Don't let the front heel lift
+Dumbbell Walking Lunge|Dumbbells at the sides|Step into each lunge continuously, back knee kissing the floor|Don't let the knee cave or the torso lean forward
+Barbell Walking Lunge|Bar on the upper back, braced, plenty of clear floor|Walk forward with long strides, back knee lowering under control each step|Don't take short choppy steps or let the bar tip side to side
+Front-Foot-Elevated Split Squat|Front foot on a small platform|Lower straight down into a deep split squat|Don't let the front heel lift
+Bulgarian Split Squat|Rear foot on a bench, front foot far enough out to sit straight down|Lower until the back knee nearly touches the floor, drive up through the front foot|Don't push off the back foot. The front leg does the work
+Barbell Bulgarian Split Squat|Bar on the back, rear foot on a bench|Lower straight down until the back knee nearly touches, drive up through the front foot|Don't let the bar shift or the hips rotate
+Smith Machine Split Squat|Split stance under the bar, front foot well forward|Lower straight down and press up along the fixed path|Don't let the front knee cave or the heel lift
+Split Squat|Split stance, about a leg-length apart|Lower straight down until the back knee nearly touches the floor|Don't let the front knee cave or the weight shift onto the back leg
+Dumbbell Split Squat|Dumbbells at the sides, split stance|Lower straight down and drive up through the front foot|Don't lean the torso too far forward
+Landmine Reverse Lunge|Hold the bar end at the chest with both hands|Step back into a lunge and drive back to standing|Don't let the bar pull the torso forward
+Goblet Reverse Lunge|Kettlebell held at the chest|Step back and lower the back knee toward the floor|Don't let the chest drop toward the front thigh
+Curtsy Lunge|Stand tall, hands on the hips|Step one leg behind and across the other, then lower|Don't twist the hips too much. Keep the front knee over the toes
+Lateral Lunge|Feet together, then a wide step to the side|Sit back into the stepping hip, keeping the other leg straight|Don't let the stepping knee cave in
+Dumbbell Lateral Lunge|Dumbbells in hand, feet together|Step out wide and sit into that hip, the dumbbells framing the front knee|Don't round the back or let the heel of the stepping foot lift
+Goblet Lateral Lunge|Kettlebell at the chest|Lunge to the side with the chest up and the hips back|Don't let the heel lift or the knee cave
+Slider Lateral Lunge|Stand with one foot on a slider, weight on the other leg|Slide the leg out to the side as you sit into the standing hip, then pull it back in|Don't let the working knee cave or the chest drop
+Slider Reverse Lunge|Stand with the back foot on a slider|Slide the foot back into a lunge, then pull it back in using the front leg|Don't push off the slider foot. The front leg does the work
+Crossover Step-Up|Stand beside a box with the far foot crossing over onto it|Drive up through the box foot to stand tall on the box|Don't push off the bottom leg
+Step-Up|Box at about knee height, whole foot on the box|Step up through the front foot to stand tall|Don't push off the back foot
+Dumbbell Step-Up|Dumbbells in hand, whole foot on the box|Step up and stand tall, then lower with control|Don't lean forward excessively or bounce off the floor
+Barbell Step-Up|Bar on the upper back, box at about knee height|Step up through the whole front foot and stand fully, then step down under control|Don't let the bar shift or the knee cave
+Lateral Step-Up|Stand beside the box, inside foot on top|Drive up through the box foot to stand|Don't let the knee cave in
+Step-Down|Stand on a box on one leg|Slowly lower the free heel to touch the floor, then stand back up|Don't let the hips drop or rotate
+Jumping Lunge|Start in a lunge with the back knee hovering|Jump and switch legs in the air, landing softly back in a lunge|Don't land with a stiff knee or let the front knee cave
+Overhead Walking Lunge|Dumbbells locked out overhead|Walk forward in lunges with the arms locked|Don't arch the lower back to keep the weight up
+Rotational Lunge|Hold a med ball at the chest|Lunge and rotate the torso toward the front leg|Don't let the front knee follow the rotation inward
+# legs / Glutes
+Barbell Hip Thrust|Upper back on a bench at the bottom of the shoulder blades, bar padded over the hips|Drive through the heels to full hip extension, chin tucked, ribs down|Don't hyperextend the lower back at the top
+Single-Leg Hip Thrust|Upper back on the bench, one foot planted|Drive up through one heel to full hip extension|Don't let the hips rotate or drop on one side
+Dumbbell Hip Thrust|Upper back on a bench, dumbbell held on the hips|Drive up to full hip extension and pause|Don't overextend the lower back at the top
+Machine Hip Thrust|Belt or pad over the hips, feet planted|Drive to full extension and pause 1 s|Don't push through the toes. Drive through the heels
+Glute Bridge|Lie on the back, knees bent, feet flat|Drive the hips up to a straight line and squeeze|Don't arch the lower back to get higher
+Barbell Glute Bridge|Lie on the floor with a padded bar on the hips|Bridge up and squeeze the glutes|Don't push through the toes
+Single-Leg Glute Bridge|One foot planted, the other leg up|Drive up through one heel to full hip extension|Don't let the hips sag on one side
+Frog Pump|Lie on the back, soles of the feet together, knees out|Thrust the hips up and squeeze|Don't use the lower back to lift
+Cable Kickback|Ankle strap, hinge forward slightly|Kick the leg back by squeezing the glute|Don't arch the lower back to get height
+Cable Hip Abduction|Ankle strap, stand side-on to the cable|Lift the leg out to the side and lower slowly|Don't lean the torso to get the leg higher
+Hip Abduction Machine|Sit with the pads outside the knees|Push the knees out and squeeze, pause briefly|Don't use momentum or rock the torso
+Hip Adduction Machine|Sit tall with the pads inside the knees|Squeeze the legs together and pause for a beat|Don't let the weight snap the legs back open
+Banded Lateral Walk|Band around the knees or ankles, half-squat|Step sideways, keeping tension in the band|Don't let the feet come together. Keep the knees out
+Monster Walk|Band around the ankles or knees, athletic stance|Walk forward and back on a diagonal|Don't let the knees cave or the feet come together
+Clamshell|Lie on the side, knees bent, band around the knees|Lift the top knee while keeping the feet together|Don't roll the hips backward
+Fire Hydrant|On hands and knees, back flat|Lift the bent knee out to the side to about hip height|Don't shift the weight away from the working side or rotate the torso
+Side-Lying Hip Abduction|Lie on the side, bottom knee bent|Raise the top leg straight up, slightly behind the body|Don't let the leg drift forward
+Copenhagen Plank|Side plank with the top leg on a bench (inner knee for easier, ankle for harder)|Hold the body straight, lifting with the top leg's adductors|Don't let the hips sag
+Copenhagen Adduction|Side-lying with the top leg on a bench|Lift the hips and bottom leg up to the bench|Don't rush. Control both the up and the down
+45-Degree Hip Extension|Pad just below the hips, feet slightly turned out|Round the upper back slightly and drive the hips into the pad to lift|Don't extend through the lower back
+Reverse Nordic|Kneel upright on a pad, ankles anchored or free|Lean back slowly with a straight line from knees to head, then return|Don't bend at the hips to make it easier
+# legs / Calves & Shins
+Standing Calf Raise|Balls of the feet on the edge|Lower the heels to a full stretch, rise as high as possible|Don't bounce. Pause at the bottom
+Seated Calf Raise|Knees under the pad, balls of the feet on the platform|Lower to a full stretch and rise as high as possible|Don't rush the reps. Pause at the bottom
+Single-Leg Calf Raise|One foot on a step, hold support|Lower to a full stretch and rise on one leg|Don't let the ankle roll outward
+Smith Machine Calf Raise|Bar on the shoulders, balls of the feet on a plate|Full stretch and full rise|Don't bend the knees to help
+Leg Press Calf Raise|Balls of the feet on the bottom edge of the platform, knees soft|Press through the toes to full ankle extension, lower to a stretch|Don't let the feet slip. Keep the sled locked
+Donkey Calf Raise|Hinge forward with weight on the hips|Lower to a full stretch, then rise high|Don't bend the knees to bounce the weight
+Bent-Knee Calf Raise|Knees bent about 30–45°|Raise the heels to work the soleus|Don't let the knees straighten as you rise
+Tibialis Raise|Back against a wall, heels out about a foot|Lift the toes toward the shins, lower slowly|Don't push off the wall with the hips
+Banded Tibialis Raise|Band around the top of the foot, anchored in front|Pull the toes up against the band|Don't move the knee. Isolate the ankle
+Pogo Jump|Stand tall, feet hip-width|Bounce quickly off the balls of the feet with stiff ankles|Don't bend the knees much. The ankles do the work
+# core / Anti-Extension
+Front Plank|Forearms under the shoulders, body in a straight line|Squeeze the glutes and brace the abs as if about to be punched|Don't let the hips sag or pike up
+Weighted Plank|Plate on the upper back between the shoulder blades|Hold a rigid plank with the glutes squeezed and the ribs pulled down|Don't let the weight make the hips sag
+RKC Plank|Elbows slightly in front of the shoulders, fists clenched|Squeeze everything maximally and pull the elbows toward the toes|Hold only 10–20 s at full tension. Don't hold it loose
+Long-Lever Plank|Forearms further in front of the head|Hold the plank with a longer lever|Don't let the lower back arch
+Plank Shoulder Tap|High plank with the feet wider than the hips|Tap the opposite shoulder slowly while keeping the hips still|Don't let the hips rock side to side
+Body Saw|Forearm plank with the feet on sliders|Push the body back and forth from the shoulders|Don't let the hips sag as you go back
+Ab Wheel Rollout|Kneel with the wheel under the shoulders|Roll out with the hips extended and the core tight, pull back|Don't let the lower back arch
+Kneeling Ab Wheel Rollout|Kneel on a pad with the wheel under the shoulders|Roll out as far as you can without the back arching, then pull back with the abs|Don't let the hips sag or lead with the butt on the return
+Barbell Rollout|Bar loaded with round plates, kneel behind it|Roll out with the core braced, then pull back|Don't arch the lower back at full extension
+Swiss Ball Rollout|Forearms on the ball, kneel|Roll the ball out by extending the arms and hips|Don't let the lower back sag
+Stir the Pot|Forearm plank on a Swiss ball, feet wide|Draw small circles with the elbows|Don't let the hips sway with the ball
+Dead Bug|Lie on the back, arms up, knees at 90°|Lower the opposite arm and leg while keeping the lower back flat on the floor|Don't let the lower back peel off the floor
+Weighted Dead Bug|Hold a dumbbell over the chest with both hands|Lower the legs alternately while keeping the lower back flat|Don't arch the back as the leg extends
+Band Dead Bug|Band anchored behind you, pulled taut overhead|Lower the legs alternately|Don't let the band pull the arms back
+Hollow Body Hold|Lie on the back, arms overhead, legs straight|Lift the shoulders and legs off the floor, lower back pressed down|Don't let the lower back lift
+Hollow Rock|Hold the hollow position, arms overhead|Rock back and forth while keeping the shape|Don't break at the hips or let the lower back lift
+Bear Crawl Hold|On hands and knees, then lift the knees an inch off the floor|Hold with a flat back and steady breathing|Don't let the hips rise above the shoulders
+TRX Fallout|Hold the handles with straight arms, lean in|Let the arms rise overhead as the body falls forward, then pull back|Don't let the hips sag at the bottom
+# core / Anti-Rotation
+Pallof Press|Stand side-on to the cable at chest height|Press the handle straight out from the chest and hold, resisting rotation|Don't let the torso twist toward the cable
+Band Pallof Press|Band anchored at chest height, side-on|Press straight out from the sternum and hold 2 s|Don't let the torso rotate toward the anchor
+Half-Kneeling Pallof Press|Half-kneel with the inside knee down|Press out and resist rotation|Don't let the hips shift or the lower back arch
+Tall-Kneeling Pallof Press|Both knees down side-on to the cable, glutes squeezed|Press the handle straight out from the chest and hold 2 s|Don't lean back or let the torso rotate
+Split-Stance Pallof Press|Split stance side-on to the cable, inside leg forward|Press out from the chest and hold 2 s|Don't let the front knee wobble or the hips rotate
+Pallof Press with Overhead Reach|Normal Pallof stance, handle at the chest|Press out, then raise the arms overhead and bring them back down|Don't arch the back as the arms go up
+Pallof Hold|Hold the press-out position|Breathe while resisting rotation|Don't hold the breath the whole time
+Side Plank|Elbow under the shoulder, body in a straight line|Lift the hips and hold|Don't let the hips sag or roll forward
+Side Plank with Hip Dip|Side plank on the elbow, body straight|Lower the hip toward the floor, then lift back up past neutral|Don't let the hips rotate forward or back
+Side Plank Row|Side plank facing a low cable|Row the handle while holding the plank|Don't let the hips drop
+Renegade Row Hold|Push-up position on dumbbells, feet wide|Hold one dumbbell up at the rib with the hips square|Don't let the hips twist toward the lifted side
+Bird Dog|On hands and knees, back flat|Reach the opposite arm and leg out long, pause, return|Don't let the hips rotate or the lower back arch
+Suitcase Hold|Heavy dumbbell or kettlebell in one hand, stand tall|Hold for time with the shoulders level|Don't side-bend toward or away from the weight
+Single-Arm Plank|High plank with the feet wide|Lift one hand off the floor and hold|Don't let the hips rotate
+# core / Rotation
+Cable Woodchop|Cable at shoulder height, side-on|Rotate through the torso and hips, pulling across the body|Don't pull with the arms only
+High-to-Low Cable Woodchop|Cable set high, side-on|Chop diagonally down across the body, pivoting the back foot|Don't round the back or pull only with the arms
+Low-to-High Cable Woodchop|Cable set low, side-on|Lift diagonally up across the body, rotating through the hips|Don't arch the back at the top
+Half-Kneeling Cable Chop|Half-kneel with the inside knee up|Chop down and across the body|Don't let the hips rotate. Move through the upper back
+Half-Kneeling Cable Lift|Half-kneel with the outside knee up|Lift up and across the body|Don't arch the back at the top
+Landmine Rotation|Hold the bar end at arm's length in front of the chest|Rotate the bar from hip to hip, pivoting the back foot|Don't bend the arms. The rotation comes from the hips and trunk
+Landmine 180|Hold the bar end overhead|Rotate the bar down to each hip|Don't let the arms bend
+Landmine Rainbow|Hold the bar end with straight arms overhead|Swing the bar in an arc from hip to hip over the head|Don't arch the back as the bar passes overhead
+Russian Twist|Sit with the heels down or lifted, lean back to about 45°, chest up|Rotate the shoulders side to side and touch the ball beside each hip|Don't round the back or just move the arms
+Band Rotation|Band at chest height, side-on, arms straight|Rotate away from the anchor, turning the hips and back foot|Don't let the arms bend
+Cable Rotation|Cable at chest height, side-on, arms straight|Rotate through the torso, turning the back foot|Don't pull with the arms
+Med Ball Rotational Throw|Stand side-on to a wall, ball at the hip|Load the back hip, then rotate explosively and throw the ball into the wall|Don't throw with the arms. Power comes from the hips
+Med Ball Scoop Toss|Ball at the back hip, athletic stance side-on to a wall|Scoop and throw underhand into the wall, driving from the back hip|Don't round the back or throw with only the arms
+Med Ball Side Toss|Stand side-on to a wall, ball at the hip|Toss the ball sideways into the wall with a hip rotation|Don't throw with only the arms
+Windshield Wiper|Lie on the back or hang from a bar, legs up|Lower the legs side to side|Don't let the shoulders lift off the floor
+Seated Cable Rotation|Sit side-on to the cable, handle at the chest|Rotate the torso away from the cable and return slowly|Don't lean back to help
+Rotational Med Ball Slam|Ball overhead, feet wide|Rotate and slam the ball down beside one foot, alternate sides|Don't let the ball bounce back into the face. Use a dead ball
+# core / Flexion & Lateral
+Crunch|Lie on the back, knees bent, hands lightly at the temples or across the chest|Curl the ribs toward the pelvis until the shoulder blades clear the floor, exhale at the top|Don't yank the head with the hands. Keep a fist-sized gap under the chin
+Cable Crunch|Kneel facing a high cable, rope held beside the head|Curl the ribs down toward the hips, rounding the spine|Don't sit the hips back. The hips stay still and the spine flexes
+Decline Crunch|Feet hooked on a decline bench, arms crossed on the chest|Curl up until the torso is about halfway, lower slowly|Don't throw the arms or arch off the bench to start the rep
+Machine Crunch|Seat and pads set so you can curl over the hips|Crunch down by rounding the spine, exhale hard|Don't push with the arms. The abs move the pads
+Sit-Up|Knees bent, feet anchored or flat|Curl up segment by segment to sitting, lower with control|Don't fling up with the arms or jerk the neck
+Weighted Sit-Up|Plate held against the chest|Curl up to sitting and lower slowly|Don't hold the plate behind the head. It strains the neck
+V-Up|Lie flat, arms overhead, legs straight|Lift the arms and legs together to meet over the hips|Don't let the lower back arch on the way down
+Toe Touch|Lie on the back, legs straight up|Reach the hands up toward the toes, lifting the shoulder blades|Don't let the legs drop toward you to make it easier
+Reverse Crunch|Lie on the back, knees bent at 90° over the hips|Curl the pelvis up off the floor toward the ribs|Don't swing the legs. Lift with the lower abs
+Hanging Leg Raise|Dead hang, shoulders engaged|Raise the straight legs to at least hip height while tilting the pelvis up|Don't swing. Pause at the bottom to kill the momentum
+Hanging Knee Raise|Dead hang, shoulders engaged|Pull the knees up toward the chest and curl the pelvis|Don't just lift the thighs. Curl the hips up
+Toes-to-Bar|Hang with an active grip, lats engaged|Pull the toes to touch the bar between the hands, using lats and abs|Don't let it turn into an uncontrolled swing
+Captain's Chair Leg Raise|Back against the pad, forearms on the rests|Raise the knees up and curl the hips off the pad|Don't swing the legs or arch off the backrest
+Lying Leg Raise|Lie on the back, hands under the hips|Raise the straight legs to vertical and lower slowly|Don't let the lower back arch as the legs go down
+Dragon Flag|Lie on a bench and grip it behind the head|Lift the body in a straight line from the shoulders, lower slowly|Don't bend at the hips. Build up with negatives
+L-Sit|Hands on parallettes or the floor, arms locked|Press down, lift the hips and hold the legs straight out|Don't let the shoulders shrug up. Push them down
+Bicycle Crunch|Lie on the back, hands at the temples|Rotate the shoulder toward the opposite knee as the other leg extends|Don't yank the neck or rush the reps
+Mountain Climber|High plank, hands under the shoulders|Drive one knee toward the chest at a time in a quick rhythm|Don't let the hips bounce up and down
+Dumbbell Side Bend|Dumbbell in one hand, stand tall|Bend directly sideways toward the weight, then return|Don't lean forward or rotate
+Cable Side Bend|Stand side-on to a low cable, handle in the far hand|Bend away from the cable and return slowly|Don't twist the torso or lean forward
+Hanging Oblique Knee Raise|Dead hang, shoulders engaged|Raise the knees up and to one side, alternating|Don't swing. Control each rep
+Swiss Ball Pike|High plank with the shins on the ball|Lift the hips into a pike while the ball rolls toward the hands|Don't let the shoulders drift behind the hands
+Swiss Ball Knee Tuck|High plank with the shins on the ball|Pull the knees toward the chest, rolling the ball in|Don't let the hips sag on the return
+TRX Pike|Feet in the straps, high plank|Pike the hips up, keeping the legs straight|Don't let the lower back sag between reps
+# power / Olympic Lifts
+Power Clean|Bar over mid-foot, shoulders slightly ahead of the bar, flat back|Push the floor away, then extend hips and knees violently and pull under to catch in a quarter squat with the elbows high|Don't pull with the arms early or let the bar swing out from the body
+Hang Power Clean|Start standing, slide the bar to just above the knees with a hip hinge|Jump and shrug, pull under fast, catch high with the elbows forward|Don't reverse-curl the bar. Elbows whip around fast
+Hang Clean|Start from the hang position|Explode up and drop into a full front squat to catch|Don't catch with the elbows low
+Clean|Bar over mid-foot, set back|Pull from the floor, extend and drop into a full squat catch|Don't let the bar swing away from the body
+Clean Pull|Clean setup: bar over mid-foot, flat back|Pull to full extension with a violent shrug, no catch|Don't bend the arms early or lean back at the top
+High Pull|Clean or snatch grip, bar over mid-foot|Extend explosively and let the elbows rise high and out|Don't lift with the arms. Hips and legs drive it
+Muscle Clean|Bar at the hips or on the floor|Pull and turn the elbows over without re-bending the knees|Don't dip under. Keep the legs straight at the catch
+Power Snatch|Wide grip, bar over mid-foot|Extend explosively, pull under and catch overhead in a quarter squat|Don't press out the catch. Lock the arms fast
+Hang Power Snatch|Wide grip, bar at mid-thigh|Jump, shrug, and pull under to catch overhead in a quarter squat|Don't let the bar loop forward away from the body
+Hang Snatch|Wide grip from the hang|Explode up and drop into a full overhead squat catch|Don't catch with soft elbows
+Snatch|Wide grip from the floor|Pull, extend, and drop into a full overhead squat catch|Don't let the bar drift forward
+Snatch Pull|Snatch grip, bar over mid-foot, flat back|Pull to full extension with a strong shrug, keeping the bar close|Don't bend the arms early
+Snatch Balance|Bar on the back, snatch grip|Dip and drive the bar up while dropping under into an overhead squat|Don't press the bar up slowly. Punch and drop
+Clean and Jerk|Clean the bar to the front rack|Dip and drive, then split or push under to lock out overhead|Don't let the torso lean forward in the dip
+Split Jerk|Bar in the front rack, elbows slightly up|Dip and drive, then split the feet and punch the bar overhead|Don't land with the front knee caved in
+Push Jerk|Bar in the front rack, feet hip-width|Dip and drive, then push yourself under into a quarter squat as the arms lock|Don't press the bar out slowly
+Clean and Press|Clean the bar to the shoulders|Then strict press it overhead|Don't use the legs to press. It's strict
+Dumbbell Snatch|Dumbbell between the feet|Explode from the hips and punch the dumbbell overhead in one motion|Don't curl it up. Keep it close to the body
+Dumbbell Hang Clean|Dumbbells at the sides|Dip and jump, catching the dumbbells at the shoulders|Don't reverse-curl them up
+Dumbbell Clean and Press|Clean the dumbbells to the shoulders|Then press overhead to lockout|Don't arch the back during the press
+Kettlebell Clean|Hike the bell back between the legs|Drive the hips and keep the bell close so it rolls around the wrist into the rack|Don't let the bell flop and bang the forearm
+Kettlebell Snatch|Hike the bell back between the legs|Drive the hips and punch the hand through as the bell floats overhead|Don't let the bell flip over and slam the wrist
+Kettlebell Clean and Jerk|Clean the bell to the rack|Dip and drive, then dip again under the bell to lock out|Don't press it out slowly
+Landmine Clean|Bar end in front of you, hinge to grab it|Explode from the hips and catch the bar end at the shoulder|Don't let the bar swing away from the body
+Single-Arm Landmine Clean and Press|Bar end between the feet|Clean to the shoulder, then press up and forward|Don't twist the torso during the press
+Trap Bar Jump|Stand inside the trap bar with a light load|Quarter squat and jump explosively, landing softly|Don't use a weight that makes the jump slow
+# power / Plyometrics & Throws
+Box Jump|Stand a foot from the box, feet hip-width|Swing the arms and jump, landing softly on the whole foot in a half squat|Don't land in a deep squat. Use a lower box and step down
+Seated Box Jump|Sit on a bench with the feet flat|Jump from seated onto a box, landing softly|Don't rock to get momentum
+Depth Jump|Step (don't jump) off a 12–24 inch box|Land on both feet and immediately jump as high as possible|Don't let the heels crash. Keep ground contact as short as possible
+Depth Drop|Stand on a box 12–24 inches high|Step off and land softly in a half squat, sticking it for 2 s|Don't let the knees cave on landing
+Broad Jump|Feet hip-width, arms back|Swing the arms and jump forward as far as possible, landing in a half squat|Don't land stiff-legged or fall forward
+Single-Leg Broad Jump|Stand on one leg, arms back|Jump forward and land on the same leg, sticking it|Don't let the landing knee cave
+Vertical Jump|Feet hip-width, arms relaxed|Dip quickly and jump straight up, reaching high|Don't pause at the bottom of the dip
+Tuck Jump|Stand tall, feet hip-width|Jump and pull the knees up to the chest, landing softly|Don't land with straight legs
+Squat Jump|Squat to about parallel and pause|Jump straight up from the pause|Don't bounce. Start from the hold
+Split Squat Jump|Split stance, back knee hovering|Jump straight up and land in the same split|Don't let the front knee cave
+Single-Leg Box Jump|Stand on one leg in front of a low box|Jump onto the box from one leg and land softly|Use a low box first. Don't land hard or with the knee caved
+Hurdle Hop|Row of mini hurdles, about 1 m apart|Hop over each hurdle with quick, stiff-ankled ground contacts|Don't land on the heels or pause between hurdles
+Lateral Hurdle Hop|Stand beside a low hurdle, feet together|Hop side to side over it quickly with short contacts|Don't let the knees cave on landing
+Lateral Box Jump|Stand side-on beside a low box|Jump sideways onto it and land softly with both feet|Don't land off-balance or with the feet split
+Bounding|Jog in, then start the bounds|Leap forward with exaggerated strides, driving the knee up and the arms opposite|Don't overstride. Land under the hips
+Lateral Bound|Stand on the outside leg, hips loaded|Push off sideways and land on the opposite leg, sticking it|Don't let the landing knee cave
+Skater Bound|Stand on one leg with a slight knee bend|Bound side to side like a speed skater, the free leg reaching behind|Don't land with a stiff knee
+Single-Leg Hop|Stand on one leg, slight knee bend|Hop forward repeatedly, landing softly on the same leg|Don't let the knee cave on landing
+Ankle Hop|Stand tall, feet hip-width|Hop using the ankles only, with quick contacts|Don't bend the knees much
+Plyo Push-Up|High push-up position, body rigid|Push explosively so the hands leave the floor|Don't land with locked elbows
+Clap Push-Up|High push-up position, body rigid|Push explosively, clap, and land with soft elbows|Don't let the hips sag
+Med Ball Chest Pass|Ball at the chest, face a wall or partner|Step and push the ball explosively from the chest|Don't throw with bent wrists only
+Med Ball Overhead Throw|Ball overhead, step forward|Throw forward explosively, finishing with the arms|Don't arch the lower back excessively
+Med Ball Slam|Hold the ball overhead, rise onto the toes|Slam the ball down hard, hinging at the hips|Don't round the back
+Med Ball Scoop Throw|Ball held low at the hip, side-on to the target|Scoop and throw up and forward, driving from the back hip|Don't throw with only the arms
+Med Ball Shot Put|Ball at the shoulder, side-on|Drive from the back leg and push the ball out|Don't let the elbow drop below the ball
+Med Ball Backward Overhead Throw|Ball held low, feet hip-width|Dip and explode, throwing the ball backward over the head|Make sure the area behind you is clear
+# carry / Carries
+Farmer's Carry|Deadlift the weights up with a flat back, stand tall|Walk with short, quick steps, shoulders packed down|Don't let the shoulders round forward or the weights swing
+Trap Bar Carry|Stand centered in the trap bar and deadlift it up|Walk with short, quick steps, staying tall|Don't lean forward or let the bar tilt
+Kettlebell Farmer's Carry|Kettlebells at the sides, deadlift them up|Walk tall and steady with short steps|Don't shrug or let the bells swing
+Suitcase Carry|Heavy weight in one hand, stand tall|Walk without leaning toward or away from the weight|Don't side-bend. Keep the shoulders level
+Overhead Carry|Weights locked out overhead|Walk with the ribs down and the arms locked|Don't arch the lower back
+Single-Arm Overhead Carry|One weight locked out overhead, biceps by the ear|Walk tall, keeping the arm vertical|Don't lean away from the weight
+Front Rack Carry|Kettlebells in the front rack, elbows tucked|Walk tall, breathing behind the brace|Don't let the elbows drop or the upper back round
+Waiter's Carry|Kettlebell held overhead in the palm, bell facing back|Walk with a straight arm and a vertical forearm|Don't let the wrist bend back
+Mixed Carry|One bell overhead, one at the side|Walk tall, resisting the urge to lean|Don't lean toward the low bell
+Goblet Carry|Kettlebell held at the chest by the horns|Walk upright with the elbows tucked|Don't let the bell pull the shoulders forward
+Zercher Carry|Bar in the crooks of the elbows|Walk with the chest up and the hands clasped|Don't round the upper back
+Sandbag Bear-Hug Carry|Hug the sandbag tight to the chest|Walk tall with quick steps|Don't round the back or lean back excessively
+Sandbag Shoulder Carry|Sandbag on one shoulder|Walk with a braced trunk|Don't lean excessively away from the bag
+Yoke Carry|Yoke on the upper back, brace hard|Take quick, short steps|Don't overstride or let the yoke swing
+Bottoms-Up Kettlebell Carry|Hold the bell upside down in the rack|Walk with the bell balanced and the grip crushing|Don't let the bell tip over
+Strongman Farmer's Walk|Heavy implements, deadlift them up|Walk fast with short steps|Don't let the implements swing
+# carry / Strongman & Sled
+Sled Push|Hands on the posts, arms straight or bent, body at about 45°|Drive with short, powerful steps, pushing through the balls of the feet|Don't stand up tall. Keep the forward lean
+Sled Pull|Harness or rope attached, face away or toward the sled|Walk or run with a strong forward lean|Don't let the hips sit back
+Backward Sled Drag|Hold the straps, face the sled|Walk backward with small steps, knees bent|Don't stand upright. Stay low to load the quads
+Lateral Sled Drag|Stand side-on to the sled holding the straps|Step sideways staying low|Don't cross the feet or stand upright
+Sled Rope Pull|Sled at the end of a rope, athletic stance|Pull the rope hand over hand, using the hips|Don't pull with only the arms
+Prowler Push|Hands on the low or high handles|Drive hard with short steps, keeping the back flat|Don't let the hips rise above the shoulders
+Tire Flip|Squat down, chest against the tire, fingers under the edge|Drive with the legs and hips, then push the tire over|Don't deadlift it with a rounded back
+Atlas Stone Lift|Stone between the feet, hug it|Lap the stone, then extend the hips to load it onto the platform|Don't round the upper back excessively
+Sandbag Clean|Sandbag on the floor between the feet|Hinge and pull it to the lap, then extend the hips to bring it to the chest|Don't curl it up with the arms
+Sandbag Over Shoulder|Sandbag on the floor between the feet|Lap it, then explode with the hips and throw it over one shoulder|Don't twist under load
+Log Clean and Press|Log on the floor, neutral grip on the handles|Pull to the lap, roll it to the chest, then press overhead|Don't press with a soft trunk
+Axle Deadlift|Thick bar, double overhand grip|Deadlift with a flat back and squeeze the bar hard|Don't round the back or let the bar roll out
+Keg Carry|Hug the keg high and tight against the chest|Walk with short, quick steps|Don't let the keg slip down
+Sledgehammer Strike|Stand side-on to a tire|Swing the hammer overhead and strike|Don't swing with a rounded back
+Battle Rope Waves|Hold the rope ends, athletic stance|Make waves by moving the arms up and down quickly|Don't stand up. Stay in the athletic stance
+Battle Rope Slams|Hold the rope ends, feet shoulder width|Lift the ropes overhead and slam them down hard|Don't round the back
+Scrum Machine Drive|Bind on the pads with a flat back and the hips just above the knees|Drive with short, powerful steps, keeping the spine neutral|Don't drop the hips below the knees or look down
+# cardio / Machines
+Treadmill Run|Start at a walk and build up the speed|Run tall with a slight forward lean, landing under the hips|Don't hold the rails or overstride
+Incline Treadmill Walk|Set the incline (8–15%) and a brisk walk|Walk tall, swinging the arms naturally|Don't hang on the handrails. It cancels the incline
+Rowing Machine|Feet strapped, damper at 3–5|Drive with the legs, then lean back slightly and pull the handle to the lower ribs. Reverse on the recovery|Don't pull with the arms first or bend the knees before the hands pass them
+Assault Bike|Seat at about hip height|Push and pull with the arms while pedaling hard|Don't hunch over. Stay tall
+Stationary Bike|Seat height so the knee has a slight bend at the bottom|Pedal smoothly at the target cadence|Don't bounce in the seat
+Spin Bike|Seat at hip height, handlebars level with or above the seat|Pedal with resistance, seated or standing|Don't lock the knees or bounce
+SkiErg|Stand facing the machine, handles overhead|Hinge and pull down, driving the hands past the hips|Don't pull only with the arms
+Elliptical|Stand tall, hands on the handles|Push and pull through the full stride|Don't lean on the handles
+Stair Climber|Stand tall, light touch on the rails|Step through the full foot|Don't hang on the rails
+VersaClimber|Feet in the pedals, hands on the grips|Climb with opposite arm and leg|Don't take tiny steps. Use the full range
+Curved Treadmill Sprint|Start from a walk, stay on the front of the curve|Drive the knees and stay on the balls of the feet to speed up|Don't lean back. That slows the belt
+# cardio / Running & Conditioning
+Outdoor Run|5 min easy jog to warm up|Run tall, relaxed shoulders, quick cadence|Don't overstride. Land with the foot under the hips
+Sprint|Thorough warm-up and a few build-ups first|Drive the knees and pump the arms, pushing the ground back|Don't reach out with the feet
+Hill Sprint|Short, steep hill, full recovery walking back down|Lean into the hill from the ankles and drive the arms and knees|Don't look down at the feet or shorten the arm swing
+Shuttle Run|Two lines 5–25 m apart|Sprint, plant the outside foot low, touch the line, and push back|Don't round the turn. Plant and cut
+300-Yard Shuttle|Two lines 25 yd apart, start low|Sprint 6 round trips (12 lengths), touching each line|Don't go out too fast. Pace it so the last lengths hold
+Tempo Run|Pace about 70–80% effort|Run steadily at a hard-but-controlled pace|Don't let it turn into a sprint
+Bronco Test|Cones at 0, 20, 40, 60 m|Shuttle 0-20-0, 0-40-0, 0-60-0 for 5 sets without rest (1,200 m)|Don't go out too fast or cut the turns
+Yo-Yo Intermittent Run|Cones 20 m apart with a 5 m recovery zone|Run 2×20 m to the beeps, then 10 s active rest|Don't start your turn early. Wait for the beep
+Burpee|Stand tall, feet shoulder width|Squat, kick the feet back to a plank, chest to the floor, then jump up|Don't let the hips sag in the plank
+Burpee Broad Jump|Stand tall, feet shoulder width|Do a burpee, then broad jump forward and land softly|Don't land stiff-legged
+Jumping Jack|Stand with the feet together|Jump the feet out and the arms overhead, then back|Don't land on the heels
+Jump Rope|Elbows close, wrists turning the rope|Small hops on the balls of the feet|Don't jump high or kick the feet back
+Double-Under|Rope slightly shorter than for singles, elbows close|Jump a little higher and whip the wrists so the rope passes twice|Don't pike or kick the legs. Stay tall
+High Knees|Stand tall, arms bent at 90°|Drive the knees to hip height quickly, landing on the balls of the feet|Don't lean back. Stay tall with a slight forward lean
+Butt Kicks|Stand tall, arms relaxed|Kick the heels up to the glutes with quick turnover|Don't lean forward or let the knees swing forward
+Bear Crawl|On hands and feet with the knees an inch off the floor|Crawl with the opposite hand and foot together|Don't let the hips rise above the shoulders
+Crab Walk|Hands and feet on the floor, belly up, hips lifted|Walk with the opposite hand and foot|Don't let the hips sag to the floor
+Swimming|Warm up with easy laps|Long, smooth strokes with steady breathing|Don't hold the breath. Exhale into the water
+Cycling|Saddle height so the knee is slightly bent at the bottom of the stroke|Pedal in smooth circles at a steady cadence|Don't grind in too heavy a gear
+Thruster|Bar in the front rack, elbows up|Front squat, then drive up and press overhead in one motion|Don't press before the hips finish
+Dumbbell Thruster|Dumbbells at the shoulders|Squat and drive up into a press|Don't let the elbows drop in the squat
+Wall Ball|Ball at the chest, face the wall|Squat to depth and throw the ball to the target as you stand|Don't throw before the hips finish
+Man Maker|Dumbbells on the floor|Push-up, row each side, then clean and press|Don't let the hips twist during the rows
+Devil Press|Dumbbells on the floor|Burpee with the chest to the dumbbells, then swing them overhead in one motion|Don't round the back on the swing
+Kettlebell Complex|Pick 3–5 moves, e.g. swing, clean, press, squat|Do them back to back without setting the bell down|Don't let form slip as fatigue builds. Pick a lighter bell
+Barbell Complex|Pick 3–5 moves, e.g. deadlift, row, clean, front squat, press|Flow from one move to the next without setting the bar down|Don't let form slip. The weakest lift sets the weight
+# agility / Change of Direction
+Lateral Shuffle|Athletic stance: feet wide, hips low, chest up|Push off the trailing foot and shuffle sideways quickly|Don't click the heels together or bob up and down
+Banded Lateral Shuffle|Band around the ankles or knees, athletic stance|Shuffle sideways, keeping tension in the band|Don't let the feet come together
+Defensive Slide|Low athletic stance, arms out|Slide sideways while staying low, pushing off the trailing leg|Don't stand up between slides
+Carioca|Stand side-on, arms out for balance|Move sideways, crossing the trailing leg in front and then behind|Don't lock the hips. Let them rotate
+Crossover Run|Stand side-on in an athletic stance|Cross the trailing leg over and sprint in that direction|Don't stand up. Stay low and drive
+5-10-5 Pro Agility Drill|Three cones 5 yd apart, start at the middle in a three-point stance|Sprint 5 yd, touch the line, sprint 10 back, touch, sprint 5 through the middle|Don't round the turns. Plant and cut hard
+T-Drill|Cones in a T: 10 yd forward, 5 yd to each side|Sprint forward, shuffle left, shuffle right, shuffle back to the middle, backpedal|Don't cross the feet during the shuffles
+Box Drill|Four cones in a 5–10 yd square, start at one corner|Sprint forward, shuffle across, backpedal, then shuffle back to the start|Don't round the corners. Plant and change direction at each cone
+L-Drill|Three cones in an L, 5 yd apart|Sprint, touch, sprint back, then weave around the cones|Don't lose your speed in the turns
+Illinois Agility Drill|10 m × 5 m course with weave cones|Sprint, weave through the cones, sprint to finish|Don't swing wide around the cones
+Cone Weave|Line of cones about 1 m apart|Weave through quickly, staying low|Don't stand up. Stay low through the cuts
+Zig-Zag Cone Drill|Cones staggered 3–5 yd apart in a zig-zag|Sprint to each cone, plant the outside foot and cut sharply to the next|Don't round the cuts or stand up tall between cones
+Mirror Drill|Face a partner 2–3 yd away in an athletic stance|Shuffle and sprint to mirror the partner's moves as quickly as possible|Don't guess or cross the feet. React to what they do
+Reactive Ball Drop|Partner holds a tennis ball at shoulder height|Sprint and catch the ball after one bounce|Don't move before the drop
+Split Step|Athletic stance, weight on the balls of the feet|Make a small hop just as the play happens and land wide, ready to move any direction|Don't land flat-footed or with the feet too narrow
+Drop Step|Athletic stance facing forward|Open the hip and step back at a 45° angle to turn and run|Don't false-step forward first or pop upright
+Lateral Crossover Step|Stand side-on in an athletic stance|Turn the hips and cross the trailing leg over in front to accelerate sideways|Don't stand up during the crossover. Stay low
+Lateral A-Skip|Stand side-on, tall posture|Skip sideways, driving the lead knee up and snapping the foot down under the hip|Don't cross the feet or lean the torso
+Lateral Skater Hop|Stand on one leg, slight knee bend|Hop sideways to the other leg and stick each landing for a beat|Don't let the landing knee cave inward
+Lateral Med Ball Toss and Shuffle|Partner tosses a light med ball while you shuffle|Shuffle, catch the ball, toss it back, keep shuffling|Don't cross the feet or stand up to catch
+Band-Resisted Lateral Bound|Band around the waist, anchored to the side|Bound away from the anchor and stick the landing|Don't let the band yank you
+Lateral Lunge to Sprint|Start in a lateral lunge|Push hard off the bent leg and accelerate into a sprint|Don't stand up first. Push straight out of the lunge
+Ladder Icky Shuffle|Face the ladder from one side|In-in-out pattern, moving forward through each box|Don't look at your feet the whole time. Eyes up after the first few boxes
+Ladder Lateral In-Out|Stand side-on to the ladder|Step both feet in, then both out, moving sideways through each box|Don't cross the feet or touch the rungs
+Ladder Two Feet In|Face the ladder, light on the feet|Step both feet into each box quickly|Don't skip boxes or slap the feet down
+Ladder Single-Leg Hop|Face the ladder on one leg|Hop through each box with quick, controlled contacts|Don't let the knee cave on landing
+Ladder Crossover|Stand side-on to the ladder|Cross the trailing foot over into the next box as you move sideways|Don't slow down or let the hips stop rotating
+Dot Drill|Five dots in a dice pattern (2 ft × 3 ft)|Hop through the pattern quickly on both feet, then on one foot|Don't land on the heels or look down the whole time
+Four-Square Hop|Mark a 4-square grid on the floor|Hop forward, sideways, back and sideways around the grid|Don't land with stiff legs
+A-Skip|Stand tall, arms at 90°|Skip, driving the knee up and snapping the foot down under the hip|Don't let the foot land in front of the body
+B-Skip|Stand tall, arms at 90°|A-skip, then extend the leg forward and paw it back under you|Don't let the extension become a kick
+Wall Drill|Hands on a wall, body at a 45° lean in a straight line|March or switch the knees up quickly, driving the foot down under the hips|Don't break at the hips or lean back
+Falling Start|Stand tall, feet hip-width|Lean forward from the ankles until you tip, then sprint|Don't pause or false-step. Go as soon as you tip
+Sled-Resisted Sprint|Light sled attached to a harness|Sprint with a strong forward lean|Don't load it so heavy that the sprint becomes a trudge
+Partner-Resisted Sprint|Partner holds a band or harness around the waist|Sprint with a strong forward lean against the resistance|Don't stand up early. The partner should let you move
+Backpedal|Low stance, chest over the toes|Push off the balls of the feet to run backward, with the arms pumping|Don't lean back or let the heels hit first
+Backpedal to Sprint|Start backpedaling in a low stance|Open the hips (drop step) and sprint forward or to the side|Don't stand up during the transition. Stay low through the turn
+# mobility / Mobility
+World's Greatest Stretch|Step into a long lunge with the back knee down or up|Put the same-side elbow to the instep, then rotate that arm up toward the ceiling|Don't let the front knee collapse inward
+90/90 Hip Switch|Sit with both knees bent at 90°, one leg in front and one to the side|Rotate the knees to the other side without using the hands|Don't lean way back. Stay tall
+Hip CARs|Stand on one leg holding support|Make the largest slow circle you can with the knee, rotating through the hip|Don't let the pelvis move. Isolate the hip
+Shoulder CARs|Stand tall, one arm straight, fist clenched, core braced|Make the biggest slow circle you can with the arm, actively reaching|Don't let the torso twist or the back arch to fake the range
+Cat-Cow|On hands and knees, hands under the shoulders|Alternate rounding the spine up (cat) and letting it sink with the chest forward (cow)|Don't rush. Move one segment at a time
+Thoracic Spine Rotation|On hands and knees, one hand behind the head|Rotate the elbow up toward the ceiling, following it with the eyes|Don't let the hips shift or sway
+Open Book|Lie on the side, knees bent, arms out front|Open the top arm across to the other side, rotating the upper back|Don't let the knees separate
+Thread the Needle|On hands and knees, hips over the knees|Thread one arm under the body, then reach it up toward the ceiling|Don't sit back into the hips
+Quadruped Rock Back|On hands and knees, back flat|Rock the hips back toward the heels as far as you can with a neutral spine|Don't let the lower back round at the end
+Deep Squat Hold|Feet shoulder width, toes slightly out|Sit into a deep squat with the heels down and the chest up, and hold|Don't let the heels lift. Hold a support if needed
+Goblet Squat Pry|Hold a kettlebell goblet-style at the bottom of a squat|Use the elbows to gently push the knees out and shift side to side|Don't round the back or bounce at the bottom
+Ankle Dorsiflexion Mobilization|Half-kneeling, front foot flat|Drive the knee forward over the toes and hold briefly|Don't let the heel lift
+Knee-to-Wall Ankle Mobilization|Stand facing a wall, toes a few inches back|Touch the knee to the wall without the heel lifting|Don't let the knee cave inward
+Leg Swing|Hold a wall and stand on one leg|Swing the free leg forward and back, building the range gradually|Don't arch the back to swing higher
+Lateral Leg Swing|Face the wall with both hands on it|Swing the leg side to side across the body|Don't rotate the hips
+Inchworm|Stand, then hinge down with the hands to the floor|Walk the hands out to a plank, then walk the feet up to the hands|Don't let the hips sag in the plank
+Spiderman Lunge with Rotation|Long lunge, hands inside the front foot|Rotate the arm on the front-leg side up toward the ceiling|Don't let the back knee sag to the floor
+Walking Knee Hug|Stand tall, step forward|Pull one knee to the chest and rise onto the toe of the standing leg|Don't round the back
+Walking Quad Pull|Stand tall, step forward|Pull the heel to the glute and reach the opposite arm up|Don't arch the back or let the knee drift out
+Frankenstein Walk|Arms straight out in front|Kick the straight leg up toward the opposite hand as you walk|Don't round the back to reach the leg
+Hip Airplane|Stand on one leg in a hinge, hold support if needed|Rotate the pelvis open toward the ceiling and back closed|Don't let the standing knee cave
+Wall Slide|Back against the wall, arms in a W|Slide the arms up while keeping contact with the wall|Don't arch the lower back away from the wall
+Scapular Wall Slide|Forearms on the wall, elbows at shoulder height|Slide up while letting the shoulder blades rotate upward|Don't shrug toward the ears
+Band Dislocate|Hold the band wide in front with straight arms|Rotate the arms over the head and behind the back, then return|Don't bend the elbows. Widen the grip if you have to
+PVC Pass-Through|Hold the PVC pipe wide|Pass it over the head and behind the back with straight arms|Don't bend the elbows or arch the lower back
+Prone Swimmer|Lie face-down, forehead on the floor, arms overhead|Sweep the arms around to the lower back while keeping them off the floor|Don't shrug or lift the head
+Wrist Mobility Circles|Interlace the fingers in front of the chest|Circle the wrists slowly in both directions|Don't force the end range. Keep it pain-free
+Neck CARs|Sit or stand tall, shoulders relaxed|Make slow, full circles with the head|Don't force the range. Keep it pain-free
+Foam Roll Thoracic Spine|Roller under the upper back, hands behind the head|Roll slowly and extend back over the roller at each segment|Don't roll the lower back
+Foam Roll Quads|Lie face-down on the roller|Roll from the hip to just above the knee|Don't roll over the kneecap
+Foam Roll IT Band|Lie on the side on the roller, top leg crossed in front|Roll the outer thigh slowly from the hip to above the knee|Don't roll over the knee joint
+Foam Roll Lats|Lie on the side with the arm overhead|Roll the side of the back below the armpit|Don't roll into the armpit itself
+Lacrosse Ball Glute Release|Sit on the ball with one ankle crossed over the opposite knee|Roll over the glute, pausing on tight spots|Don't sit on a spot that sends tingling down the leg. Move off it
+Lacrosse Ball Pec Release|Ball against a wall or the floor below the collarbone|Roll over the chest, pausing on tight spots|Don't roll over bone or the front of the shoulder joint
+# stretch / Stretching
+Couch Stretch|Back knee against the wall, foot up the wall, front foot planted|Squeeze the glute on the back side and lift the torso tall|Don't arch the lower back. Tuck the pelvis
+Half-Kneeling Hip Flexor Stretch|Half-kneel with a pad under the back knee, torso tall|Squeeze the back-side glute and tuck the pelvis, then shift slightly forward until the front of the hip stretches|Don't arch the lower back to fake the range
+Pigeon Stretch|Front shin across, back leg straight behind|Fold forward over the front shin|Don't let the front knee hurt. Ease off if it does
+Figure-4 Stretch|Lie on the back, ankle on the opposite knee|Pull the bottom leg toward you|Don't round the upper back
+Butterfly Stretch|Sit tall with the soles of the feet together, heels close|Let the knees drop and hinge forward from the hips with a long spine|Don't push the knees down with the hands or round the back
+Frog Stretch|On the forearms, knees wide, ankles in line with the knees|Slowly rock the hips back toward the heels|Don't force the range or let the lower back sag
+Seated Hamstring Stretch|Sit with the legs straight, toes up|Hinge from the hips toward the toes, chest leading|Don't round the back to reach further
+Standing Hamstring Stretch|Heel on a low step, leg straight, hips square|Hinge forward with a flat back until the hamstring stretches|Don't lock the knee hard or round the back
+Lying Hamstring Stretch|Lie on the back with a band around one foot|Pull the straight leg up until you feel a hamstring stretch, the other leg flat|Don't bend the knee or lift the hips
+Standing Quad Stretch|Stand on one leg, hold support|Pull the heel to the glute with the knees together and squeeze that glute|Don't arch the back or let the knee drift forward
+Side-Lying Quad Stretch|Lie on the side, bottom knee bent for stability|Pull the top heel to the glute and push the hip slightly forward|Don't let the knee drift forward or the back arch
+Adductor Rock Back|On hands and knees with one leg straight out to the side|Rock the hips back toward the heel until the inner thigh stretches|Don't round the back
+Standing Calf Stretch|Hands on a wall, one foot back, back leg straight|Press the back heel down and lean in|Don't let the heel lift or the foot turn out
+Soleus Wall Stretch|Hands on a wall, one foot back|Bend the back knee while keeping the heel down|Don't let the heel lift
+Child's Pose|Kneel and sit back on the heels, knees wide or together|Reach the arms forward and breathe into the back|Don't hold the breath. Let the hips sink back
+Cobra Stretch|Lie face-down, hands under the shoulders|Press up into a gentle back extension with the hips on the floor|Don't crank the lower back or shrug
+Lat Stretch|Hold a support at about hip height with one or both hands|Sink the hips back and away, letting the side of the back stretch|Don't shrug the shoulders up
+Doorway Pec Stretch|Forearm on the door frame with the elbow at shoulder height|Step through with the same-side foot until the chest stretches|Don't let the shoulder roll forward. Keep it gentle
+Cross-Body Shoulder Stretch|Pull one arm across the chest with the other hand|Hold at the back of the shoulder with the shoulder blade down|Don't rotate the trunk with it
+Sleeper Stretch|Lie on the side with the bottom arm forward, elbow at 90°|Gently push the forearm down toward the floor|Don't force it or roll onto the shoulder. Stop before any pinch
+Overhead Triceps Stretch|Reach one hand behind the head, between the shoulder blades|Gently pull the elbow toward the head with the other hand|Don't arch the back or crank the neck forward
+Upper Trap Stretch|Sit tall and hold the chair with one hand|Tilt the ear toward the opposite shoulder and add gentle hand pressure|Don't pull hard or let the shoulder hike up
+Levator Scapulae Stretch|Turn the head 45° toward one armpit and look down|Gently pull the head forward and down with the same-side hand|Don't pull hard. A light stretch is enough
+Wrist Flexor Stretch|Arm straight out, palm up|Gently pull the fingers back with the other hand|Don't force it into pain
+Wrist Extensor Stretch|Arm straight out, palm down|Gently pull the hand down and toward you|Don't force it into pain
+Supine Spinal Twist|Lie on the back, arms out in a T|Drop the bent knees to one side and look the other way|Don't let the opposite shoulder lift off the floor
+Seated Glute Stretch|Sit tall, cross one ankle over the opposite knee|Hinge forward with a long spine until the glute stretches|Don't round the back to go lower
+Standing Side Bend Stretch|Arms overhead, feet together|Bend to one side, reaching up and over|Don't twist or lean forward
+Downward Dog|Hands and feet on the floor, hips high|Press the chest toward the thighs and the heels toward the floor|Don't round the back. Bend the knees if you need to
+Happy Baby|Lie on the back, hold the outside of the feet|Pull the knees down toward the armpits|Don't lift the head or shoulders
+Banded Hip Distraction|Heavy band around the top of the thigh, anchored behind you|Step forward to tension the band, then move into a lunge or pigeon stretch|Don't let the band slip down toward the knee

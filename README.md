@@ -40,3 +40,8 @@ Go to More → Export JSON to download `slimtucci-diary-YYYY-MM-DD.json`. Use Im
 - **WHOOP**: a card on Macros (below the targets) and **More → Connections**. `config.js` holds `WHOOP_WORKER_URL`. While it's `''` the card shows **Setup needed** with the 3 setup steps. Set it to the deployed Worker URL to go live.
 - The phone stores only a random per-device session id (`localStorage['slimtucci-whoop-v1']`), never WHOOP tokens and never the client secret. That key is not part of Export.
 - The Cloudflare Worker bridge is intentionally **not in this repo** (WHOOP credentials must never be in an open-source repo). It lives in the private ops folder `business-ops/whoop-worker/` with its own `SETUP.md`.
+
+## v6 (Oct 7, 2026): Exercises redesign
+- **One list**: no more "My exercises / Library" toggle. Your saved and custom exercises are merged with the 627-movement library, deduped by name. Saved ones show first, custom ones carry a small **Custom** tag. Search and category chips work as before. The workout and template picker use the same list.
+- **Watch demo**: every exercise links to a YouTube search for `<name> exercise proper form` (no hard-coded video IDs). There's a play icon on each row and a **Watch demo** button on the detail page. It opens in a new tab or the YouTube app.
+- **Coaching cues**: every library movement has 3 specific cues (setup, execution, common fault) from `tools/cues.txt`, built into `exercises-library.js` by `tools/build_library.py`. The build fails if any item is missing cues. Cues pre-fill **Notes / cues** on the detail page. Your edits override them and persist ("Reset to default cues" brings them back). Custom exercises start with an empty field. Opening a library movement doesn't save it; editing it does.

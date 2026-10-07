@@ -62,21 +62,52 @@ with sync_playwright() as p:
     check("Sunday empty state", "No workouts on Sun" in page.locator(".day-empty").inner_text())
     check("today still outlined", page.locator(f'.day.today[data-date="{iso(TODAY)}"]').count() == 1)
 
-    # ---- Exercises tab: library browse/search/add + custom ----
-    page.click('.tabbar a[data-tab="exercises"]'); page.click('.seg-btn[data-seg="lib"]')
+    # ---- Exercises tab: ONE merged list (no My/Library toggle), demo links, coaching cues ----
+    page.click('.tabbar a[data-tab="exercises"]'); page.wait_for_selector("#exResults .ex-row")
+    check("Exercises: single list, no My exercises / Library toggle", page.locator(".seg-btn").count() == 0 and page.locator("#app .seg").count() == 0 and page.locator('#app .chip[data-chip="mine"]').count() == 0)
+    check("single list shows all 627 library movements", page.locator("#exResults .list-count").inner_text().startswith("627 exercises"), page.locator("#exResults .list-count").inner_text())
+    allok = page.evaluate("""() => { const L = window.SLIMTUCCI_LIBRARY, S = window.SlimTucci; const bad = [];
+      for (const [name] of L.items) { const u = S.demoUrl(name), c = S.libCues(name);
+        const want = 'https://www.youtube.com/results?search_query=' + encodeURIComponent(name + ' exercise proper form').replace(/%20/g, '+');
+        if (u !== want || !c || c.length < 2 || c.length > 4 || c.some(x => !x || x.length < 12)) bad.push(name); }
+      return [L.items.length, bad, L.fields]; }""")
+    check("every library item has a YouTube demo URL and 2–4 coaching cues", allok[0] == 627 and not allok[1] and allok[2][-1] == "cues", f"{allok[0]} items, bad: {allok[1][:5]}")
     page.fill("#exQ", "bulgrian split")   # typo on purpose
     names = page.locator("#exResults .pr-name").all_inner_texts()
-    check("library fuzzy search ('bulgrian split') finds Bulgarian Split Squat", any("Bulgarian Split Squat" == n for n in names), ", ".join(names[:4]))
+    check("fuzzy search ('bulgrian split') finds Bulgarian Split Squat", any("Bulgarian Split Squat" == n for n in names), ", ".join(names[:4]))
     page.fill("#exQ", ""); page.click('#app .chip[data-chip="agility"]')
     ag = page.locator("#exResults .pr-name").all_inner_texts()
     check("category chip filters (Agility)", len(ag) >= 20 and "Lateral Shuffle" in ag, f"{len(ag)} shown")
+    rows = page.locator("#exResults .ex-row").count()
+    check("every list row has a small demo (play) icon", rows > 0 and page.locator("#exResults .ex-row .demo-ico").count() == rows and page.locator("#exResults .demo-ico").first.get_attribute("target") == "_blank")
     page.click('#app .chip[data-chip="all"]'); page.fill("#exQ", "copenhagen plank")
-    page.locator("#exResults .pick-row", has=page.locator(".pr-name", has_text="Copenhagen Plank")).first.click()
-    check("tapping a library movement adds it to My exercises", any(e["name"] == "Copenhagen Plank" for e in page.evaluate("() => window.SlimTucci.state.exercises")))
-    page.click('.seg-btn[data-seg="mine"]'); page.fill("#exQ", "Pickleball Ready Hop")
-    page.click('#exResults [data-x="custom"]')
-    mine = page.locator("#exResults .pr-name").all_inner_texts()
-    check("custom exercise added from Exercises tab", "Pickleball Ready Hop" in mine)
+    cp = page.locator("#exResults .ex-row", has=page.locator(".pr-name", has_text="Copenhagen Plank")).first
+    check("row demo link = YouTube search '<name> exercise proper form'", cp.locator(".demo-ico").get_attribute("href") == "https://www.youtube.com/results?search_query=Copenhagen+Plank+exercise+proper+form", cp.locator(".demo-ico").get_attribute("href"))
+    page.locator("#exResults .ex-row .pr-name", has_text="Copenhagen Plank").first.click(); page.wait_for_selector("#watchDemo")
+    wd = page.locator("#watchDemo")
+    check("detail: 'Watch demo' button (play icon, new tab)", "Watch demo" in wd.inner_text() and wd.locator("svg").count() == 1 and wd.get_attribute("target") == "_blank" and wd.get_attribute("href").endswith("Copenhagen+Plank+exercise+proper+form"))
+    cues = page.evaluate("() => window.SlimTucci.libCues('Copenhagen Plank')")
+    check("detail: Notes/Cues pre-filled with the coaching cues", page.input_value("#exNotes") == "\n".join("• " + c for c in cues) and len(cues) >= 2, page.input_value("#exNotes")[:80])
+    check("browsing a movement doesn't save it", not any(e["name"] == "Copenhagen Plank" for e in page.evaluate("() => window.SlimTucci.state.exercises")))
+    page.evaluate("window.scrollTo(0,0)"); page.wait_for_timeout(100)
+    shot(page, "15-exercise-detail.png")
+    page.fill("#exNotes", "Knee on the bench first. Build to ankle.\nHips high, ribs down."); page.locator("#exNotes").blur()
+    st_ex = [e for e in page.evaluate("() => window.SlimTucci.state.exercises") if e["name"] == "Copenhagen Plank"]
+    check("editing cues saves the movement with his notes (override)", len(st_ex) == 1 and st_ex[0]["notesEdited"] and st_ex[0]["notes"].startswith("Knee on the bench") and page.evaluate("location.hash") == "#/exercise/" + st_ex[0]["id"])
+    page.reload(); page.wait_for_selector("#exNotes")
+    check("edited cues persist after reload", page.input_value("#exNotes") == "Knee on the bench first. Build to ankle.\nHips high, ribs down." and page.locator('[data-action="cues-reset"]').count() == 1)
+    page.goto(BASE + "#/exercises"); page.wait_for_selector("#exResults"); page.fill("#exQ", "copenhagen plank")
+    check("merged list is deduped by name (saved + library = one row)", page.locator("#exResults .pr-name").all_inner_texts().count("Copenhagen Plank") == 1)
+    page.fill("#exQ", "Pickleball Ready Hop")
+    page.click('#exResults [data-x="custom"]'); page.wait_for_selector("#exNotes")
+    check("custom exercise: empty editable cues + Custom tag + demo link", page.input_value("#exNotes") == "" and page.locator(".exd-head .tag-custom").count() == 1 and page.locator("#watchDemo").get_attribute("href").endswith("Pickleball+Ready+Hop+exercise+proper+form"))
+    page.goto(BASE + "#/exercises"); page.wait_for_selector("#exResults"); page.fill("#exQ", "")
+    saved = page.evaluate("() => window.SlimTucci.state.exercises.map(e => e.name)")
+    top = page.evaluate("(n) => [...document.querySelectorAll('#exResults .pr-name')].slice(0, n).map(el => el.firstChild.textContent.trim())", len(saved))
+    check("saved + custom exercises lead the single list (then the library)", top == saved and "Copenhagen Plank" in saved and "Pickleball Ready Hop" in saved, f"{len(saved)} saved first")
+    check("custom row shows a small 'Custom' tag", page.locator("#exResults .ex-row", has=page.locator(".pr-name", has_text="Pickleball Ready Hop")).locator(".tag-custom").count() == 1)
+    page.locator("#toast").wait_for(state="hidden"); page.evaluate("document.activeElement.blur(); window.scrollTo(0,0)"); page.wait_for_timeout(150)
+    shot(page, "14-exercises-list.png")
 
     # ---- template built with the picker ----
     page.goto(BASE + "#/templates"); page.wait_for_selector("#newTpl")
@@ -100,7 +131,7 @@ with sync_playwright() as p:
     check("log empty state + sticky Add/Finish bar", page.locator(".empty-title").inner_text() == "No exercises yet" and page.locator(".actionbar").is_visible())
     page.fill("#sName", "Sunday Strength")
     page.locator('.actionbar [data-action="add-ex"]').click()
-    check("picker opens with My exercises first, then Library", page.locator("#pickList .sec-title").first.inner_text().lower().startswith("my exercises") and page.locator("#pickList .sec-title").nth(1).inner_text().lower().startswith("library"))
+    check("picker uses the same single list (no My/Library sections), saved first, with demo icons", page.locator("#pickList .sec-title").count() == 0 and page.locator("#pickList .pr-name").first.inner_text() == page.evaluate("() => window.SlimTucci.state.exercises[0].name") and page.locator("#pickList .ex-row .demo-ico").count() == page.locator("#pickList .ex-row").count())
     picker_search(page, "back squat"); picker_pick(page, "Barbell Back Squat")
     r = picker_search(page, "zercher")
     check("picker library search 'zercher'", "Zercher Squat" in r, ", ".join(r))
@@ -277,7 +308,7 @@ with sync_playwright() as p:
     page.goto(BASE); page.evaluate("async () => { await navigator.serviceWorker.ready; }")
     page.reload(); page.wait_for_function("navigator.serviceWorker.controller !== null", timeout=15000)
     cache = page.evaluate("async () => { const ks = await caches.keys(); const c = await caches.open(ks[0]); return [ks, (await c.keys()).map(r => r.url.split('/').pop())]; }")
-    check("SW cache st-diary-v5 holds library + macro + config files", "st-diary-v5" in cache[0] and "exercises-library.js" in cache[1] and "macros-calc.js" in cache[1] and "config.js" in cache[1], str(cache[0]))
+    check("SW cache st-diary-v6 holds library + macro + config files", "st-diary-v6" in cache[0] and "exercises-library.js" in cache[1] and "macros-calc.js" in cache[1] and "config.js" in cache[1], str(cache[0]))
     ctx.set_offline(True); page.reload(); page.wait_for_selector("#dayPanel")
     check("offline: app + library load", page.evaluate("() => window.SlimTucci.libSize") >= 300)
     ctx.set_offline(False)
@@ -306,6 +337,12 @@ with sync_playwright() as p:
     pill = dp.evaluate("() => getComputedStyle(document.querySelector('#whoopCard .status-pill')).color")
     check("dark mode: WHOOP card renders (amber 'Setup needed' pill)", dp.locator('#whoopCard [data-state="setup"]').count() == 1 and pill == "rgb(251, 191, 36)", pill)
     shot(dp, "11-whoop-card-dark.png")
+    dp.goto(BASE + "#/exercises"); dp.wait_for_selector("#exResults .ex-row"); dp.fill("#exQ", "barbell back squat")
+    dp.locator("#exResults .ex-row .pr-name", has_text="Barbell Back Squat").first.click(); dp.wait_for_selector("#watchDemo")
+    dbtn = dp.evaluate("() => { const cs = getComputedStyle(document.getElementById('watchDemo')); return [cs.backgroundColor, cs.color, getComputedStyle(document.getElementById('exNotes')).color]; }")
+    check("dark mode: exercise detail (demo button + cues readable)", dbtn[0] == "rgb(220, 38, 38)" and dbtn[1] == "rgb(255, 255, 255)" and dbtn[2] == "rgb(232, 238, 240)" and dp.input_value("#exNotes").startswith("• "), str(dbtn))
+    dp.evaluate("document.activeElement.blur(); window.scrollTo(0,0)"); dp.wait_for_timeout(150)
+    shot(dp, "16-exercise-detail-dark.png")
 
     # ---- v5: WHOOP ready + connected states with a mocked Worker (no real WHOOP / Cloudflare) ----
     MOCK = "https://slimtucci-whoop.mock-worker.test"

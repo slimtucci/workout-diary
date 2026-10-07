@@ -74,7 +74,15 @@
   const CAT_KEY = Object.fromEntries(LIB.categories.map((c) => [c.label.toLowerCase(), c.key]));
   const CHIP_SHORT = { push: 'Push', pull: 'Pull', legs: 'Legs', core: 'Core', power: 'Power & Plyo', carry: 'Carries', cardio: 'Cardio', agility: 'Agility', mobility: 'Mobility', stretch: 'Stretching' };
   const norm = (s) => String(s || '').toLowerCase().replace(/[’']/g, '').replace(/[^a-z0-9]+/g, ' ').trim();
-  const LIB_ITEMS = LIB.items.map(([name, cat, sub, equip], i) => ({ i, name, cat, sub, equip, key: norm(name), hay: ' ' + norm([name, CAT_LABEL[cat], sub, equip].join(' ')) }));
+  const LIB_ITEMS = LIB.items.map(([name, cat, sub, equip, cues], i) => ({ i, name, cat, sub, equip, cues: cues || [], key: norm(name), hay: ' ' + norm([name, CAT_LABEL[cat], sub, equip].join(' ')) }));
+  const LIB_BY_KEY = new Map(LIB_ITEMS.map((x) => [x.key, x]));
+  // YouTube demo: a search for "<name> exercise proper form" (no invented video IDs). Opens in a new tab / the YouTube app.
+  const demoUrl = (name) => 'https://www.youtube.com/results?search_query=' + encodeURIComponent(`${String(name || '').trim()} exercise proper form`).replace(/%20/g, '+');
+  const PLAY_SVG = '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M8 5.5v13a1 1 0 0 0 1.5.86l10.5-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5z"/></svg>';
+  function libOf(e) { return (e.lib && LIB_BY_KEY.get(e.lib)) || LIB_BY_KEY.get(norm(e.name)) || null; }
+  const defaultCues = (li) => (li && li.cues.length ? li.cues.map((c) => '• ' + c).join('\n') : '');
+  // Notes/cues shown for an exercise: his own edits win; otherwise the library's coaching cues; custom = his notes (or empty).
+  function cuesText(e) { if (e.notesEdited) return e.notes || ''; const li = libOf(e); return li ? defaultCues(li) : (e.notes || ''); }
   const SYN = { db: 'dumbbell', dbs: 'dumbbell', bb: 'barbell', kb: 'kettlebell', kbs: 'kettlebell', rdl: 'romanian deadlift', sldl: 'stiff leg deadlift',
     ohp: 'overhead press', mb: 'med ball', bss: 'bulgarian split squat', ghr: 'glute ham raise', sl: 'single leg', sa: 'single arm', bw: 'bodyweight',
     lat: 'lat', pulldown: 'pulldown', pullup: 'pull up', pushup: 'push up', chinup: 'chin up', situp: 'sit up', stepup: 'step up', trx: 'suspension', ez: 'ez' };
@@ -121,7 +129,7 @@
   function ensureMine(libItem) {
     const have = findMineByName(libItem.name);
     if (have) return { ex: have, created: false };
-    const ex = { id: uid(), name: libItem.name, cat: CAT_LABEL[libItem.cat], sub: libItem.sub, equip: libItem.equip, notes: '' };
+    const ex = { id: uid(), name: libItem.name, cat: CAT_LABEL[libItem.cat], sub: libItem.sub, equip: libItem.equip, notes: '', lib: libItem.key };
     state.exercises.push(ex); save();
     return { ex, created: true };
   }
@@ -180,6 +188,10 @@
     if (!Array.isArray(d.plans)) d.plans = [];
     if (d.macros === undefined) d.macros = null;
     if (d.burn === undefined) d.burn = null;
+    for (const e of d.exercises) {
+      if (e.lib === undefined) { const li = LIB_BY_KEY.get(norm(e.name)); e.lib = li ? li.key : null; }
+      if (e.notesEdited === undefined) e.notesEdited = !!(e.notes && e.notes.trim()); // older notes he typed himself are kept
+    }
     // map first-release category names onto the library categories
     const LEGACY = { rotation: 'Core', carry: 'Carries & Strongman', conditioning: 'Cardio & Conditioning', 'full body': 'Legs' };
     for (const e of d.exercises) { const k = String(e.cat || '').toLowerCase(); if (LEGACY[k]) e.cat = LEGACY[k]; }
@@ -249,64 +261,58 @@
     return { bg, close };
   }
 
-  // ---------- exercise browser (picker + Exercises tab share this) ----------
-  function chipsHTML(active, withMine) {
-    const chips = [['all', 'All']].concat(withMine ? [['mine', 'My exercises']] : []).concat(LIB.categories.map((c) => [c.key, CHIP_SHORT[c.key] || c.label]));
+  // ---------- exercise browser: ONE list (his saved + custom exercises merged with the library, deduped by name) ----------
+  function chipsHTML(active) {
+    const chips = [['all', 'All']].concat(LIB.categories.map((c) => [c.key, CHIP_SHORT[c.key] || c.label]));
     return `<div class="chips" role="tablist">${chips.map(([k, l]) => `<button class="chip${k === active ? ' on' : ''}" data-chip="${k}" role="tab" aria-selected="${k === active}">${esc(l)}</button>`).join('')}</div>`;
   }
   function metaLine(cat, sub, equip) { return [cat, sub, equip].filter(Boolean).map(esc).join(' · '); }
-  // returns HTML for result rows. mode: 'pick' (adds) or 'browse' (Exercises tab)
+  function unifiedList(chip, q) {
+    const seen = new Set(), rows = [];
+    for (const e of state.exercises) {
+      const k = norm(e.name); if (seen.has(k)) continue; seen.add(k);
+      const li = libOf(e);
+      rows.push({ kind: 'mine', e, id: e.id, name: e.name, key: k, catKey: catKeyOf(e) || (li && li.cat) || null, custom: !li, hay: mineHay(e), sub: e.sub || (li && li.sub) || '', equip: e.equip || (li && li.equip) || '' });
+    }
+    for (const x of LIB_ITEMS) {
+      if (seen.has(x.key)) continue; seen.add(x.key);
+      rows.push({ kind: 'lib', x, id: 'lib-' + x.i, name: x.name, key: x.key, catKey: x.cat, custom: false, hay: x.hay, sub: x.sub === CAT_LABEL[x.cat] ? '' : x.sub, equip: x.equip });
+    }
+    const filtered = rows.filter((r) => chip === 'all' || r.catKey === chip);
+    return searchList(filtered, q, (r) => r.hay, (r) => r.key);
+  }
+  const demoLink = (name, cls) => `<a class="${cls || 'demo-ico'}" href="${esc(demoUrl(name))}" target="_blank" rel="noopener" aria-label="Watch demo: ${esc(name)} (YouTube)" title="Watch demo">${PLAY_SVG}</a>`;
+  // returns HTML for the single list. mode: 'pick' (tap adds to a workout/template) or 'browse' (Exercises tab → detail page)
   function resultsHTML(o) {
-    const { q, chip, limit, added, mode, seg } = o;
-    const showMine = mode === 'pick' ? chip !== 'lib' : seg === 'mine';
-    const showLib = mode === 'pick' ? chip !== 'mine' : seg === 'lib';
-    let mine = [], lib = [];
-    if (showMine) {
-      mine = state.exercises.filter((e) => chip === 'all' || chip === 'mine' || catKeyOf(e) === chip);
-      mine = searchList(mine, q, mineHay, (e) => norm(e.name));
-    }
-    if (showLib) {
-      const mineKeys = new Set(state.exercises.map((e) => norm(e.name)));
-      lib = LIB_ITEMS.filter((x) => (chip === 'all' || chip === 'mine' || x.cat === chip) && (mode === 'browse' || !mineKeys.has(x.key)));
-      lib = searchList(lib, q, (x) => x.hay, (x) => x.key);
-    }
+    const { q, chip, limit, added, mode } = o;
+    const list = unifiedList(chip, q);
     const qt = q.trim();
-    const exact = qt && (state.exercises.some((e) => norm(e.name) === norm(qt)) || LIB_ITEMS.some((x) => x.key === norm(qt)));
-    const customRow = qt && !exact ? `<button class="pick-row custom" data-x="custom"><span class="pr-plus" aria-hidden="true">+</span><span class="grow"><span class="pr-name">Add custom “${esc(qt)}”</span><span class="pr-meta">Saved to My exercises${chip !== 'all' && chip !== 'mine' ? ' · ' + esc(CAT_LABEL[chip]) : ''}</span></span></button>` : '';
-    let h = '';
-    const nothing = !mine.length && !lib.length;
-    if (nothing && customRow) h += customRow;
-    if (showMine) {
-      if (mode === 'pick') h += `<div class="sec-title">My exercises <span class="count">${mine.length}</span></div>`;
-      if (mine.length) h += mine.map((e) => {
-        const isAdded = added && added.has(e.id);
-        if (mode === 'pick') return `<button class="pick-row${isAdded ? ' added' : ''}" data-x="pick-mine" data-id="${e.id}"><span class="grow"><span class="pr-name">${esc(e.name)}</span><span class="pr-meta">${metaLine(e.cat, e.sub, e.equip) || 'Custom'}</span></span><span class="pr-add" aria-hidden="true">${isAdded ? '✓ Added' : '+'}</span></button>`;
-        return `<div class="pick-row" data-exrow="${e.id}"><a class="grow rowlink" href="#/exercise/${e.id}"><span class="pr-name">${esc(e.name)}</span><span class="pr-meta">${metaLine(e.cat, e.sub, e.equip) || 'Custom'}${(() => { const lp = lastPerformance(e.id); const t = lp && topSet(lp.e.sets); return t ? ` · last ${fmtSet(t)}` : ''; })()}</span></a><span class="chev" aria-hidden="true">›</span></div>`;
-      }).join('');
-      else if (!qt && mode === 'pick') h += `<div class="sec-empty">Nothing here yet — pick from the library below.</div>`;
-      else if (!qt) h += emptyState('🏋️', 'No exercises yet', 'Browse the library and tap + to add movements you use.', `<button class="btn primary" data-x="seg-lib">Browse library</button>`);
-      else if (mode === 'browse' && !customRow) h += `<div class="sec-empty">No match in My exercises.</div>`;
-    }
-    if (showLib) {
-      const shown = lib.slice(0, limit);
-      if (mode === 'pick') h += `<div class="sec-title">Library <span class="count">${lib.length}</span></div>`;
-      if (!lib.length && qt && !(nothing && customRow)) h += `<div class="sec-empty">No library match for “${esc(qt)}”.</div>`;
-      h += shown.map((x) => {
-        const mineEx = mode === 'browse' ? findMineByName(x.name) : null;
-        const isAdded = added && added.has('lib:' + x.i);
-        const right = mode === 'browse' ? (mineEx ? '<span class="pr-have">✓ Mine</span>' : '<span class="pr-add" aria-hidden="true">+</span>') : `<span class="pr-add" aria-hidden="true">${isAdded ? '✓ Added' : '+'}</span>`;
-        return `<button class="pick-row${isAdded ? ' added' : ''}" data-x="pick-lib" data-li="${x.i}" aria-label="${esc((mineEx ? 'Open ' : 'Add ') + x.name)}"><span class="grow"><span class="pr-name">${esc(x.name)}</span><span class="pr-meta">${metaLine(x.sub === CAT_LABEL[x.cat] ? '' : x.sub, x.equip)}</span></span>${right}</button>`;
-      }).join('');
-      if (lib.length > shown.length) h += `<button class="btn ghost block" data-x="more">Show more (${lib.length - shown.length} more)</button>`;
-    }
-    if (!nothing && customRow) h += customRow;
+    const exact = qt && list.some((r) => r.key === norm(qt));
+    const customRow = qt && !exact ? `<button class="pick-row custom" data-x="custom"><span class="pr-plus" aria-hidden="true">+</span><span class="grow"><span class="pr-name">Add custom “${esc(qt)}”</span><span class="pr-meta">Saved as your own exercise${chip !== 'all' ? ' · ' + esc(CAT_LABEL[chip]) : ''}</span></span></button>` : '';
+    const shown = list.slice(0, limit);
+    let h = `<div class="list-count" aria-live="polite">${list.length.toLocaleString()} exercise${list.length === 1 ? '' : 's'}</div>`;
+    if (!list.length && qt) h += `<div class="sec-empty">No match for “${esc(qt)}”.</div>`;
+    if (!list.length && customRow) h += customRow;
+    h += shown.map((r) => {
+      const tag = r.custom ? '<span class="tag-custom">Custom</span>' : '';
+      let meta = metaLine(r.custom ? (r.e.cat && r.e.cat !== 'Custom' ? r.e.cat : '') : '', r.sub, r.equip);
+      if (r.kind === 'mine' && mode === 'browse') { const lp = lastPerformance(r.id); const t = lp && topSet(lp.e.sets); if (t) meta += (meta ? ' · ' : '') + `last ${esc(fmtSet(t))}`; }
+      if (mode === 'pick') {
+        const isAdded = added && (added.has(r.id) || (r.kind === 'lib' && added.has('lib:' + r.x.i)));
+        const data = r.kind === 'mine' ? `data-x="pick-mine" data-id="${r.id}"` : `data-x="pick-lib" data-li="${r.x.i}"`;
+        return `<div class="pick-row ex-row${isAdded ? ' added' : ''}"><button class="pr-main grow" ${data}><span class="pr-name">${esc(r.name)}${tag}</span><span class="pr-meta">${meta || 'Your exercise'}</span></button>${demoLink(r.name)}<button class="pr-add" ${data} aria-label="Add ${esc(r.name)}">${isAdded ? '✓ Added' : '+'}</button></div>`;
+      }
+      return `<div class="pick-row ex-row" data-exrow="${r.id}"><a class="grow rowlink" href="#/exercise/${r.id}"><span class="pr-name">${esc(r.name)}${tag}</span><span class="pr-meta">${meta || 'Your exercise'}</span></a>${demoLink(r.name)}<span class="chev" aria-hidden="true">›</span></div>`;
+    }).join('');
+    if (list.length > shown.length) h += `<button class="btn ghost block" data-x="more">Show more (${(list.length - shown.length).toLocaleString()} more)</button>`;
+    if (list.length && customRow) h += customRow;
     return h;
   }
 
   // the "Add exercise" picker sheet. onPick(exerciseId) is called for every tap; sheet stays open for multi-add.
   function pickExercise(title, onPick, onDone) {
     const st = { q: '', chip: 'all', limit: 60, added: new Set(), mode: 'pick' };
-    const body = `<div class="picker-top"><input type="search" id="pickQ" placeholder="Search ${LIB_ITEMS.length}+ exercises" autocomplete="off" autocapitalize="off" enterkeyhint="search" aria-label="Search exercises">${chipsHTML('all', true)}</div><div id="pickList" class="pick-list"></div>`;
+    const body = `<div class="picker-top"><input type="search" id="pickQ" placeholder="Search ${LIB_ITEMS.length}+ exercises" autocomplete="off" autocapitalize="off" enterkeyhint="search" aria-label="Search exercises">${chipsHTML('all')}</div><div id="pickList" class="pick-list"></div>`;
     let count = 0;
     const sh = openSheet(title, body, (el, close, bg) => {
       const x = el.dataset.x;
@@ -314,9 +320,9 @@
       else if (x === 'pick-lib') {
         const li = LIB_ITEMS[+el.dataset.li]; const r = ensureMine(li);
         onPick(r.ex.id); st.added.add('lib:' + li.i); st.added.add(r.ex.id); count++;
-        toast(r.created ? `Added ${li.name} · saved to My exercises` : `Added ${li.name}`);
+        toast(`Added ${li.name}`);
       } else if (x === 'custom') {
-        const r = createCustom(st.q, st.chip !== 'all' && st.chip !== 'mine' ? st.chip : null);
+        const r = createCustom(st.q, st.chip !== 'all' ? st.chip : null);
         onPick(r.ex.id); st.added.add(r.ex.id); count++; toast(`Added custom “${r.ex.name}”`);
         st.q = ''; bg.querySelector('#pickQ').value = '';
       } else if (x === 'more') st.limit += 100;
@@ -490,13 +496,12 @@
     }).join('');
   }
 
-  const exTab = { seg: 'mine', q: '', chip: 'all', limit: 80, mode: 'browse' };
+  const exTab = { q: '', chip: 'all', limit: 80, mode: 'browse' };
   function viewExercises() {
     setChrome('Exercises', false);
-    $app.innerHTML = `<div class="seg" role="tablist"><button class="seg-btn${exTab.seg === 'mine' ? ' on' : ''}" data-action="seg" data-seg="mine" role="tab" aria-selected="${exTab.seg === 'mine'}">My exercises <span class="count">${state.exercises.length}</span></button><button class="seg-btn${exTab.seg === 'lib' ? ' on' : ''}" data-action="seg" data-seg="lib" role="tab" aria-selected="${exTab.seg === 'lib'}">Library <span class="count">${LIB_ITEMS.length}</span></button></div>
-      <div class="search"><input type="search" id="exQ" placeholder="${exTab.seg === 'mine' ? 'Search my exercises or add a new one' : `Search ${LIB_ITEMS.length} exercises`}" value="${esc(exTab.q)}" autocomplete="off" aria-label="Search exercises">${chipsHTML(exTab.chip, false)}</div>
+    $app.innerHTML = `<div class="search"><input type="search" id="exQ" placeholder="Search ${LIB_ITEMS.length}+ exercises or add your own" value="${esc(exTab.q)}" autocomplete="off" autocapitalize="off" enterkeyhint="search" aria-label="Search exercises">${chipsHTML(exTab.chip)}</div>
       <div id="exResults" class="pick-list"></div>
-      ${exTab.seg === 'mine' && state.exercises.length > 1 ? '<button class="btn ghost block" data-action="lib-reorder">Reorder my exercises</button>' : ''}`;
+      ${state.exercises.length > 1 ? '<button class="btn ghost block" data-action="lib-reorder">Reorder your saved exercises (they show first)</button>' : ''}`;
     const inp = document.getElementById('exQ');
     inp.addEventListener('input', () => { exTab.q = inp.value; exTab.limit = 80; drawExResults(); });
     drawExResults();
@@ -504,7 +509,7 @@
   function drawExResults() { const el = document.getElementById('exResults'); if (el) el.innerHTML = resultsHTML(exTab); }
   function reorderSheet() {
     const draw = () => state.exercises.map((e, i) => `<div class="pick-row"><span class="grow"><span class="pr-name">${esc(e.name)}</span></span><button class="icon-btn sm" data-x="up" data-i="${i}" aria-label="Move ${esc(e.name)} up"${i === 0 ? ' disabled' : ''}>↑</button><button class="icon-btn sm" data-x="down" data-i="${i}" aria-label="Move ${esc(e.name)} down"${i === state.exercises.length - 1 ? ' disabled' : ''}>↓</button></div>`).join('');
-    const sh = openSheet('Reorder my exercises', `<div id="ro">${draw()}</div>`, (el) => {
+    const sh = openSheet('Reorder saved exercises', `<div id="ro">${draw()}</div>`, (el) => {
       const i = +el.dataset.i; if (el.disabled) return;
       if (el.dataset.x === 'up') swap(state.exercises, i, i - 1); else if (el.dataset.x === 'down') swap(state.exercises, i, i + 1); else return;
       save(); sh.bg.querySelector('#ro').innerHTML = draw();
@@ -512,9 +517,15 @@
   }
 
   function viewExercise(id) {
-    const e = exById(id);
+    const lm = /^lib-(\d+)$/.exec(id || '');
+    const li0 = lm ? LIB_ITEMS[+lm[1]] : null;
+    const saved = li0 ? findMineByName(li0.name) : null;
+    if (saved) { history.replaceState(null, '', '#/exercise/' + saved.id); return viewExercise(saved.id); }
+    // library movement he hasn't saved yet: a virtual exercise; editing anything saves it (see onField 'exdef')
+    const e = li0 ? { id, name: li0.name, cat: CAT_LABEL[li0.cat], sub: li0.sub, equip: li0.equip, notes: '', lib: li0.key, virtual: true } : exById(id);
     if (!e) { setChrome('Exercise', true); $app.innerHTML = emptyState('🤔', 'Exercise not found', '', '<a class="btn primary" href="#/exercises">Back to exercises</a>'); return; }
     setChrome(e.name, true);
+    const li = libOf(e);
     const rows = [];
     for (const s of sortedSessions()) for (const x of s.exercises) if (x.exId === id && x.sets.some(isLogged)) rows.push({ s, x, top: topSet(x.sets) });
     let best = null;
@@ -522,7 +533,15 @@
     const groups = new Map();
     for (const r of rows) { const k = weekStart(r.s.date); if (!groups.has(k)) groups.set(k, []); groups.get(k).push(r); }
     const cats = LIB.categories.map((c) => `<option value="${esc(c.label)}"${c.label === e.cat ? ' selected' : ''}>${esc(c.label)}</option>`).join('') + `<option value="Custom"${!catKeyOf(e) ? ' selected' : ''}>Custom / other</option>`;
-    $app.innerHTML = `${best ? `<section class="card best"><div class="best-l">Best set</div><div class="best-v">${esc(fmtSet(best.row.top))}</div><div class="best-d">${esc(fmtDate(best.row.s.date))} · ${plural(rows.length, 'session')} logged</div></section>` : ''}
+    const head = `<section class="card exd-head"><div class="exh-meta">${metaLine(e.cat, e.sub && e.sub !== e.cat ? e.sub : '', e.equip) || 'Your exercise'}${li ? '' : '<span class="tag-custom">Custom</span>'}</div>
+      <a class="btn demo block" id="watchDemo" href="${esc(demoUrl(e.name))}" target="_blank" rel="noopener">${PLAY_SVG} Watch demo</a>
+      <div class="hint">Opens YouTube form videos for “${esc(e.name)}”.</div></section>
+      <div class="sec-title">Notes / cues</div>
+      <section class="card stack cues-card">
+        <textarea id="exNotes" class="cues" data-bind="exdef" data-k="notes" rows="${Math.max(4, (cuesText(e).match(/\n/g) || []).length + 2)}" aria-label="Notes and coaching cues" placeholder="${li ? 'Setup, cues, machine settings…' : 'Add your own cues: setup, execution, what to avoid…'}">${esc(cuesText(e))}</textarea>
+        <div class="cue-foot"><span class="hint" id="cueSrc">${e.notesEdited ? 'Your notes (saved)' : li ? 'Coaching cues: edit to make them yours' : 'Your own exercise: add cues if you like'}</span>${e.notesEdited && li ? '<button class="btn ghost sm" data-action="cues-reset">Reset to default cues</button>' : ''}</div>
+      </section>`;
+    $app.innerHTML = `${head}${best ? `<section class="card best"><div class="best-l">Best set</div><div class="best-v">${esc(fmtSet(best.row.top))}</div><div class="best-d">${esc(fmtDate(best.row.s.date))} · ${plural(rows.length, 'session')} logged</div></section>` : ''}
       <div class="sec-title">History by week (Sun–Sat)</div>
       ${rows.length ? [...groups.entries()].map(([ws, rs]) => {
         const wkTop = topSet(rs.map((r) => r.top));
@@ -533,9 +552,11 @@
       <section class="card stack">
         <div><label class="f" for="exName">Name</label><input id="exName" data-bind="exdef" data-k="name" value="${esc(e.name)}"></div>
         <div><label class="f" for="exCat">Category</label><select id="exCat" data-bind="exdef" data-k="cat">${cats}</select></div>
-        <div><label class="f" for="exNotes">Notes / cues</label><textarea id="exNotes" data-bind="exdef" data-k="notes" placeholder="Setup, cues, machine settings…">${esc(e.notes || '')}</textarea></div>
       </section>
-      <button class="btn danger block" data-action="ex-delete" data-id="${e.id}">Delete exercise</button>`;
+      ${e.virtual ? '' : `<button class="btn danger block" data-action="ex-delete" data-id="${e.id}">${li ? 'Remove from saved exercises' : 'Delete exercise'}</button>`}`;
+    const ta = document.getElementById('exNotes');
+    const fit = () => { ta.style.height = 'auto'; ta.style.height = Math.min(ta.scrollHeight + 2, 420) + 'px'; };
+    fit(); ta.addEventListener('input', fit);
   }
 
   function viewTemplates() {
@@ -908,14 +929,14 @@
       }
       case 'del-session': if (confirm('Delete this workout? This cannot be undone.')) { state.sessions = state.sessions.filter((x) => x.id !== s.id); save(); toast('Workout deleted'); go('#/'); } break;
       case 'hist-clear': histQ = ''; render(); break;
-      case 'seg': exTab.seg = d.seg; exTab.limit = 80; render(); break;
+      case 'cues-reset': { const e = exById(curId()); if (e) { e.notes = ''; e.notesEdited = false; save(); rerenderKeepScroll(); toast('Default cues restored'); } break; }
       case 'lib-reorder': reorderSheet(); break;
       case 'ex-delete': {
         const e = exById(d.id);
-        if (!confirm(`Delete “${e.name}” from My exercises? Past workouts keep their logs; it is removed from templates.`)) break;
+        if (!confirm(`${libOf(e) ? 'Remove' : 'Delete'} “${e.name}” from your saved exercises? Past workouts keep their logs; it is removed from templates.${libOf(e) ? ' It stays in the list, with the default cues.' : ''}`)) break;
         for (const ss of state.sessions) for (const x of ss.exercises) if (x.exId === e.id) x.name = e.name;
         for (const tt of state.templates) tt.items = tt.items.filter((it) => it.exId !== e.id);
-        state.exercises = state.exercises.filter((x) => x.id !== e.id); save(); toast('Exercise deleted'); go('#/exercises'); break;
+        state.exercises = state.exercises.filter((x) => x.id !== e.id); save(); toast(libOf(e) ? 'Removed from saved' : 'Exercise deleted'); go('#/exercises'); break;
       }
       case 'tpl-create': {
         const inp = document.getElementById('newTpl'); const name = inp.value.trim(); if (!name) { toast('Give the template a name first'); return inp.focus(); }
@@ -953,15 +974,9 @@
     const chip = ev.target.closest('[data-chip]');
     if (chip) { exTab.chip = chip.dataset.chip; exTab.limit = 80; document.querySelectorAll('#app .chip').forEach((b) => { b.classList.toggle('on', b === chip); b.setAttribute('aria-selected', b === chip); }); drawExResults(); return; }
     const x = ev.target.closest('[data-x]'); if (!x) return;
-    if (x.dataset.x === 'pick-lib') {
-      const li = LIB_ITEMS[+x.dataset.li]; const have = findMineByName(li.name);
-      if (have) { location.hash = '#/exercise/' + have.id; return; }
-      ensureMine(li); toast(`${li.name} added to My exercises`); drawExResults();
-      const c = document.querySelector('.seg-btn[data-seg="mine"] .count'); if (c) c.textContent = state.exercises.length;
-    } else if (x.dataset.x === 'custom') {
-      const r = createCustom(exTab.q, exTab.chip !== 'all' ? exTab.chip : null); exTab.q = ''; toast(`Added “${r.ex.name}” to My exercises`); exTab.seg = 'mine'; render();
+    if (x.dataset.x === 'custom') {
+      const r = createCustom(exTab.q, exTab.chip !== 'all' ? exTab.chip : null); exTab.q = ''; toast(`Added “${r.ex.name}”`); location.hash = '#/exercise/' + r.ex.id;
     } else if (x.dataset.x === 'more') { exTab.limit += 150; drawExResults(); }
-    else if (x.dataset.x === 'seg-lib') { exTab.seg = 'lib'; render(); }
   });
 
   function exportJSON() {
@@ -1009,7 +1024,18 @@
       s[k] = v; touch(s); if (k === 'name') document.getElementById('title').textContent = v || 'Workout';
     } else if (b === 'set') { const s = curSession(); if (!s) return; s.exercises[+el.dataset.ei].sets[+el.dataset.si][k] = v; touch(s); }
     else if (b === 'exnote') { const s = curSession(); if (!s) return; s.exercises[+el.dataset.ei].notes = v; touch(s); }
-    else if (b === 'exdef') { const e = exById(curId()); if (!e) return; if (k === 'name' && !v.trim()) return; e[k] = k === 'name' ? v.trim() : v; if (k === 'name') document.getElementById('title').textContent = v; }
+    else if (b === 'exdef') {
+      if (k === 'name' && !v.trim()) return;
+      let e = exById(curId());
+      if (!e) { // first edit of a library movement saves it (with its coaching cues) to his exercises
+        const m = /^lib-(\d+)$/.exec(curId() || ''); if (!m) return;
+        e = ensureMine(LIB_ITEMS[+m[1]]).ex;
+        history.replaceState(null, '', '#/exercise/' + e.id); renderedHash = location.hash;
+      }
+      e[k] = k === 'name' ? v.trim() : v;
+      if (k === 'notes') { e.notesEdited = true; const cs = document.getElementById('cueSrc'); if (cs) cs.textContent = 'Your notes (saved)'; }
+      if (k === 'name') document.getElementById('title').textContent = v;
+    }
     else if (b === 'tpl') { const t = curTpl(); if (!t || !v.trim()) return; t.name = v.trim(); document.getElementById('title').textContent = v; }
     else if (b === 'ti') { const t = curTpl(); if (!t) return; t.items[+el.dataset.i][k] = k === 'sets' ? Math.max(1, parseInt(v, 10) || 1) : v; }
     else if (b === 'macro') { macroInput(); return; }
@@ -1023,7 +1049,7 @@
   document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') save(); });
 
   // expose helpers for testing / debugging
-  window.SlimTucci = { computeTargets: (p, x) => MAC.computeTargets(p, x), computeBurnExtra: MAC.computeBurnExtra, caloriesBurnedToday, adjustedToday, whoopConfigured: () => !!WHOOP_URL, weekStart, weekEnd, weekNum, weekLabel, search: (q) => searchList(LIB_ITEMS, q, (x) => x.hay, (x) => x.key).slice(0, 10).map((x) => x.name), libSize: LIB_ITEMS.length, get state() { return state; } };
+  window.SlimTucci = { computeTargets: (p, x) => MAC.computeTargets(p, x), computeBurnExtra: MAC.computeBurnExtra, caloriesBurnedToday, adjustedToday, whoopConfigured: () => !!WHOOP_URL, demoUrl, libCues: (name) => { const li = LIB_BY_KEY.get(norm(name)); return li ? li.cues.slice() : null; }, cuesFor: (name) => { const e = findMineByName(name); return e ? cuesText(e) : null; }, weekStart, weekEnd, weekNum, weekLabel, search: (q) => searchList(LIB_ITEMS, q, (x) => x.hay, (x) => x.key).slice(0, 10).map((x) => x.name), libSize: LIB_ITEMS.length, get state() { return state; } };
 
   render();
   if (navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(() => {});
