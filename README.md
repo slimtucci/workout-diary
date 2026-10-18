@@ -50,3 +50,14 @@ Go to More → Export JSON to download `slimtucci-diary-YYYY-MM-DD.json`. Use Im
 - **More → Connections → Dashboard sync**: paste the sync code from the SlimTucci admin (My Training → Connect diary) once. The diary then sends its workout data (the Export JSON shape, but only `settings, exercises, templates, sessions, plans`: no macros, burn or WHOOP session) to the admin about 30 s after changes and when the app opens. Unchanged data isn't re-sent. A quiet status line shows "Synced 2 min ago".
 - The code is write-only (it can't read anything back). It lives in its own key `localStorage['slimtucci-dashsync-v1']` and is never part of Export. `config.js` holds `DASHBOARD_URL`. Disconnect on the same screen.
 - `tests/e2e_test.py` now pins `config.js` to the "nothing configured" state for the fresh-install checks (the live config points at the Worker since v7), reads the SW version from `sw.js`, and tests Dashboard sync against a mocked endpoint (connect, payload shape, debounce, on-open, Export exclusion, revoked code, disconnect).
+
+## Exercises grid (v9)
+- Cards show a SlimTucci drawing (img/art/, `art-manifest.js`), else a public-domain photo (img/ex/, from
+  [free-exercise-db](https://github.com/yuhonas/free-exercise-db), Unlicense), else our own SVG body map (`bodymap.js`).
+- `exercise-media.js` (photo slug + primary/secondary muscles per library item) is built by
+  `python3 tools/build_media.py /path/to/free-exercise-db` (hand-checked ALIAS table; match list in `tools/media_matches.txt`).
+- New drawings: drop `<exercise-name-in-kebab-case>.svg` into `/workspace/business-ops/exercise-art/full/` (chip icons into `.../chips/`),
+  run `python3 tools/build_art.py` (add `--badge` to also show the muscle badge on drawings), bump `VERSION` in `sw.js`, deploy.
+  Names that don't match the library are listed by the script; map them in `exercise-art/aliases.json` as `{"slug": "Library Name"}`.
+- Images are lazy-loaded and cached on first view; they are not precached by the service worker.
+- Bookmarks live in `settings.favs` (normalized exercise names) inside the existing diary data.

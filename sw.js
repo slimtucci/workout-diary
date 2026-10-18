@@ -1,7 +1,8 @@
-/* SlimTucci Workout Diary service worker: offline app shell. Bump VERSION on every deploy. */
-const VERSION = 'st-diary-v8';
+/* SlimTucci Workout Diary service worker: offline app shell. Bump VERSION on every deploy.
+   Exercise photos and drawings (img/ex/*.webp, img/art/*) are NOT precached; they are cached the first time they are viewed (cache-first branch below). */
+const VERSION = 'st-diary-v9';
 const SHELL = [
-  './', './index.html', './styles.css', './app.js', './config.js', './exercises-library.js', './macros-calc.js', './manifest.webmanifest',
+  './', './index.html', './styles.css', './app.js', './config.js', './exercises-library.js', './exercise-media.js', './bodymap.js', './art-manifest.js', './macros-calc.js', './manifest.webmanifest',
   './icons/icon-192.png', './icons/icon-512.png', './icons/icon-maskable-512.png',
   './icons/apple-touch-icon.png', './icons/favicon-32.png'
 ];

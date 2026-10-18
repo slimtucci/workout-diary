@@ -76,6 +76,33 @@
   const norm = (s) => String(s || '').toLowerCase().replace(/[’']/g, '').replace(/[^a-z0-9]+/g, ' ').trim();
   const LIB_ITEMS = LIB.items.map(([name, cat, sub, equip, cues], i) => ({ i, name, cat, sub, equip, cues: cues || [], key: norm(name), hay: ' ' + norm([name, CAT_LABEL[cat], sub, equip].join(' ')) }));
   const LIB_BY_KEY = new Map(LIB_ITEMS.map((x) => [x.key, x]));
+  // ---------- exercise media: photos (free-exercise-db, public domain) + muscle regions (exercise-media.js), body map (bodymap.js) ----------
+  const MEDIA = (window.SLIMTUCCI_MEDIA && window.SLIMTUCCI_MEDIA.items) || [];
+  const BODY = window.SlimTucciBody || { NAMES: {}, GROUPS: [], svg: () => '', uri: () => '', inferCustom: () => ({ p: [], s: [] }), clearCache() {} };
+  const GROUP_BY_KEY = Object.fromEntries(BODY.GROUPS.map((g) => [g.key, g]));
+  // art overrides (art-manifest.js): original SlimTucci illustrations win over photos on cards and in the detail view
+  const ART = window.SLIMTUCCI_ART || { items: {}, chips: {}, back: [], badge: false };
+  const mediaCache = new Map();
+  // {img, frames, p:[regions], s:[regions]} for a library item (by index) or his own exercise (inferred from name/category)
+  function mediaOf(li, name, catKey) {
+    const ck = li ? 'i' + li.i : 'c|' + norm(name) + '|' + (catKey || '');
+    let m = mediaCache.get(ck); if (m) return m;
+    const it = li && MEDIA[li.i];
+    if (it) m = { img: it[0] || '', p: it[1] ? it[1].split(' ') : [], s: it[2] ? it[2].split(' ') : [], frames: it[3] || 0 };
+    else { const g = BODY.inferCustom(name, catKey); m = { img: '', p: g.p, s: g.s, frames: 0 }; }
+    m.art = (li && ART.items[String(li.i)]) || '';
+    mediaCache.set(ck, m); return m;
+  }
+  const muscleNames = (list) => list.map((k) => BODY.NAMES[k] || k);
+  function musclesLine(m) { const a = muscleNames(m.p.slice(0, 2)); if (a.length < 2) a.push(...muscleNames(m.s.slice(0, 2 - a.length))); return a.join(', '); }
+  const imgUrl = (slug, f) => `img/ex/${slug}-${f || 0}.webp`;
+  const BOOKMARK_SVG = '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M6.5 3.5h11a1 1 0 0 1 1 1v16l-6.5-4.2-6.5 4.2v-16a1 1 0 0 1 1-1z"/></svg>';
+  const isFav = (key) => state.settings.favs.includes(key);
+  function toggleFav(key) {
+    const f = state.settings.favs, i = f.indexOf(key);
+    if (i >= 0) f.splice(i, 1); else f.push(key);
+    save(); return i < 0;
+  }
   // YouTube demo: a search for "<name> exercise proper form" (no invented video IDs). Opens in a new tab / the YouTube app.
   const demoUrl = (name) => 'https://www.youtube.com/results?search_query=' + encodeURIComponent(`${String(name || '').trim()} exercise proper form`).replace(/%20/g, '+');
   const PLAY_SVG = '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M8 5.5v13a1 1 0 0 0 1.5.86l10.5-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5z"/></svg>';
@@ -154,7 +181,7 @@
     const ex = names.map(([name, cat, sub]) => { const li = LIB_ITEMS.find((x) => x.name === name); return { id: uid(), name, cat, sub, equip: li ? li.equip : '', notes: '' }; });
     return {
       version: 1,
-      settings: { programStart: weekStart(todayStr()), samplesCleared: true },
+      settings: { programStart: weekStart(todayStr()), samplesCleared: true, favs: [] },
       exercises: ex,
       templates: [],
       sessions: [],
@@ -185,6 +212,8 @@
     if (!d || !Array.isArray(d.exercises) || !Array.isArray(d.templates) || !Array.isArray(d.sessions)) throw new Error('Not a SlimTucci diary backup');
     d.settings = d.settings || {};
     if (!('programStart' in d.settings)) d.settings.programStart = null;
+    if (!Array.isArray(d.settings.favs)) d.settings.favs = []; // bookmarked exercises (normalized names); added in v9
+    d.settings.favs = d.settings.favs.filter((k) => typeof k === 'string');
     if (!Array.isArray(d.plans)) d.plans = [];
     if (d.macros === undefined) d.macros = null;
     if (d.burn === undefined) d.burn = null;
@@ -236,6 +265,7 @@
     const map = { whoop: 'settings', '': 'home', log: 'home', history: 'history', exercises: 'exercises', exercise: 'exercises', templates: 'settings', template: 'settings', settings: 'settings', macros: 'macros' };
     document.querySelectorAll('.tabbar a').forEach((a) => { const on = a.dataset.tab === (map[tab] || tab); a.classList.toggle('active', on); if (on) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); });
     document.body.classList.toggle('has-actionbar', tab === 'log');
+    document.body.classList.remove('wide');
   }
   function go(h) { if (location.hash === h) render(); else location.hash = h; }
   function emptyState(icon, title, sub, btnHtml) {
@@ -278,9 +308,14 @@
       if (seen.has(x.key)) continue; seen.add(x.key);
       rows.push({ kind: 'lib', x, id: 'lib-' + x.i, name: x.name, key: x.key, catKey: x.cat, custom: false, hay: x.hay, sub: x.sub === CAT_LABEL[x.cat] ? '' : x.sub, equip: x.equip });
     }
-    const filtered = rows.filter((r) => chip === 'all' || r.catKey === chip);
+    let filtered;
+    if (chip === 'all') filtered = rows;
+    else if (chip === 'saved') filtered = rows.filter((r) => isFav(r.key));
+    else if (chip.startsWith('m-') && GROUP_BY_KEY[chip.slice(2)]) { const want = GROUP_BY_KEY[chip.slice(2)].muscles; filtered = rows.filter((r) => rowMedia(r).p.some((k) => want.includes(k))); }
+    else filtered = rows.filter((r) => r.catKey === chip);
     return searchList(filtered, q, (r) => r.hay, (r) => r.key);
   }
+  const rowMedia = (r) => (r.kind === 'lib' ? mediaOf(r.x, r.name, r.catKey) : mediaOf(r.custom ? null : libOf(r.e), r.name, r.catKey));
   const demoLink = (name, cls) => `<a class="${cls || 'demo-ico'}" href="${esc(demoUrl(name))}" target="_blank" rel="noopener" aria-label="Watch demo: ${esc(name)} (YouTube)" title="Watch demo">${PLAY_SVG}</a>`;
   // returns HTML for the single list. mode: 'pick' (tap adds to a workout/template) or 'browse' (Exercises tab → detail page)
   function resultsHTML(o) {
@@ -496,17 +531,85 @@
     }).join('');
   }
 
-  const exTab = { q: '', chip: 'all', limit: 80, mode: 'browse' };
+  const exTab = { q: '', chip: 'all', limit: 48, mode: 'browse', list: [], y: 0 };
+  const EX_BATCH = 48;
+  // non-muscle movement types shown after the muscle chips (library categories)
+  const TYPE_CHIPS = [['cardio', 'Cardio', '<path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/>'],
+    ['power', 'Plyo', '<path d="M13 3 6 13h5l-1 8 7-10h-5z"/>'], ['carry', 'Carries', '<path d="M7 9h10l-1 11H8zM9.5 9V6.5a2.5 2.5 0 0 1 5 0V9"/>'],
+    ['agility', 'Agility', '<path d="M4 17l4-6 4 4 4-7 4 5"/>'], ['mobility', 'Mobility', '<path d="M19 12a7 7 0 1 1-2-4.9M19 4v4h-4"/>'],
+    ['stretch', 'Stretching', '<circle cx="12" cy="5" r="2"/><path d="M5 9l7 2 7-2M12 11v4l-4 6M12 15l4 6"/>']];
+  function exChipsHTML(active) {
+    const chip = (k, label, ico) => `<button class="chip mchip${k === active ? ' on' : ''}" data-chip="${k}" role="tab" aria-selected="${k === active}"><span class="mchip-ico" aria-hidden="true">${ico}</span><span class="mchip-l">${esc(label)}</span></button>`;
+    const glyph = (d) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
+    let h = chip('all', 'All', glyph('<rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/>'));
+    h += chip('saved', `Saved${state.settings.favs.length ? ' ' + state.settings.favs.length : ''}`, BOOKMARK_SVG);
+    const icon = (k, fallback) => (ART.chips[k] ? `<img src="img/art/${esc(ART.chips[k])}" alt="" class="ds">${ART.back.includes(k) ? '<i class="back-mark" title="Back view">B</i>' : ''}` : fallback);
+    h += BODY.GROUPS.map((g) => chip('m-' + g.key, g.label, icon('m-' + g.key, `<img src="${BODY.uri(g.muscles, [], 'auto')}" alt="">`))).join('');
+    h += '<span class="chip-sep" aria-hidden="true"></span>';
+    h += TYPE_CHIPS.map(([k, l, d]) => chip(k, l, icon(k, glyph(d)))).join('');
+    return `<div class="chips mchips" role="tablist" aria-label="Filter by muscle or type">${h}</div>`;
+  }
   function viewExercises() {
     setChrome('Exercises', false);
-    $app.innerHTML = `<div class="search"><input type="search" id="exQ" placeholder="Search ${LIB_ITEMS.length}+ exercises or add your own" value="${esc(exTab.q)}" autocomplete="off" autocapitalize="off" enterkeyhint="search" aria-label="Search exercises">${chipsHTML(exTab.chip)}</div>
-      <div id="exResults" class="pick-list"></div>
+    document.body.classList.add('wide');
+    $app.innerHTML = `<div class="search ex-search"><input type="search" id="exQ" placeholder="Search ${LIB_ITEMS.length}+ exercises or add your own" value="${esc(exTab.q)}" autocomplete="off" autocapitalize="off" enterkeyhint="search" aria-label="Search exercises">${exChipsHTML(exTab.chip)}</div>
+      <div id="exResults"></div>
       ${state.exercises.length > 1 ? '<button class="btn ghost block" data-action="lib-reorder">Reorder your saved exercises (they show first)</button>' : ''}`;
     const inp = document.getElementById('exQ');
-    inp.addEventListener('input', () => { exTab.q = inp.value; exTab.limit = 80; drawExResults(); });
+    inp.addEventListener('input', () => { exTab.q = inp.value; exTab.limit = EX_BATCH; drawExResults(); });
     drawExResults();
+    const on = document.querySelector('.mchips .chip.on'); if (on && on.scrollIntoView && exTab.chip !== 'all') on.scrollIntoView({ block: 'nearest', inline: 'center' });
   }
-  function drawExResults() { const el = document.getElementById('exResults'); if (el) el.innerHTML = resultsHTML(exTab); }
+  function exCardHTML(r) {
+    const m = rowMedia(r), fav = isFav(r.key), nm = esc(r.name);
+    const tag = r.custom ? '<span class="tag-custom">Custom</span>' : '';
+    let last = '';
+    if (r.kind === 'mine') { const lp = lastPerformance(r.id); const t = lp && topSet(lp.e.sets); if (t) last = `<span class="exg-last">last ${esc(fmtSet(t))}</span>`; }
+    const art = m.art
+      ? `<img class="exg-ill" src="img/art/${esc(m.art)}" alt="" loading="lazy" decoding="async" width="400" height="400">${ART.badge ? `<img class="exg-badge" src="${BODY.uri(m.p, m.s)}" alt="" loading="lazy">` : ''}`
+      : m.img
+      ? `<img class="exg-photo" src="${imgUrl(m.img)}" alt="" loading="lazy" decoding="async" width="400" height="267"><img class="exg-badge" src="${BODY.uri(m.p, m.s)}" alt="" loading="lazy">`
+      : `<img class="exg-map" src="${BODY.uri(m.p, m.s)}" alt="" loading="lazy">`;
+    return `<div class="exg ex-row${fav ? ' fav' : ''}" data-exrow="${r.id}">
+      <a class="exg-art ${m.art ? 'art' : m.img ? 'photo' : 'diagram'}" href="#/exercise/${r.id}" tabindex="-1" aria-hidden="true">${art}</a>
+      <button class="exg-save" data-x="fav" data-key="${esc(r.key)}" aria-pressed="${fav}" aria-label="${fav ? 'Unsave' : 'Save'} ${nm}">${BOOKMARK_SVG}</button>
+      <a class="exg-info" href="#/exercise/${r.id}" aria-label="About ${nm}">?</a>
+      <div class="exg-text"><a class="rowlink grow" href="#/exercise/${r.id}"><span class="pr-name">${nm}${tag}</span><span class="pr-meta exg-mus">${esc(musclesLine(m)) || 'Your exercise'}</span>${last}</a>${demoLink(r.name)}</div></div>`;
+  }
+  let exIO = null;
+  function drawExResults() {
+    const el = document.getElementById('exResults'); if (!el) return;
+    const { q, chip } = exTab, qt = q.trim();
+    const list = exTab.list = unifiedList(chip, q);
+    const exact = qt && list.some((r) => r.key === norm(qt));
+    const customRow = qt && !exact ? `<button class="pick-row custom" data-x="custom"><span class="pr-plus" aria-hidden="true">+</span><span class="grow"><span class="pr-name">Add custom “${esc(qt)}”</span><span class="pr-meta">Saved as your own exercise${CAT_LABEL[chip] ? ' · ' + esc(CAT_LABEL[chip]) : ''}</span></span></button>` : '';
+    let h = `<div class="list-count" aria-live="polite">${list.length.toLocaleString()} exercise${list.length === 1 ? '' : 's'}${chip === 'saved' ? ' saved' : ''}</div>`;
+    if (!list.length && qt) h += `<div class="sec-empty">No match for “${esc(qt)}”.</div>`;
+    if (!list.length && chip === 'saved' && !qt) h += emptyState('🔖', 'Nothing saved yet', 'Tap the bookmark on any exercise to keep it here.');
+    if (!list.length && customRow) h += customRow;
+    h += `<div class="exg-grid" id="exGrid">${list.slice(0, exTab.limit).map(exCardHTML).join('')}</div>`;
+    h += `<button class="btn ghost block" data-x="more" id="exMore"${list.length > exTab.limit ? '' : ' hidden'}>Show more (${Math.max(0, list.length - exTab.limit).toLocaleString()} more)</button>`;
+    if (list.length && customRow) h += customRow;
+    el.innerHTML = h;
+    watchMore();
+  }
+  function moreExResults() {
+    const grid = document.getElementById('exGrid'), btn = document.getElementById('exMore'); if (!grid) return;
+    const from = exTab.limit; exTab.limit += EX_BATCH * 2;
+    grid.insertAdjacentHTML('beforeend', exTab.list.slice(from, exTab.limit).map(exCardHTML).join(''));
+    const left = exTab.list.length - exTab.limit;
+    if (btn) { btn.hidden = left <= 0; btn.textContent = `Show more (${Math.max(0, left).toLocaleString()} more)`; }
+  }
+  // incremental rendering: the next batch is added as the "Show more" button nears the screen
+  function watchMore() {
+    if (exIO) exIO.disconnect();
+    const btn = document.getElementById('exMore'); if (!btn || btn.hidden || !('IntersectionObserver' in window)) return;
+    exIO = new IntersectionObserver((ents) => {
+      if (!ents.some((x) => x.isIntersecting) || btn.hidden) return;
+      moreExResults(); exIO.unobserve(btn); if (!btn.hidden) exIO.observe(btn); // re-check: keep filling while it's still near the screen
+    }, { rootMargin: '900px 0px' });
+    exIO.observe(btn);
+  }
   function reorderSheet() {
     const draw = () => state.exercises.map((e, i) => `<div class="pick-row"><span class="grow"><span class="pr-name">${esc(e.name)}</span></span><button class="icon-btn sm" data-x="up" data-i="${i}" aria-label="Move ${esc(e.name)} up"${i === 0 ? ' disabled' : ''}>↑</button><button class="icon-btn sm" data-x="down" data-i="${i}" aria-label="Move ${esc(e.name)} down"${i === state.exercises.length - 1 ? ' disabled' : ''}>↓</button></div>`).join('');
     const sh = openSheet('Reorder saved exercises', `<div id="ro">${draw()}</div>`, (el) => {
@@ -533,7 +636,31 @@
     const groups = new Map();
     for (const r of rows) { const k = weekStart(r.s.date); if (!groups.has(k)) groups.set(k, []); groups.get(k).push(r); }
     const cats = LIB.categories.map((c) => `<option value="${esc(c.label)}"${c.label === e.cat ? ' selected' : ''}>${esc(c.label)}</option>`).join('') + `<option value="Custom"${!catKeyOf(e) ? ' selected' : ''}>Custom / other</option>`;
-    const head = `<section class="card exd-head"><div class="exh-meta">${metaLine(e.cat, e.sub && e.sub !== e.cat ? e.sub : '', e.equip) || 'Your exercise'}${li ? '' : '<span class="tag-custom">Custom</span>'}</div>
+    const m = mediaOf(li, e.name, catKeyOf(e)), favKey = norm(e.name), fav = isFav(favKey);
+    const mapLabel = `Muscles worked: ${muscleNames(m.p).join(', ') || 'not set'}${m.s.length ? '; also ' + muscleNames(m.s).join(', ') : ''}`;
+    const favBtn = `<button class="exd-save${fav ? ' on' : ''}" data-action="fav-toggle" data-key="${esc(favKey)}" aria-pressed="${fav}" aria-label="${fav ? 'Unsave' : 'Save'} exercise">${BOOKMARK_SVG}<span>${fav ? 'Saved' : 'Save'}</span></button>`;
+    const musList = `<div class="exd-mus">
+        <div class="lg"><span class="sw p" aria-hidden="true"></span>Primary</div><div class="mv" id="exdPrimary">${esc(muscleNames(m.p).join(', ')) || '—'}</div>
+        <div class="lg"><span class="sw s" aria-hidden="true"></span>Secondary</div><div class="mv" id="exdSecondary">${esc(muscleNames(m.s).join(', ')) || '—'}</div>
+        <div class="lg">Equipment</div><div class="mv" id="exdEquip">${esc(e.equip || (li && li.equip) || '—')}</div></div>`;
+    const frames = []; // [src, alt, label]
+    if (m.art) frames.push([`img/art/${esc(m.art)}`, `${esc(e.name)} illustration`, 'Drawing']);
+    if (m.img) { frames.push([imgUrl(m.img, 0), `${esc(e.name)}, start position`, 'Start']); if (m.frames > 1) frames.push([imgUrl(m.img, 1), `${esc(e.name)}, end position`, 'Finish']); }
+    const credit = m.img ? `<div class="exd-credit">${m.art ? 'Drawing: SlimTucci. ' : ''}Photos: free-exercise-db (public domain)</div>` : m.art ? '<div class="exd-credit">Drawing: SlimTucci</div>' : '';
+    const hero = m.art
+      ? `<section class="card exd-hero"><div class="exd-media art" id="exdMedia" data-frames="${m.art ? 1 : frames.length}">
+          ${frames.map(([src, alt], i) => `<img class="exd-f${i ? '' : ' on'}${i && m.art ? ' ph' : ''}" src="${src}" alt="${alt}" decoding="async">`).join('')}
+          ${favBtn}${frames.length > 1 ? `<div class="exd-frames" role="group" aria-label="Picture">${frames.map(([, , l], i) => `<button class="${i ? '' : 'on'}" data-action="ex-frame" data-f="${i}">${l}</button>`).join('')}</div>` : ''}</div>
+          <div class="exd-body"><div class="exd-map">${BODY.svg(m.p, m.s, { captions: true, label: mapLabel })}</div>${musList}</div>${credit}</section>`
+      : m.img
+      ? `<section class="card exd-hero"><div class="exd-media photo" id="exdMedia" data-frames="${m.frames}">
+          <img class="exd-f on" src="${imgUrl(m.img, 0)}" alt="${esc(e.name)}, start position" decoding="async">${m.frames > 1 ? `<img class="exd-f" src="${imgUrl(m.img, 1)}" alt="${esc(e.name)}, end position" decoding="async">` : ''}
+          ${favBtn}${m.frames > 1 ? '<div class="exd-frames" role="group" aria-label="Photo"><button class="on" data-action="ex-frame" data-f="0">Start</button><button data-action="ex-frame" data-f="1">Finish</button></div>' : ''}</div>
+          <div class="exd-body"><div class="exd-map">${BODY.svg(m.p, m.s, { captions: true, label: mapLabel })}</div>${musList}</div>
+          <div class="exd-credit">Photos: free-exercise-db (public domain)</div></section>`
+      : `<section class="card exd-hero"><div class="exd-media diagram" id="exdMedia">${favBtn}<div class="exd-map big">${BODY.svg(m.p, m.s, { captions: true, label: mapLabel })}</div></div>
+          <div class="exd-body nomap">${musList}</div></section>`;
+    const head = hero + `<section class="card exd-head"><div class="exh-meta">${metaLine(e.cat, e.sub && e.sub !== e.cat ? e.sub : '', e.equip) || 'Your exercise'}${li ? '' : '<span class="tag-custom">Custom</span>'}</div>
       <a class="btn demo block" id="watchDemo" href="${esc(demoUrl(e.name))}" target="_blank" rel="noopener">${PLAY_SVG} Watch demo</a>
       <div class="hint">Opens YouTube form videos for “${esc(e.name)}”.</div></section>
       <div class="sec-title">Notes / cues</div>
@@ -554,9 +681,24 @@
         <div><label class="f" for="exCat">Category</label><select id="exCat" data-bind="exdef" data-k="cat">${cats}</select></div>
       </section>
       ${e.virtual ? '' : `<button class="btn danger block" data-action="ex-delete" data-id="${e.id}">${li ? 'Remove from saved exercises' : 'Delete exercise'}</button>`}`;
+    startFrames();
     const ta = document.getElementById('exNotes');
     const fit = () => { ta.style.height = 'auto'; ta.style.height = Math.min(ta.scrollHeight + 2, 420) + 'px'; };
     fit(); ta.addEventListener('input', fit);
+  }
+
+  // detail photos: gentle start/finish crossfade until he picks a frame
+  let frameT = null;
+  function showFrame(f) {
+    const box = document.getElementById('exdMedia'); if (!box) return;
+    box.querySelectorAll('.exd-f').forEach((im, i) => im.classList.toggle('on', i === f));
+    box.querySelectorAll('.exd-frames button').forEach((b) => { const on = +b.dataset.f === f; b.classList.toggle('on', on); b.setAttribute('aria-pressed', on); });
+  }
+  function startFrames() {
+    clearInterval(frameT); frameT = null;
+    const box = document.getElementById('exdMedia'); if (!box || +box.dataset.frames < 2) return;
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    let f = 0; frameT = setInterval(() => { if (!document.body.contains(box)) { clearInterval(frameT); return; } f = 1 - f; showFrame(f); }, 1800);
   }
 
   function viewTemplates() {
@@ -607,6 +749,8 @@
         <div class="hint">${plural(st.workouts, 'workout')} · ${plural(state.exercises.length, 'exercise')} · ${plural(state.templates.length, 'template')} · <span id="persist">checking storage…</span></div></section>
       <div class="sec-title">Danger zone</div><section class="card">
         <button class="btn danger block" data-action="wipe">Erase all data</button></section>
+      <div class="sec-title">About</div><section class="card">
+        <div class="hint" id="photoCredit" style="margin-top:0">Exercise photos: <a href="https://github.com/yuhonas/free-exercise-db" target="_blank" rel="noopener">free-exercise-db</a> (public domain). Muscle diagrams: SlimTucci.</div></section>
       <div class="foot">SlimTucci Workout Diary · works offline<br>Add to Home Screen from your browser’s Share / ⋮ menu</div>`;
     if (navigator.storage && navigator.storage.persisted) navigator.storage.persisted().then((p) => { const el = document.getElementById('persist'); if (el) el.textContent = p ? 'storage: persistent' : 'storage: best-effort'; });
     else document.getElementById('persist').textContent = 'storage: local';
@@ -955,9 +1099,10 @@
     if (hpath === '#/whoop' && hquery) handleWhoopReturn(hquery);
     const [r, id] = (location.hash.split('?')[0].replace(/^#\/?/, '') || '').split('/');
     window.scrollTo(0, 0);
+    clearInterval(frameT); frameT = null;
     if (r === 'log') viewLog(id);
     else if (r === 'history') viewHistory();
-    else if (r === 'exercises') viewExercises();
+    else if (r === 'exercises') { viewExercises(); if (exTab.y) { const y = exTab.y; exTab.y = 0; requestAnimationFrame(() => window.scrollTo(0, y)); } }
     else if (r === 'exercise') viewExercise(id);
     else if (r === 'templates') viewTemplates();
     else if (r === 'template') viewTemplate(id);
@@ -1009,6 +1154,11 @@
       case 'hist-clear': histQ = ''; render(); break;
       case 'cues-reset': { const e = exById(curId()); if (e) { e.notes = ''; e.notesEdited = false; save(); rerenderKeepScroll(); toast('Default cues restored'); } break; }
       case 'lib-reorder': reorderSheet(); break;
+      case 'ex-frame': clearInterval(frameT); frameT = null; showFrame(+d.f); break;
+      case 'fav-toggle': {
+        const on = toggleFav(d.key); el.classList.toggle('on', on); el.setAttribute('aria-pressed', on); el.setAttribute('aria-label', (on ? 'Unsave' : 'Save') + ' exercise');
+        el.querySelector('span').textContent = on ? 'Saved' : 'Save'; toast(on ? 'Saved to your exercises list' : 'Removed from Saved'); break;
+      }
       case 'ex-delete': {
         const e = exById(d.id);
         if (!confirm(`${libOf(e) ? 'Remove' : 'Delete'} “${e.name}” from your saved exercises? Past workouts keep their logs; it is removed from templates.${libOf(e) ? ' It stays in the list, with the default cues.' : ''}`)) break;
@@ -1053,7 +1203,7 @@
       case 'import': document.getElementById('importFile').click(); break;
       case 'wipe':
         if (confirm('Erase ALL workouts, exercises and templates on this phone? Export a backup first!') && confirm('Really erase everything?')) {
-          state = { version: 1, settings: { programStart: weekStart(todayStr()), samplesCleared: true }, exercises: [], templates: [], sessions: [], plans: [], macros: null, burn: null }; save(); toast('All data erased'); go('#/');
+          state = { version: 1, settings: { programStart: weekStart(todayStr()), samplesCleared: true, favs: [] }, exercises: [], templates: [], sessions: [], plans: [], macros: null, burn: null }; save(); toast('All data erased'); go('#/');
         }
         break;
     }
@@ -1063,11 +1213,24 @@
   $app.addEventListener('click', (ev) => {
     if (!location.hash.startsWith('#/exercises')) return;
     const chip = ev.target.closest('[data-chip]');
-    if (chip) { exTab.chip = chip.dataset.chip; exTab.limit = 80; document.querySelectorAll('#app .chip').forEach((b) => { b.classList.toggle('on', b === chip); b.setAttribute('aria-selected', b === chip); }); drawExResults(); return; }
+    if (chip) {
+      exTab.chip = exTab.chip === chip.dataset.chip && chip.dataset.chip !== 'all' ? 'all' : chip.dataset.chip; exTab.limit = EX_BATCH; // tap the active chip again to clear it
+      document.querySelectorAll('#app .chip').forEach((b) => { const on = b.dataset.chip === exTab.chip; b.classList.toggle('on', on); b.setAttribute('aria-selected', on); });
+      drawExResults(); const sb = document.querySelector('.ex-search'); if (sb && window.scrollY > sb.offsetTop) window.scrollTo(0, 0); return;
+    }
+    if (ev.target.closest('.exg a[href^="#/exercise/"]')) { exTab.y = window.scrollY; return; } // remember where he was in the grid
     const x = ev.target.closest('[data-x]'); if (!x) return;
+    if (x.dataset.x === 'fav') {
+      const on = toggleFav(x.dataset.key), card = x.closest('.exg');
+      x.setAttribute('aria-pressed', on); x.setAttribute('aria-label', x.getAttribute('aria-label').replace(/^(Uns|S)ave/, on ? 'Unsave' : 'Save'));
+      if (card) card.classList.toggle('fav', on);
+      const sc = document.querySelector('.mchips [data-chip="saved"] .mchip-l'); if (sc) sc.textContent = `Saved${state.settings.favs.length ? ' ' + state.settings.favs.length : ''}`;
+      if (exTab.chip === 'saved' && !on) drawExResults();
+      toast(on ? 'Saved' : 'Removed from Saved'); return;
+    }
     if (x.dataset.x === 'custom') {
       const r = createCustom(exTab.q, exTab.chip !== 'all' ? exTab.chip : null); exTab.q = ''; toast(`Added “${r.ex.name}”`); location.hash = '#/exercise/' + r.ex.id;
-    } else if (x.dataset.x === 'more') { exTab.limit += 150; drawExResults(); }
+    } else if (x.dataset.x === 'more') moreExResults();
   });
 
   function exportJSON() {
@@ -1136,11 +1299,15 @@
   $app.addEventListener('input', onField);
   $app.addEventListener('change', onField);
   window.addEventListener('hashchange', render);
+  if (window.matchMedia) {
+    const mq = window.matchMedia('(prefers-color-scheme: dark)'), onScheme = () => { BODY.clearCache(); if (/^#\/exercise/.test(location.hash)) rerenderKeepScroll(); };
+    if (mq.addEventListener) mq.addEventListener('change', onScheme); else if (mq.addListener) mq.addListener(onScheme);
+  }
   window.addEventListener('pagehide', save);
   document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') save(); });
 
   // expose helpers for testing / debugging
-  window.SlimTucci = { computeTargets: (p, x) => MAC.computeTargets(p, x), computeBurnExtra: MAC.computeBurnExtra, caloriesBurnedToday, adjustedToday, whoopConfigured: () => !!WHOOP_URL, dashSync: () => dashSync('manual'), dashStatusText: () => dashStatusText(), demoUrl, libCues: (name) => { const li = LIB_BY_KEY.get(norm(name)); return li ? li.cues.slice() : null; }, cuesFor: (name) => { const e = findMineByName(name); return e ? cuesText(e) : null; }, weekStart, weekEnd, weekNum, weekLabel, search: (q) => searchList(LIB_ITEMS, q, (x) => x.hay, (x) => x.key).slice(0, 10).map((x) => x.name), libSize: LIB_ITEMS.length, get state() { return state; } };
+  window.SlimTucci = { computeTargets: (p, x) => MAC.computeTargets(p, x), computeBurnExtra: MAC.computeBurnExtra, caloriesBurnedToday, adjustedToday, whoopConfigured: () => !!WHOOP_URL, dashSync: () => dashSync('manual'), dashStatusText: () => dashStatusText(), demoUrl, libCues: (name) => { const li = LIB_BY_KEY.get(norm(name)); return li ? li.cues.slice() : null; }, cuesFor: (name) => { const e = findMineByName(name); return e ? cuesText(e) : null; }, weekStart, weekEnd, weekNum, weekLabel, search: (q) => searchList(LIB_ITEMS, q, (x) => x.hay, (x) => x.key).slice(0, 10).map((x) => x.name), libSize: LIB_ITEMS.length, media: (name) => { const li = LIB_BY_KEY.get(norm(name)); return li ? mediaOf(li, name, li.cat) : null; }, mediaCount: () => LIB_ITEMS.filter((x) => mediaOf(x).img).length, get state() { return state; } };
 
   render();
   setTimeout(() => dashSync('open'), 1500); // on app open

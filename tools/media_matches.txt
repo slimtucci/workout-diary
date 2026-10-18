@@ -1,0 +1,628 @@
+# 320/627 library movements matched to a free-exercise-db photo; 307 diagram-only
+Barbell Bench Press | alias | Barbell Bench Press - Medium Grip
+Close-Grip Barbell Bench Press | exact | Close-Grip Barbell Bench Press
+Paused Barbell Bench Press | alias | Barbell Bench Press - Medium Grip
+Incline Barbell Bench Press | alias | Barbell Incline Bench Press - Medium Grip
+Decline Barbell Bench Press | exact | Decline Barbell Bench Press
+Floor Press | exact | Floor Press
+Spoto Press | diagram | 
+Pin Press | exact | Pin Presses
+Board Press | exact | Board Press
+Smith Machine Bench Press | exact | Smith Machine Bench Press
+Smith Machine Incline Press | alias | Smith Machine Incline Bench Press
+Dumbbell Bench Press | exact | Dumbbell Bench Press
+Incline Dumbbell Bench Press | alias | Incline Dumbbell Press
+Decline Dumbbell Bench Press | exact | Decline Dumbbell Bench Press
+Single-Arm Dumbbell Bench Press | alias | One Arm Dumbbell Bench Press
+Alternating Dumbbell Bench Press | alias | Dumbbell Bench Press
+Neutral-Grip Dumbbell Bench Press | alias | Dumbbell Bench Press with Neutral Grip
+Dumbbell Floor Press | exact | Dumbbell Floor Press
+Single-Arm Dumbbell Floor Press | diagram | 
+Dumbbell Squeeze Press | diagram | 
+Dumbbell Fly | exact | Dumbbell Flyes
+Incline Dumbbell Fly | exact | Incline Dumbbell Flyes
+Kettlebell Floor Press | alias | One-Arm Kettlebell Floor Press
+Single-Arm Kettlebell Floor Press | alias | One-Arm Kettlebell Floor Press
+Cable Fly | alias | Cable Crossover
+High-to-Low Cable Fly | alias | Cable Crossover
+Low-to-High Cable Fly | alias | Low Cable Crossover
+Single-Arm Cable Fly | alias | Single-Arm Cable Crossover
+Standing Cable Chest Press | exact | Standing Cable Chest Press
+Single-Arm Cable Chest Press | diagram | 
+Machine Chest Press | alias | Leverage Chest Press
+Incline Machine Chest Press | alias | Leverage Incline Chest Press
+Pec Deck Fly | alias | Butterfly
+Hammer Strength Chest Press | alias | Leverage Chest Press
+Push-Up | exact | Pushups
+Wide Push-Up | alias | Push-Up Wide
+Diamond Push-Up | alias | Push-Ups - Close Triceps Position
+Incline Push-Up | exact | Incline Push-Up
+Decline Push-Up | exact | Decline Push-Up
+Deficit Push-Up | diagram | 
+Archer Push-Up | diagram | 
+Weighted Push-Up | diagram | 
+Band-Resisted Push-Up | diagram | 
+Single-Arm Push-Up | exact | Single-Arm Push-Up
+Ring Push-Up | diagram | 
+Chest Dip | alias | Dips - Chest Version
+Weighted Dip | diagram | 
+Ring Dip | exact | Ring Dips
+Landmine Chest Press | diagram | 
+Svend Press | exact | Svend Press
+Barbell Overhead Press | alias | Standing Military Press
+Push Press | exact | Push Press
+Behind-the-Neck Press | alias | Standing Barbell Press Behind Neck
+Z Press | diagram | 
+Seated Barbell Shoulder Press | alias | Seated Barbell Military Press
+Dumbbell Shoulder Press | exact | Dumbbell Shoulder Press
+Seated Dumbbell Shoulder Press | alias | Seated Dumbbell Press
+Single-Arm Dumbbell Shoulder Press | alias | Dumbbell One-Arm Shoulder Press
+Arnold Press | alias | Arnold Dumbbell Press
+Kettlebell Overhead Press | alias | Two-Arm Kettlebell Military Press
+Single-Arm Kettlebell Press | diagram | 
+Bottoms-Up Kettlebell Press | diagram | 
+Half-Kneeling Single-Arm Press | diagram | 
+Landmine Press | diagram | 
+Single-Arm Landmine Press | diagram | 
+Half-Kneeling Landmine Press | diagram | 
+Landmine Push Press | diagram | 
+Machine Shoulder Press | alias | Machine Shoulder (Military) Press
+Smith Machine Shoulder Press | alias | Smith Machine Overhead Shoulder Press
+Pike Push-Up | diagram | 
+Handstand Push-Up | exact | Handstand Push-Ups
+Wall Walk | diagram | 
+Dumbbell Lateral Raise | alias | Side Lateral Raise
+Cable Lateral Raise | alias | Standing Low-Pulley Deltoid Raise
+Machine Lateral Raise | diagram | 
+Lean-Away Lateral Raise | diagram | 
+Dumbbell Front Raise | alias | Front Dumbbell Raise
+Plate Front Raise | alias | Front Plate Raise
+Cable Front Raise | alias | Front Cable Raise
+Rear Delt Fly | alias | Reverse Flyes
+Reverse Pec Deck | alias | Reverse Machine Flyes
+Cable Rear Delt Fly | exact | Cable Rear Delt Fly
+Band Pull-Apart | exact | Band Pull Apart
+Face Pull | exact | Face Pull
+Band Face Pull | diagram | 
+Y-T-W Raise | diagram | 
+Barbell Upright Row | alias | Upright Barbell Row
+Cable Upright Row | alias | Upright Cable Row
+Dumbbell External Rotation | alias | External Rotation
+Cable External Rotation | alias | External Rotation with Cable
+Band External Rotation | alias | External Rotation with Band
+Cable Internal Rotation | exact | Cable Internal Rotation
+Cuban Press | exact | Cuban Press
+Overhead Plate Raise | diagram | 
+Close-Grip Push-Up | alias | Push-Ups - Close Triceps Position
+Bench Dip | exact | Bench Dips
+Triceps Pushdown | exact | Triceps Pushdown
+Rope Triceps Pushdown | alias | Triceps Pushdown - Rope Attachment
+Single-Arm Cable Pushdown | diagram | 
+Overhead Cable Triceps Extension | alias | Cable Rope Overhead Triceps Extension
+Skull Crusher | alias | EZ-Bar Skullcrusher
+Dumbbell Skull Crusher | alias | Lying Dumbbell Tricep Extension
+Overhead Dumbbell Triceps Extension | alias | Standing Dumbbell Triceps Extension
+Single-Arm Overhead Dumbbell Extension | alias | Standing One-Arm Dumbbell Triceps Extension
+Dumbbell Triceps Kickback | alias | Tricep Dumbbell Kickback
+Cable Triceps Kickback | diagram | 
+JM Press | exact | JM Press
+Tate Press | exact | Tate Press
+Band Triceps Pushdown | diagram | 
+Machine Triceps Extension | exact | Machine Triceps Extension
+Machine Dip | alias | Dip Machine
+Pull-Up | exact | Pullups
+Chin-Up | exact | Chin-Up
+Neutral-Grip Pull-Up | alias | V-Bar Pullup
+Wide-Grip Pull-Up | alias | Pullups
+Weighted Pull-Up | exact | Weighted Pull Ups
+Weighted Chin-Up | diagram | 
+Band-Assisted Pull-Up | exact | Band Assisted Pull-Up
+Assisted Pull-Up Machine | diagram | 
+Negative Pull-Up | alias | Pullups
+Scapular Pull-Up | exact | Scapular Pull-Up
+Commando Pull-Up | diagram | 
+Lat Pulldown | alias | Wide-Grip Lat Pulldown
+Close-Grip Lat Pulldown | alias | Close-Grip Front Lat Pulldown
+Neutral-Grip Lat Pulldown | alias | V-Bar Pulldown
+Single-Arm Lat Pulldown | alias | One Arm Lat Pulldown
+Straight-Arm Pulldown | exact | Straight-Arm Pulldown
+Kneeling Single-Arm Pulldown | alias | Kneeling Single-Arm High Pulley Row
+Band Lat Pulldown | diagram | 
+Barbell Bent-Over Row | alias | Bent Over Barbell Row
+Pendlay Row | alias | Bent Over Barbell Row
+Yates Row | alias | Reverse Grip Bent-Over Rows
+Seal Row | alias | Lying Cambered Barbell Row
+T-Bar Row | alias | T-Bar Row with Handle
+Meadows Row | alias | Bent Over One-Arm Long Bar Row
+Landmine Row | alias | Bent Over Two-Arm Long Bar Row
+Dumbbell Row | alias | Bent Over Two-Dumbbell Row
+Single-Arm Dumbbell Row | alias | One-Arm Dumbbell Row
+Chest-Supported Dumbbell Row | alias | Dumbbell Incline Row
+Incline Dumbbell Row | alias | Dumbbell Incline Row
+Kroc Row | alias | One-Arm Dumbbell Row
+Renegade Row | alias | Alternating Renegade Row
+Kettlebell Row | alias | Two-Arm Kettlebell Row
+Single-Arm Kettlebell Row | alias | One-Arm Kettlebell Row
+Gorilla Row | alias | Alternating Kettlebell Row
+Seated Cable Row | exact | Seated Cable Rows
+Single-Arm Seated Cable Row | alias | Seated One-arm Cable Pulley Rows
+Wide-Grip Seated Cable Row | diagram | 
+Half-Kneeling Single-Arm Cable Row | diagram | 
+Standing Cable Row | diagram | 
+Machine Row | alias | Leverage Iso Row
+Chest-Supported Machine Row | alias | Leverage Iso Row
+Hammer Strength High Row | alias | Leverage High Row
+Inverted Row | exact | Inverted Row
+Ring Row | alias | Inverted Row with Straps
+TRX Row | alias | Suspended Row
+Band Row | diagram | 
+Barbell Shrug | exact | Barbell Shrug
+Dumbbell Shrug | exact | Dumbbell Shrug
+Trap Bar Shrug | diagram | 
+Cable Shrug | exact | Cable Shrugs
+Rack Pull | alias | Rack Pulls
+Back Extension | alias | Hyperextensions (Back Extensions)
+45-Degree Back Extension | alias | Hyperextensions (Back Extensions)
+Reverse Hyperextension | exact | Reverse Hyperextension
+Superman Hold | alias | Superman
+Prone Y Raise | diagram | 
+Dumbbell Pullover | alias | Bent-Arm Dumbbell Pullover
+Cable Pullover | diagram | 
+Barbell Curl | exact | Barbell Curl
+EZ-Bar Curl | exact | EZ-Bar Curl
+Dumbbell Curl | alias | Dumbbell Bicep Curl
+Alternating Dumbbell Curl | alias | Dumbbell Alternate Bicep Curl
+Hammer Curl | exact | Hammer Curls
+Cross-Body Hammer Curl | exact | Cross Body Hammer Curl
+Incline Dumbbell Curl | exact | Incline Dumbbell Curl
+Preacher Curl | exact | Preacher Curl
+Dumbbell Preacher Curl | alias | Two-Arm Dumbbell Preacher Curl
+Machine Preacher Curl | exact | Machine Preacher Curls
+Concentration Curl | exact | Concentration Curls
+Spider Curl | exact | Spider Curl
+Zottman Curl | exact | Zottman Curl
+Cable Curl | alias | Standing Biceps Cable Curl
+Single-Arm Cable Curl | alias | Standing One-Arm Cable Curl
+Bayesian Cable Curl | diagram | 
+Rope Hammer Curl | alias | Cable Hammer Curls - Rope Attachment
+Reverse Barbell Curl | exact | Reverse Barbell Curl
+Drag Curl | exact | Drag Curl
+Band Curl | diagram | 
+Kettlebell Curl | diagram | 
+Wrist Curl | alias | Seated Dumbbell Palms-Up Wrist Curl
+Reverse Wrist Curl | alias | Seated Dumbbell Palms-Down Wrist Curl
+Wrist Roller | exact | Wrist Roller
+Plate Pinch | exact | Plate Pinch
+Dead Hang | diagram | 
+Towel Pull-Up | diagram | 
+Fat Grip Hold | diagram | 
+Barbell Back Squat | alias | Barbell Squat
+High-Bar Back Squat | alias | Barbell Squat
+Low-Bar Back Squat | alias | Barbell Squat
+Paused Back Squat | alias | Barbell Squat
+Box Squat | exact | Box Squat
+Pin Squat | diagram | 
+Front Squat | alias | Front Barbell Squat
+Zercher Squat | exact | Zercher Squats
+Safety Bar Squat | diagram | 
+Overhead Squat | exact | Overhead Squat
+Anderson Squat | diagram | 
+Goblet Squat | exact | Goblet Squat
+Kettlebell Goblet Squat | alias | Goblet Squat
+Double Kettlebell Front Squat | alias | Front Squats With Two Kettlebells
+Dumbbell Squat | exact | Dumbbell Squat
+Landmine Squat | diagram | 
+Heels-Elevated Goblet Squat | diagram | 
+Smith Machine Squat | exact | Smith Machine Squat
+Hack Squat | exact | Hack Squat
+Pendulum Squat | diagram | 
+Belt Squat | diagram | 
+Leg Press | exact | Leg Press
+Single-Leg Leg Press | diagram | 
+Sissy Squat | alias | Weighted Sissy Squat
+Bodyweight Squat | exact | Bodyweight Squat
+Jump Squat | alias | Freehand Jump Squat
+Wall Sit | diagram | 
+Pistol Squat | diagram | 
+Box Pistol Squat | diagram | 
+Skater Squat | diagram | 
+Shrimp Squat | diagram | 
+Cossack Squat | diagram | 
+Goblet Cossack Squat | diagram | 
+Lateral Squat | diagram | 
+Sumo Squat | alias | Plie Dumbbell Squat
+Leg Extension | exact | Leg Extensions
+Single-Leg Leg Extension | exact | Single-Leg Leg Extension
+Spanish Squat | diagram | 
+Conventional Deadlift | alias | Barbell Deadlift
+Sumo Deadlift | exact | Sumo Deadlift
+Trap Bar Deadlift | exact | Trap Bar Deadlift
+High-Handle Trap Bar Deadlift | alias | Trap Bar Deadlift
+Deficit Deadlift | exact | Deficit Deadlift
+Paused Deadlift | alias | Barbell Deadlift
+Snatch-Grip Deadlift | alias | Snatch Deadlift
+Romanian Deadlift | exact | Romanian Deadlift
+Dumbbell Romanian Deadlift | alias | Stiff-Legged Dumbbell Deadlift
+Kettlebell Romanian Deadlift | diagram | 
+Single-Leg Romanian Deadlift | alias | Kettlebell One-Legged Deadlift
+Kickstand Romanian Deadlift | diagram | 
+Landmine Romanian Deadlift | diagram | 
+Landmine Single-Leg Romanian Deadlift | diagram | 
+Cable Romanian Deadlift | diagram | 
+Stiff-Leg Deadlift | alias | Stiff-Legged Barbell Deadlift
+Good Morning | exact | Good Morning
+Seated Good Morning | alias | Seated Good Mornings
+Kettlebell Swing | diagram | 
+Single-Arm Kettlebell Swing | alias | One-Arm Kettlebell Swings
+American Kettlebell Swing | diagram | 
+Kettlebell Deadlift | diagram | 
+Suitcase Deadlift | diagram | 
+Cable Pull-Through | alias | Pull Through
+Band Pull-Through | alias | Band Good Morning (Pull Through)
+Lying Leg Curl | exact | Lying Leg Curls
+Seated Leg Curl | exact | Seated Leg Curl
+Single-Leg Lying Leg Curl | diagram | 
+Nordic Hamstring Curl | alias | Natural Glute Ham Raise
+Glute-Ham Raise | exact | Glute Ham Raise
+Swiss Ball Hamstring Curl | alias | Ball Leg Curl
+Slider Hamstring Curl | diagram | 
+Single-Leg Swiss Ball Hamstring Curl | diagram | 
+Forward Lunge | diagram | 
+Reverse Lunge | diagram | 
+Dumbbell Reverse Lunge | alias | Dumbbell Rear Lunge
+Barbell Reverse Lunge | diagram | 
+Deficit Reverse Lunge | diagram | 
+Dumbbell Walking Lunge | alias | Dumbbell Lunges
+Barbell Walking Lunge | exact | Barbell Walking Lunge
+Front-Foot-Elevated Split Squat | diagram | 
+Bulgarian Split Squat | alias | Split Squat with Dumbbells
+Barbell Bulgarian Split Squat | diagram | 
+Smith Machine Split Squat | alias | Smith Single-Leg Split Squat
+Split Squat | exact | Split Squats
+Dumbbell Split Squat | diagram | 
+Landmine Reverse Lunge | diagram | 
+Goblet Reverse Lunge | diagram | 
+Curtsy Lunge | diagram | 
+Lateral Lunge | diagram | 
+Dumbbell Lateral Lunge | diagram | 
+Goblet Lateral Lunge | diagram | 
+Slider Lateral Lunge | diagram | 
+Slider Reverse Lunge | diagram | 
+Crossover Step-Up | diagram | 
+Step-Up | diagram | 
+Dumbbell Step-Up | exact | Dumbbell Step Ups
+Barbell Step-Up | exact | Barbell Step Ups
+Lateral Step-Up | diagram | 
+Step-Down | diagram | 
+Jumping Lunge | diagram | 
+Overhead Walking Lunge | diagram | 
+Rotational Lunge | diagram | 
+Barbell Hip Thrust | exact | Barbell Hip Thrust
+Single-Leg Hip Thrust | diagram | 
+Dumbbell Hip Thrust | diagram | 
+Machine Hip Thrust | diagram | 
+Glute Bridge | alias | Butt Lift (Bridge)
+Barbell Glute Bridge | exact | Barbell Glute Bridge
+Single-Leg Glute Bridge | exact | Single Leg Glute Bridge
+Frog Pump | diagram | 
+Cable Kickback | alias | One-Legged Cable Kickback
+Cable Hip Abduction | diagram | 
+Hip Abduction Machine | alias | Thigh Abductor
+Hip Adduction Machine | alias | Thigh Adductor
+Banded Lateral Walk | diagram | 
+Monster Walk | exact | Monster Walk
+Clamshell | diagram | 
+Fire Hydrant | diagram | 
+Side-Lying Hip Abduction | diagram | 
+Copenhagen Plank | diagram | 
+Copenhagen Adduction | diagram | 
+45-Degree Hip Extension | diagram | 
+Reverse Nordic | diagram | 
+Standing Calf Raise | exact | Standing Calf Raises
+Seated Calf Raise | exact | Seated Calf Raise
+Single-Leg Calf Raise | diagram | 
+Smith Machine Calf Raise | exact | Smith Machine Calf Raise
+Leg Press Calf Raise | alias | Calf Press On The Leg Press Machine
+Donkey Calf Raise | exact | Donkey Calf Raises
+Bent-Knee Calf Raise | diagram | 
+Tibialis Raise | diagram | 
+Banded Tibialis Raise | diagram | 
+Pogo Jump | diagram | 
+Front Plank | alias | Plank
+Weighted Plank | diagram | 
+RKC Plank | alias | Plank
+Long-Lever Plank | diagram | 
+Plank Shoulder Tap | diagram | 
+Body Saw | diagram | 
+Ab Wheel Rollout | alias | Ab Roller
+Kneeling Ab Wheel Rollout | alias | Ab Roller
+Barbell Rollout | alias | Barbell Ab Rollout
+Swiss Ball Rollout | diagram | 
+Stir the Pot | diagram | 
+Dead Bug | exact | Dead Bug
+Weighted Dead Bug | diagram | 
+Band Dead Bug | diagram | 
+Hollow Body Hold | diagram | 
+Hollow Rock | diagram | 
+Bear Crawl Hold | diagram | 
+TRX Fallout | alias | Suspended Fallout
+Pallof Press | exact | Pallof Press
+Band Pallof Press | alias | Pallof Press
+Half-Kneeling Pallof Press | diagram | 
+Tall-Kneeling Pallof Press | diagram | 
+Split-Stance Pallof Press | diagram | 
+Pallof Press with Overhead Reach | diagram | 
+Pallof Hold | diagram | 
+Side Plank | alias | Side Bridge
+Side Plank with Hip Dip | diagram | 
+Side Plank Row | diagram | 
+Renegade Row Hold | diagram | 
+Bird Dog | diagram | 
+Suitcase Hold | diagram | 
+Single-Arm Plank | diagram | 
+Cable Woodchop | alias | Standing Cable Wood Chop
+High-to-Low Cable Woodchop | alias | Standing Cable Wood Chop
+Low-to-High Cable Woodchop | alias | Standing Cable Lift
+Half-Kneeling Cable Chop | diagram | 
+Half-Kneeling Cable Lift | diagram | 
+Landmine Rotation | alias | Landmine 180's
+Landmine 180 | alias | Landmine 180's
+Landmine Rainbow | diagram | 
+Russian Twist | exact | Russian Twist
+Band Rotation | diagram | 
+Cable Rotation | diagram | 
+Med Ball Rotational Throw | diagram | 
+Med Ball Scoop Toss | alias | Medicine Ball Scoop Throw
+Med Ball Side Toss | diagram | 
+Windshield Wiper | diagram | 
+Seated Cable Rotation | diagram | 
+Rotational Med Ball Slam | diagram | 
+Crunch | exact | Crunches
+Cable Crunch | exact | Cable Crunch
+Decline Crunch | exact | Decline Crunch
+Machine Crunch | alias | Ab Crunch Machine
+Sit-Up | exact | Sit-Up
+Weighted Sit-Up | diagram | 
+V-Up | diagram | 
+Toe Touch | alias | Toe Touchers
+Reverse Crunch | exact | Reverse Crunch
+Hanging Leg Raise | exact | Hanging Leg Raise
+Hanging Knee Raise | diagram | 
+Toes-to-Bar | diagram | 
+Captain's Chair Leg Raise | alias | Knee/Hip Raise On Parallel Bars
+Lying Leg Raise | alias | Flat Bench Lying Leg Raise
+Dragon Flag | diagram | 
+L-Sit | diagram | 
+Bicycle Crunch | alias | Air Bike
+Mountain Climber | alias | Mountain Climbers
+Dumbbell Side Bend | exact | Dumbbell Side Bend
+Cable Side Bend | diagram | 
+Hanging Oblique Knee Raise | diagram | 
+Swiss Ball Pike | diagram | 
+Swiss Ball Knee Tuck | alias | Exercise Ball Pull-In
+TRX Pike | diagram | 
+Power Clean | exact | Power Clean
+Hang Power Clean | alias | Hang Clean
+Hang Clean | exact | Hang Clean
+Clean | exact | Clean
+Clean Pull | exact | Clean Pull
+High Pull | diagram | 
+Muscle Clean | diagram | 
+Power Snatch | exact | Power Snatch
+Hang Power Snatch | alias | Hang Snatch
+Hang Snatch | exact | Hang Snatch
+Snatch | exact | Snatch
+Snatch Pull | exact | Snatch Pull
+Snatch Balance | exact | Snatch Balance
+Clean and Jerk | exact | Clean and Jerk
+Split Jerk | exact | Split Jerk
+Push Jerk | alias | Power Jerk
+Clean and Press | exact | Clean and Press
+Dumbbell Snatch | diagram | 
+Dumbbell Hang Clean | alias | Dumbbell Clean
+Dumbbell Clean and Press | diagram | 
+Kettlebell Clean | alias | One-Arm Kettlebell Clean
+Kettlebell Snatch | alias | One-Arm Kettlebell Snatch
+Kettlebell Clean and Jerk | alias | One-Arm Kettlebell Clean and Jerk
+Landmine Clean | diagram | 
+Single-Arm Landmine Clean and Press | diagram | 
+Trap Bar Jump | diagram | 
+Box Jump | alias | Front Box Jump
+Seated Box Jump | diagram | 
+Depth Jump | alias | Linear Depth Jump
+Depth Drop | diagram | 
+Broad Jump | alias | Standing Long Jump
+Single-Leg Broad Jump | diagram | 
+Vertical Jump | diagram | 
+Tuck Jump | alias | Knee Tuck Jump
+Squat Jump | alias | Freehand Jump Squat
+Split Squat Jump | alias | Split Jump
+Single-Leg Box Jump | diagram | 
+Hurdle Hop | alias | Hurdle Hops
+Lateral Hurdle Hop | alias | Lateral Cone Hops
+Lateral Box Jump | exact | Lateral Box Jump
+Bounding | diagram | 
+Lateral Bound | exact | Lateral Bound
+Skater Bound | alias | Lateral Bound
+Single-Leg Hop | diagram | 
+Ankle Hop | diagram | 
+Plyo Push-Up | exact | Plyo Push-up
+Clap Push-Up | alias | Plyo Push-up
+Med Ball Chest Pass | alias | Medicine Ball Chest Pass
+Med Ball Overhead Throw | alias | Standing Two-Arm Overhead Throw
+Med Ball Slam | alias | Overhead Slam
+Med Ball Scoop Throw | alias | Medicine Ball Scoop Throw
+Med Ball Shot Put | diagram | 
+Med Ball Backward Overhead Throw | alias | Backward Medicine Ball Throw
+Farmer's Carry | alias | Farmer's Walk
+Trap Bar Carry | diagram | 
+Kettlebell Farmer's Carry | diagram | 
+Suitcase Carry | diagram | 
+Overhead Carry | diagram | 
+Single-Arm Overhead Carry | diagram | 
+Front Rack Carry | diagram | 
+Waiter's Carry | diagram | 
+Mixed Carry | diagram | 
+Goblet Carry | diagram | 
+Zercher Carry | diagram | 
+Sandbag Bear-Hug Carry | diagram | 
+Sandbag Shoulder Carry | diagram | 
+Yoke Carry | alias | Yoke Walk
+Bottoms-Up Kettlebell Carry | diagram | 
+Strongman Farmer's Walk | alias | Farmer's Walk
+Sled Push | exact | Sled Push
+Sled Pull | alias | Sled Drag - Harness
+Backward Sled Drag | alias | Backward Drag
+Lateral Sled Drag | diagram | 
+Sled Rope Pull | diagram | 
+Prowler Push | alias | Sled Push
+Tire Flip | exact | Tire Flip
+Atlas Stone Lift | alias | Atlas Stones
+Sandbag Clean | diagram | 
+Sandbag Over Shoulder | diagram | 
+Log Clean and Press | alias | Log Lift
+Axle Deadlift | exact | Axle Deadlift
+Keg Carry | diagram | 
+Sledgehammer Strike | alias | Sledgehammer Swings
+Battle Rope Waves | alias | Battling Ropes
+Battle Rope Slams | diagram | 
+Scrum Machine Drive | diagram | 
+Treadmill Run | alias | Running, Treadmill
+Incline Treadmill Walk | alias | Walking, Treadmill
+Rowing Machine | alias | Rowing, Stationary
+Assault Bike | diagram | 
+Stationary Bike | alias | Bicycling, Stationary
+Spin Bike | diagram | 
+SkiErg | diagram | 
+Elliptical | alias | Elliptical Trainer
+Stair Climber | alias | Stairmaster
+VersaClimber | diagram | 
+Curved Treadmill Sprint | diagram | 
+Outdoor Run | diagram | 
+Sprint | diagram | 
+Hill Sprint | diagram | 
+Shuttle Run | diagram | 
+300-Yard Shuttle | diagram | 
+Tempo Run | diagram | 
+Bronco Test | diagram | 
+Yo-Yo Intermittent Run | diagram | 
+Burpee | diagram | 
+Burpee Broad Jump | diagram | 
+Jumping Jack | diagram | 
+Jump Rope | alias | Rope Jumping
+Double-Under | diagram | 
+High Knees | diagram | 
+Butt Kicks | diagram | 
+Bear Crawl | diagram | 
+Crab Walk | diagram | 
+Swimming | diagram | 
+Cycling | diagram | 
+Thruster | diagram | 
+Dumbbell Thruster | diagram | 
+Wall Ball | diagram | 
+Man Maker | diagram | 
+Devil Press | diagram | 
+Kettlebell Complex | diagram | 
+Barbell Complex | diagram | 
+Lateral Shuffle | diagram | 
+Banded Lateral Shuffle | diagram | 
+Defensive Slide | diagram | 
+Carioca | diagram | 
+Crossover Run | diagram | 
+5-10-5 Pro Agility Drill | diagram | 
+T-Drill | diagram | 
+Box Drill | diagram | 
+L-Drill | diagram | 
+Illinois Agility Drill | diagram | 
+Cone Weave | diagram | 
+Zig-Zag Cone Drill | diagram | 
+Mirror Drill | diagram | 
+Reactive Ball Drop | diagram | 
+Split Step | diagram | 
+Drop Step | diagram | 
+Lateral Crossover Step | diagram | 
+Lateral A-Skip | diagram | 
+Lateral Skater Hop | diagram | 
+Lateral Med Ball Toss and Shuffle | diagram | 
+Band-Resisted Lateral Bound | diagram | 
+Lateral Lunge to Sprint | diagram | 
+Ladder Icky Shuffle | diagram | 
+Ladder Lateral In-Out | diagram | 
+Ladder Two Feet In | diagram | 
+Ladder Single-Leg Hop | diagram | 
+Ladder Crossover | diagram | 
+Dot Drill | diagram | 
+Four-Square Hop | diagram | 
+A-Skip | diagram | 
+B-Skip | diagram | 
+Wall Drill | diagram | 
+Falling Start | diagram | 
+Sled-Resisted Sprint | diagram | 
+Partner-Resisted Sprint | diagram | 
+Backpedal | diagram | 
+Backpedal to Sprint | diagram | 
+World's Greatest Stretch | exact | World's Greatest Stretch
+90/90 Hip Switch | diagram | 
+Hip CARs | diagram | 
+Shoulder CARs | diagram | 
+Cat-Cow | alias | Cat Stretch
+Thoracic Spine Rotation | diagram | 
+Open Book | diagram | 
+Thread the Needle | diagram | 
+Quadruped Rock Back | diagram | 
+Deep Squat Hold | diagram | 
+Goblet Squat Pry | diagram | 
+Ankle Dorsiflexion Mobilization | diagram | 
+Knee-to-Wall Ankle Mobilization | diagram | 
+Leg Swing | diagram | 
+Lateral Leg Swing | diagram | 
+Inchworm | exact | Inchworm
+Spiderman Lunge with Rotation | diagram | 
+Walking Knee Hug | diagram | 
+Walking Quad Pull | diagram | 
+Frankenstein Walk | diagram | 
+Hip Airplane | diagram | 
+Wall Slide | diagram | 
+Scapular Wall Slide | diagram | 
+Band Dislocate | diagram | 
+PVC Pass-Through | diagram | 
+Prone Swimmer | diagram | 
+Wrist Mobility Circles | alias | Wrist Circles
+Neck CARs | diagram | 
+Foam Roll Thoracic Spine | diagram | 
+Foam Roll Quads | alias | Quadriceps-SMR
+Foam Roll IT Band | alias | Iliotibial Tract-SMR
+Foam Roll Lats | alias | Latissimus Dorsi-SMR
+Lacrosse Ball Glute Release | diagram | 
+Lacrosse Ball Pec Release | diagram | 
+Couch Stretch | diagram | 
+Half-Kneeling Hip Flexor Stretch | alias | Kneeling Hip Flexor
+Pigeon Stretch | diagram | 
+Figure-4 Stretch | diagram | 
+Butterfly Stretch | diagram | 
+Frog Stretch | diagram | 
+Seated Hamstring Stretch | alias | Seated Floor Hamstring Stretch
+Standing Hamstring Stretch | diagram | 
+Lying Hamstring Stretch | alias | Leg-Up Hamstring Stretch
+Standing Quad Stretch | diagram | 
+Side-Lying Quad Stretch | alias | On Your Side Quad Stretch
+Adductor Rock Back | diagram | 
+Standing Calf Stretch | alias | Calf Stretch Hands Against Wall
+Soleus Wall Stretch | alias | Standing Soleus And Achilles Stretch
+Child's Pose | exact | Child's Pose
+Cobra Stretch | diagram | 
+Lat Stretch | diagram | 
+Doorway Pec Stretch | diagram | 
+Cross-Body Shoulder Stretch | alias | Shoulder Stretch
+Sleeper Stretch | diagram | 
+Overhead Triceps Stretch | alias | Triceps Stretch
+Upper Trap Stretch | alias | Side Neck Stretch
+Levator Scapulae Stretch | diagram | 
+Wrist Flexor Stretch | diagram | 
+Wrist Extensor Stretch | diagram | 
+Supine Spinal Twist | diagram | 
+Seated Glute Stretch | alias | Seated Glute
+Standing Side Bend Stretch | diagram | 
+Downward Dog | diagram | 
+Happy Baby | diagram | 
+Banded Hip Distraction | diagram | 
