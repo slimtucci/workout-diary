@@ -90,7 +90,9 @@
     const it = li && MEDIA[li.i];
     if (it) m = { img: it[0] || '', p: it[1] ? it[1].split(' ') : [], s: it[2] ? it[2].split(' ') : [], frames: it[3] || 0 };
     else { const g = BODY.inferCustom(name, catKey); m = { img: '', p: g.p, s: g.s, frames: 0 }; }
-    m.art = (li && ART.items[String(li.i)]) || '';
+    const a = li && ART.items[String(li.i)];
+    m.art = a ? (typeof a === 'string' ? a : a.f) : ''; m.artLg = (a && a.lg) || m.art;
+    if (a && a.p) { m.p = a.p.split(' '); m.s = a.s ? a.s.split(' ') : []; } // the designer's muscles win for drawn lifts
     mediaCache.set(ck, m); return m;
   }
   const muscleNames = (list) => list.map((k) => BODY.NAMES[k] || k);
@@ -644,12 +646,12 @@
         <div class="lg"><span class="sw s" aria-hidden="true"></span>Secondary</div><div class="mv" id="exdSecondary">${esc(muscleNames(m.s).join(', ')) || '—'}</div>
         <div class="lg">Equipment</div><div class="mv" id="exdEquip">${esc(e.equip || (li && li.equip) || '—')}</div></div>`;
     const frames = []; // [src, alt, label]
-    if (m.art) frames.push([`img/art/${esc(m.art)}`, `${esc(e.name)} illustration`, 'Drawing']);
+    if (m.art) frames.push([`img/art/${esc(m.artLg)}`, `${esc(e.name)} illustration`, 'Drawing']);
     if (m.img) { frames.push([imgUrl(m.img, 0), `${esc(e.name)}, start position`, 'Start']); if (m.frames > 1) frames.push([imgUrl(m.img, 1), `${esc(e.name)}, end position`, 'Finish']); }
     const credit = m.img ? `<div class="exd-credit">${m.art ? 'Drawing: SlimTucci. ' : ''}Photos: free-exercise-db (public domain)</div>` : m.art ? '<div class="exd-credit">Drawing: SlimTucci</div>' : '';
     const hero = m.art
       ? `<section class="card exd-hero"><div class="exd-media art" id="exdMedia" data-frames="${m.art ? 1 : frames.length}">
-          ${frames.map(([src, alt], i) => `<img class="exd-f${i ? '' : ' on'}${i && m.art ? ' ph' : ''}" src="${src}" alt="${alt}" decoding="async">`).join('')}
+          ${frames.map(([src, alt], i) => `<img class="exd-f${i ? '' : ' on'}${i && m.art ? ' ph' : ''}" src="${src}" alt="${alt}" loading="lazy" decoding="async"${i ? '' : ' width="1024" height="1024"'}>`).join('')}
           ${favBtn}${frames.length > 1 ? `<div class="exd-frames" role="group" aria-label="Picture">${frames.map(([, , l], i) => `<button class="${i ? '' : 'on'}" data-action="ex-frame" data-f="${i}">${l}</button>`).join('')}</div>` : ''}</div>
           <div class="exd-body"><div class="exd-map">${BODY.svg(m.p, m.s, { captions: true, label: mapLabel })}</div>${musList}</div>${credit}</section>`
       : m.img

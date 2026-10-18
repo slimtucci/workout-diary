@@ -118,7 +118,12 @@ with sync_playwright() as p:
     page.fill("#exQ", ""); page.wait_for_timeout(100)
     med = page.evaluate("() => ({ n: window.SlimTucci.mediaCount(), lib: window.SlimTucci.libSize, items: (window.SLIMTUCCI_MEDIA||{}).items.length, art: Object.keys((window.SLIMTUCCI_ART||{}).items||{}).length })")
     check("media layer: 300+ of 627 movements matched to a public-domain photo, index-aligned", med["items"] == med["lib"] == 627 and med["n"] >= 300, str(med))
-    check("art layer: the 3 SlimTucci drawings are mapped (squat, bench, RDL)", med["art"] >= 3, str(med))
+    check("art layer: the designer's full set is mapped (>= 39 of 40 lifts)", med["art"] >= 39, str(med))
+    artm = page.evaluate("""() => { const A = window.SLIMTUCCI_ART, v = Object.values(A.items);
+        return { webp: v.every(a => /^[a-z0-9-]+\\.webp$/.test(a.f) && /^lg\\/[a-z0-9-]+\\.webp$/.test(a.lg) && a.p), svg: v.some(a => /svg$/.test(a.f)),
+                 lat: window.SlimTucci.media('Dumbbell Lateral Raise').p.join(' '), chips: Object.keys(A.chips).length }; }""")
+    check("art manifest: card + detail WebP for every drawn lift, manifest muscles, no superseded SVG samples", artm["webp"] and not artm["svg"] and artm["chips"] >= 12, str(artm))
+    check("manifest muscles override free-exercise-db (Lateral Raise -> side delts)", artm["lat"] == "sdelt", str(artm))
     cols = page.evaluate("() => getComputedStyle(document.getElementById('exGrid')).gridTemplateColumns.split(' ').length")
     check("grid: 2 columns on a 390px phone", cols == 2, str(cols))
     overflow = page.evaluate("() => document.scrollingElement.scrollWidth")
@@ -159,6 +164,20 @@ with sync_playwright() as p:
     art3 = page.locator("#exGrid .exg", has=page.locator(".exg-art.art"))
     for nm in ["Barbell Back Squat", "Barbell Bench Press"]: check(f"search 'barbell' keeps working ({nm} card)", page.locator("#exGrid .exg .pr-name", has_text=nm).count() >= 1)
     page.fill("#exQ", ""); page.wait_for_timeout(100)
+    page.fill("#exQ", "barbell"); page.wait_for_timeout(150); page.locator("#exGrid .exg").first.wait_for()
+    page.wait_for_function("() => [...document.querySelectorAll('#exGrid .exg-art.art .exg-ill')].slice(0,4).every(i => i.complete && i.naturalWidth >= 400)", timeout=15000)
+    check("art cards load the designer WebP renders (400 px)", page.locator("#exGrid .exg-art.art .exg-ill[src$='.webp']").count() >= 4)
+    page.fill("#exQ", ""); page.wait_for_timeout(100)
+    if SHOTS:  # 2-column phone grid of new art cards (cards cloned from the real grid)
+        page.evaluate("""async () => { const want = ['Barbell Bench Press', 'Barbell Back Squat', 'Romanian Deadlift', 'Dumbbell Lateral Raise', 'Pull-Up', 'Kettlebell Swing'];
+          const cs = [];
+          for (const w of want) { document.getElementById('exQ').value = w; document.getElementById('exQ').dispatchEvent(new Event('input', {bubbles: true}));
+            await new Promise(r => setTimeout(r, 120)); const c = [...document.querySelectorAll('#exGrid .exg')].find(c => c.querySelector('.pr-name').firstChild.textContent.trim() === w); if (c) { const k = c.cloneNode(true); k.querySelectorAll('img').forEach(i => i.loading = 'eager'); cs.push(k); } }
+          document.getElementById('exQ').value = ''; document.getElementById('exQ').dispatchEvent(new Event('input', {bubbles: true})); await new Promise(r => setTimeout(r, 120));
+          const g = document.getElementById('exGrid'), n = document.createElement('div'); n.id = 'artGrid'; n.className = g.className; cs.forEach(c => n.appendChild(c)); const r = document.getElementById('exResults'); [...r.children].forEach(x => { if (!x.classList.contains('list-count')) x.remove(); }); r.appendChild(n); const mc = document.querySelector('.mchips'); if (mc) mc.scrollLeft = 0; window.scrollTo(0, 0); }""")
+        page.wait_for_function("() => [...document.querySelectorAll('#artGrid .exg-ill')].every(i => i.complete && i.naturalWidth > 0)", timeout=15000)
+        page.wait_for_timeout(200); shot(page, "26-ex-art-grid.png")
+        page.goto(BASE + "#/today"); page.goto(BASE + "#/exercises"); page.wait_for_selector("#exGrid .exg")
     if SHOTS:  # squat / bench / RDL drawing cards side by side
         page.evaluate("""() => { const want = ['Barbell Back Squat', 'Barbell Bench Press', 'Romanian Deadlift'];
           const g = document.getElementById('exGrid'); const cs = [...g.querySelectorAll('.exg')].filter(c => want.includes(c.querySelector('.pr-name').firstChild.textContent.trim()));
@@ -184,13 +203,20 @@ with sync_playwright() as p:
         p: document.getElementById('exdPrimary').textContent, s: document.getElementById('exdSecondary').textContent, eq: document.getElementById('exdEquip').textContent,
         hams: getComputedStyle(document.querySelector('.exd-map g[data-m="hams"]')).fill || document.querySelector('.exd-map g[data-m="hams"]').getAttribute('fill'),
         saved: document.querySelector('.exd-save').getAttribute('aria-pressed'), demo: !!document.getElementById('watchDemo'), cues: document.getElementById('exNotes').value.startsWith('• ') })""")
-    check("detail: drawing + both photos as frames (Drawing / Start / Finish)", len(det["imgs"]) == 3 and det["imgs"][0].startswith("img/art/") and det["btns"] == ["Drawing", "Start", "Finish"], str(det["imgs"]))
-    check("detail: big front/back map, primary/secondary muscles + equipment", det["p"] == "Hamstrings" and "Glutes" in det["s"] and det["eq"] == "Barbell" and "229" in det["hams"].replace(" ", "") or det["hams"] in ("#e5484d", "rgb(229, 72, 77)"), str(det))
+    check("detail: drawing + both photos as frames (Drawing / Start / Finish)", len(det["imgs"]) == 3 and det["imgs"][0].startswith("img/art/lg/") and det["imgs"][0].endswith(".webp") and det["btns"] == ["Drawing", "Start", "Finish"], str(det["imgs"]))
+    check("detail: big front/back map, primary/secondary muscles + equipment", det["p"] == "Hamstrings, Glutes" and "Lower back" in det["s"] and det["eq"] == "Barbell" and ("229" in det["hams"].replace(" ", "") or det["hams"] in ("#e5484d", "rgb(229, 72, 77)")), str(det))
     check("detail keeps cues + YouTube demo, shows saved state", det["demo"] and det["cues"] and det["saved"] == "true")
     page.click('.exd-frames button:has-text("Start")'); page.wait_for_timeout(600)
     check("frame toggle shows the start photo", page.evaluate("() => document.querySelector('#exdMedia .exd-f.on').getAttribute('src')").endswith("-0.webp"))
     page.evaluate("window.scrollTo(0,0)"); page.wait_for_timeout(100)
     shot(page, "23-ex-detail.png")
+    page.goto(BASE + "#/exercises"); page.wait_for_selector("#exGrid .exg"); page.fill("#exQ", "barbell bench press"); page.wait_for_timeout(100)
+    page.locator("#exGrid .exg", has=page.locator(".pr-name", has_text="Barbell Bench Press")).first.locator(".exg-info").click(); page.wait_for_selector("#exdMedia")
+    page.wait_for_function("() => { const i = document.querySelector('#exdMedia .exd-f.on'); return i && i.complete && i.naturalWidth >= 800; }", timeout=15000)
+    bd = page.evaluate("() => ({ src: document.querySelector('#exdMedia .exd-f.on').getAttribute('src'), lazy: document.querySelector('#exdMedia .exd-f.on').loading, p: document.getElementById('exdPrimary').textContent, s: document.getElementById('exdSecondary').textContent })")
+    check("detail art: large designer WebP (lazy) + manifest muscles (Bench: Chest / Front Delts, Triceps)", bd["src"] == "img/art/lg/barbell-bench-press.webp" and bd["lazy"] == "lazy" and bd["p"] == "Chest" and "Triceps" in bd["s"], str(bd))
+    page.evaluate("window.scrollTo(0,0)"); page.wait_for_timeout(100)
+    shot(page, "27-ex-art-detail.png")
     page.goto(BASE + "#/exercises"); page.wait_for_selector("#exGrid .exg"); page.fill("#exQ", "lateral shuffle"); page.wait_for_timeout(100)
     page.locator("#exGrid .exg .exg-info").first.click(); page.wait_for_selector("#exdMedia")
     check("diagram-only detail: large body map (no photo)", page.locator("#exdMedia.diagram .exd-map.big svg").count() == 1 and page.locator("#exdMedia img").count() == 0)

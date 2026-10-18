@@ -51,13 +51,18 @@ Go to More → Export JSON to download `slimtucci-diary-YYYY-MM-DD.json`. Use Im
 - The code is write-only (it can't read anything back). It lives in its own key `localStorage['slimtucci-dashsync-v1']` and is never part of Export. `config.js` holds `DASHBOARD_URL`. Disconnect on the same screen.
 - `tests/e2e_test.py` now pins `config.js` to the "nothing configured" state for the fresh-install checks (the live config points at the Worker since v7), reads the SW version from `sw.js`, and tests Dashboard sync against a mocked endpoint (connect, payload shape, debounce, on-open, Export exclusion, revoked code, disconnect).
 
-## Exercises grid (v9)
+## Exercises grid (v9/v10)
 - Cards show a SlimTucci drawing (img/art/, `art-manifest.js`), else a public-domain photo (img/ex/, from
   [free-exercise-db](https://github.com/yuhonas/free-exercise-db), Unlicense), else our own SVG body map (`bodymap.js`).
 - `exercise-media.js` (photo slug + primary/secondary muscles per library item) is built by
   `python3 tools/build_media.py /path/to/free-exercise-db` (hand-checked ALIAS table; match list in `tools/media_matches.txt`).
-- New drawings: drop `<exercise-name-in-kebab-case>.svg` into `/workspace/business-ops/exercise-art/full/` (chip icons into `.../chips/`),
-  run `python3 tools/build_art.py` (add `--badge` to also show the muscle badge on drawings), bump `VERSION` in `sw.js`, deploy.
-  Names that don't match the library are listed by the script; map them in `exercise-art/aliases.json` as `{"slug": "Library Name"}`.
+- Designer art (v10): `/workspace/business-ops/exercise-art/full/manifest.json` + `<slug>.png` / `<slug>-400.png`.
+  `tools/build_art.py` turns each lift into `img/art/<library-name>.webp` (card, 400 px, <= 40 KB) and `img/art/lg/<library-name>.webp`
+  (detail, <= 120 KB), and the manifest's primary/secondary muscles override free-exercise-db for that exercise's map and target line.
+  Chip icons come from `samples/v2/chips/` (falls back to `samples/chips/`; `full/chips/` wins if present).
+  Slugs are matched by manifest display name, then `tools/art_aliases.json` (or `exercise-art/aliases.json`). Anything else is listed as NOT matched (never guessed).
+- **After the designer adds or overwrites art, one command:**
+  `cd /workspace/wd-deploy && python3 tools/build_art.py` (add `--badge` for the muscle badge on drawings), then bump `VERSION` in `sw.js` and deploy.
+  An unknown muscle name in the manifest stops the build and names it, so you can add it to `MUSCLE` in the script.
 - Images are lazy-loaded and cached on first view; they are not precached by the service worker.
 - Bookmarks live in `settings.favs` (normalized exercise names) inside the existing diary data.
