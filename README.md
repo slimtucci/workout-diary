@@ -60,7 +60,7 @@ Go to More → Export JSON to download `slimtucci-diary-YYYY-MM-DD.json`. Use Im
   `tools/build_art.py` turns each lift into `img/art/<library-name>.webp` (card, 400 px, <= 40 KB) and `img/art/lg/<library-name>.webp`
   (detail, <= 120 KB), and the manifest's primary/secondary muscles override free-exercise-db for that exercise's map and target line.
   Chip icons come from `samples/v2/chips/` (falls back to `samples/chips/`; `full/chips/` wins if present).
-  Slugs are matched by manifest display name, then `tools/art_aliases.json` (or `exercise-art/aliases.json`). Anything else is listed as NOT matched (never guessed).
+  Slugs are matched by manifest display name, then `tools/art_aliases.json` (or `exercise-art/aliases.json`). Anything else is listed as NOT matched (never guessed). All 40 lifts map as of v11 (dips -> Chest Dip).
 - **After the designer adds or overwrites art, one command:**
   `cd /workspace/wd-deploy && python3 tools/build_art.py` (add `--badge` for the muscle badge on drawings), then bump `VERSION` in `sw.js` and deploy.
   An unknown muscle name in the manifest stops the build and names it, so you can add it to `MUSCLE` in the script.

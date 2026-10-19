@@ -1,5 +1,5 @@
 {
-  "_note": "Hand-checked: art slug -> exercise library name, for art whose manifest display name isn't a library name. Checked against each render + equipment. 'dips' is deliberately NOT mapped (upright parallel-bar dip; the library only has Chest/Bench/Ring/Weighted/Machine Dip) - add it here once decided.",
+  "_note": "Hand-checked: art slug -> exercise library name, for art whose manifest display name isn't a library name. Checked against each render + equipment. 'dips' -> Chest Dip approved by Alexander (Oct 19).",
   "incline-dumbbell-press": "Incline Dumbbell Bench Press",
   "cable-crossover": "Cable Fly",
   "deadlift": "Conventional Deadlift",
@@ -9,5 +9,6 @@
   "overhead-triceps-extension": "Overhead Dumbbell Triceps Extension",
   "back-squat": "Barbell Back Squat",
   "walking-lunge": "Dumbbell Walking Lunge",
-  "plank": "Front Plank"
+  "plank": "Front Plank",
+  "dips": "Chest Dip"
 }

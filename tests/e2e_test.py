@@ -118,7 +118,7 @@ with sync_playwright() as p:
     page.fill("#exQ", ""); page.wait_for_timeout(100)
     med = page.evaluate("() => ({ n: window.SlimTucci.mediaCount(), lib: window.SlimTucci.libSize, items: (window.SLIMTUCCI_MEDIA||{}).items.length, art: Object.keys((window.SLIMTUCCI_ART||{}).items||{}).length })")
     check("media layer: 300+ of 627 movements matched to a public-domain photo, index-aligned", med["items"] == med["lib"] == 627 and med["n"] >= 300, str(med))
-    check("art layer: the designer's full set is mapped (>= 39 of 40 lifts)", med["art"] >= 39, str(med))
+    check("art layer: the designer's full set is mapped (40 of 40 lifts)", med["art"] >= 40, str(med))
     artm = page.evaluate("""() => { const A = window.SLIMTUCCI_ART, v = Object.values(A.items);
         return { webp: v.every(a => /^[a-z0-9-]+\\.webp$/.test(a.f) && /^lg\\/[a-z0-9-]+\\.webp$/.test(a.lg) && a.p), svg: v.some(a => /svg$/.test(a.f)),
                  lat: window.SlimTucci.media('Dumbbell Lateral Raise').p.join(' '), chips: Object.keys(A.chips).length }; }""")
@@ -217,6 +217,13 @@ with sync_playwright() as p:
     check("detail art: large designer WebP (lazy) + manifest muscles (Bench: Chest / Front Delts, Triceps)", bd["src"] == "img/art/lg/barbell-bench-press.webp" and bd["lazy"] == "lazy" and bd["p"] == "Chest" and "Triceps" in bd["s"], str(bd))
     page.evaluate("window.scrollTo(0,0)"); page.wait_for_timeout(100)
     shot(page, "27-ex-art-detail.png")
+    page.goto(BASE + "#/exercises"); page.wait_for_selector("#exGrid .exg"); page.fill("#exQ", "chest dip"); page.wait_for_timeout(150)
+    cd = page.locator("#exGrid .exg", has=page.locator(".pr-name", has_text="Chest Dip")).first
+    cd.locator(".exg-art.art .exg-ill").wait_for(timeout=10000)
+    page.wait_for_function("() => { const i = document.querySelector('#exGrid .exg-art.art .exg-ill[src=\"img/art/chest-dip.webp\"]'); return i && i.complete && i.naturalWidth >= 400; }", timeout=15000)
+    check("Chest Dip card shows the designer's dips art (alias dips -> Chest Dip)", cd.locator(".exg-ill").get_attribute("src") == "img/art/chest-dip.webp")
+    if SHOTS: cd.screenshot(path=os.path.join(SHOTS, PREFIX + "28-ex-chest-dip-card.png"))
+    page.fill("#exQ", ""); page.wait_for_timeout(100)
     page.goto(BASE + "#/exercises"); page.wait_for_selector("#exGrid .exg"); page.fill("#exQ", "lateral shuffle"); page.wait_for_timeout(100)
     page.locator("#exGrid .exg .exg-info").first.click(); page.wait_for_selector("#exdMedia")
     check("diagram-only detail: large body map (no photo)", page.locator("#exdMedia.diagram .exd-map.big svg").count() == 1 and page.locator("#exdMedia img").count() == 0)
